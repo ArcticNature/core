@@ -1,5 +1,5 @@
 {
-  "name": "core:model:options",
+  "name": "core.model.options",
   "type": "c++",
 
   "targets": {
