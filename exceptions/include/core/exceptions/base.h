@@ -141,6 +141,9 @@ namespace exception {
   //! Thrown when a method that has not been implemented is called.
   MSG_EXCEPTION(SfException, NotImplemented);
 
+  //! Thrown when an operation that is not permitted is attempted.
+  NO_ARG_EXCEPTION(SfException, OperationNotPermitted);
+
   //! Thrown when a requested service was not found.
   MSG_EXCEPTION(SfException, ServiceNotFound);
 

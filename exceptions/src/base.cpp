@@ -25,6 +25,7 @@ using sf::core::exception::InvalidCommandLine;
 using sf::core::exception::InvalidDaemonSession;
 using sf::core::exception::InvalidValueOperation;
 using sf::core::exception::NotImplemented;
+using sf::core::exception::OperationNotPermitted;
 using sf::core::exception::ServiceNotFound;
 using sf::core::exception::SocketException;
 using sf::core::exception::UnrecognisedEvent;
@@ -119,6 +120,10 @@ NO_ARG_DEFINITION(
 NO_ARG_DEFINITION(
     SfException, ImpossiblePath, -3,
     "An invalid system state has been reached."
+);
+NO_ARG_DEFINITION(
+    SfException, OperationNotPermitted, -22,
+    "The requested operation is not allowed within the context."
 );
 NO_ARG_DEFINITION(
     SfException, UnsupportedMode, -4,

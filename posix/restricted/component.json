@@ -1,0 +1,12 @@
+{
+  "name": "core.posix.restricted",
+  "type": "c++",
+
+  "deps": ["core.interface.posix"],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
