@@ -1,0 +1,15 @@
+{
+  "name": "core.posix.user",
+  "type": "c++",
+
+  "deps": [
+    "core.interface.posix",
+    "core.utility.string"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

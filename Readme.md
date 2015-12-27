@@ -54,6 +54,12 @@ Components
   * `core.protocol.spawner`:
     The protocols used by the Manager and Spawner to interact with each other.
 
+
+### Utilities
+
+  * `core.utility.string`: String related utilities.
+
+
 ### Posix
 
   * `core.posix.restricted`: Posix implementation used in the Spawner.
