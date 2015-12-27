@@ -1,10 +1,6 @@
 {
-  "name": "core.model.options",
+  "name": "core.exceptions",
   "type": "c++",
-
-  "deps": [
-    "core.exceptions"
-  ],
 
   "targets": {
     "debug": { "type": "lib" },

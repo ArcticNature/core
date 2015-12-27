@@ -28,6 +28,10 @@ namespace model {
     bool getBoolean(std::string name);
     int  getInteger(std::string name);
     std::string getString(std::string name);
+
+    void setBoolean(std::string name, bool value);
+    void setInteger(std::string name, int value);
+    void setString(std::string name, std::string value);
   };
 
 }  // namespace model
