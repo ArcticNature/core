@@ -1,0 +1,12 @@
+{
+  "name": "core.model.logger",
+  "type": "c++",
+
+  "deps": ["core.utility.string"],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
