@@ -1,0 +1,14 @@
+{
+  "name": "core.model.cli-parser",
+  "type": "c++",
+
+  "deps": [
+    "core.model.options"
+  ],
+
+  "targets": {
+    "debug": { "type": "lib" },
+    "release": { "type": "lib" },
+    "test": { "type": "lib" }
+  }
+}

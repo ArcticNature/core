@@ -6,6 +6,7 @@ This repository contains the core SnowFox components.
 Component groups
 ----------------
 
+  * `core.exceptions`: Definitions of exceptions used throughout the SnowFox.
   * `core.interface`:
       Interfaces are components that define how other components interact
       among each other and define the overall architecture of the system.
