@@ -1,0 +1,5 @@
+{
+  "debug": 1,
+  "default-log-format": "${level} ${<now>} ${file} -> ${function} -> L${line} ==> ${message}",
+  "trap-sigint": 0
+}

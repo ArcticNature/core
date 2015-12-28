@@ -1,0 +1,21 @@
+{
+  "name": "core.compile-time",
+  "type": "templates",
+
+  "defaults": "data/defaults.json",
+  "templates": {
+    "include/core/compile-time/options.h": "templates/options.h"
+  },
+
+  "targets": {
+    "release": {},
+
+    "debug": { "data": {
+      "include/core/compile-time/options.h": "data/debug/options.json"
+    } },
+
+    "test": { "data": {
+      "include/core/compile-time/options.h": "data/test/options.json"
+    } }
+  }
+}

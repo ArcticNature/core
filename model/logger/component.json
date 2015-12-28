@@ -2,7 +2,10 @@
   "name": "core.model.logger",
   "type": "c++",
 
-  "deps": ["core.utility.string"],
+  "deps": [
+    "core.compile-time",
+    "core.utility.string"
+  ],
 
   "targets": {
     "debug":   { "type": "lib" },

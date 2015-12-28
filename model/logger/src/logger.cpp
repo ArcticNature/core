@@ -5,10 +5,9 @@
 #include <sstream>
 #include <string>
 
+#include "core/compile-time/options.h"
 #include "core/model/logger/console.h"
 #include "core/utility/string.h"
-
-#define DEFAULT_LOG_FORMAT "${level} ${<now>} ${file} -> ${function} -> L${line} ==> ${message}"  // NOLINT(whitespace/line_length)
 
 using sf::core::model::ConsoleLogger;
 using sf::core::model::Logger;
