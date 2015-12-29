@@ -15,6 +15,11 @@ Component groups
       SnowFox (daemon, clients, and everything related).
   * `core.posix`: Different posix implementations.
   * `core.protocol`: The definition files for communication portocols.
+  * `core.registry`:
+      Components to store registires of different implementations of the
+      interfaces.
+      This is helpful to inject concrete classes without an explicit
+      dependency between components.
   * `core.utility`: Miscellaneous utility components.
 
 
@@ -40,7 +45,6 @@ interfaces.
   * `core.interface.lifecycle`: The lifecycle system implementation.
   * `core.interface.context`: Container for all changeable settings.
   * `core.interface.posix`: Interface to Linux posix API.
-  * `core.interface.registry`: Generic container for injectable instances.
   * `core.interface.static-context`: Container for all fixed settings.
 
 
@@ -68,6 +72,12 @@ interfaces.
     The public protocol for clients to interact with the daemon.
   * `core.protocol.spawner`:
     The protocols used by the Manager and Spawner to interact with each other.
+
+
+### Registries
+
+  * `core.registry.base`: Generic container for injectable instances.
+  * `core.registry.cli-parser`: Regisrty for command line parsers.
 
 
 ### Utilities

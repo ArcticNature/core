@@ -120,6 +120,9 @@ namespace exception {
   //! Thrown by the injection system when an injection has occurred already.
   MSG_EXCEPTION(SfException, DuplicateInjection);
 
+  //! Thrown when a requested factory was not registered.
+  MSG_EXCEPTION(SfException, FactoryNotFound);
+
   //! Thrown when an invalid file is being used.
   MSG_EXCEPTION(SfException, FileError);
 

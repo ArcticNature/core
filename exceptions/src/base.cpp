@@ -18,6 +18,7 @@ using sf::core::exception::ContextUninitialised;
 using sf::core::exception::CorruptedData;
 using sf::core::exception::DuplicateInjection;
 using sf::core::exception::ErrNoException;
+using sf::core::exception::FactoryNotFound;
 using sf::core::exception::FileError;
 using sf::core::exception::ForkFailed;
 using sf::core::exception::GroupNotFound;
@@ -101,6 +102,7 @@ int UnrecognisedEvent::getCode() {
 MSG_DEFINITION(SfException, CorruptedData, -10);
 MSG_DEFINITION(SfException, ContextUninitialised, -23);
 MSG_DEFINITION(SfException, DuplicateInjection, -18);
+MSG_DEFINITION(SfException, FactoryNotFound, -24);
 MSG_DEFINITION(SfException, FileError, -11);
 MSG_DEFINITION(SfException, GroupNotFound, -12);
 MSG_DEFINITION(SfException, InvalidCommandLine, -13);
