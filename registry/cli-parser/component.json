@@ -1,0 +1,15 @@
+{
+  "name": "core.registry.cli-parser",
+  "type": "c++",
+
+  "deps": [
+    "core.model.cli-parser",
+    "core.registry.base"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
