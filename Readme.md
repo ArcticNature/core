@@ -6,6 +6,7 @@ This repository contains the core SnowFox components.
 Component groups
 ----------------
 
+  * `core.context`: Components to store the different execution contexts.
   * `core.interface`:
       Interfaces are components that define how other components interact
       among each other and define the overall architecture of the system.
@@ -20,11 +21,26 @@ Component groups
 Components
 ----------
 
+
+### Contexts
+Contexts are a way to do dependency injection.
+A context is a container for a set of intefraces that are used by the system
+and are populated at the start with the appropriate instances of concrete
+interfaces.
+
+  * `core.context.dynamic`: Evolving and configurable context for the manager.
+  * `core.context.static`: Fixed context for all processes.
+
+  * `core.context.manager`: Extension of the static context for the Manager.
+  * `core.context.spawner`: Extension of the static context for the Spawner.
+
+
 ### Interfaces
 
   * `core.interface.lifecycle`: The lifecycle system implementation.
   * `core.interface.context`: Container for all changeable settings.
-  * `core.interface.posix`: Iinterface to Linux posix API.
+  * `core.interface.posix`: Interface to Linux posix API.
+  * `core.interface.registry`: Generic container for injectable instances.
   * `core.interface.static-context`: Container for all fixed settings.
 
 
@@ -56,6 +72,7 @@ Components
 
 ### Utilities
 
+  * `core.utility.forker`: Base class for forking into multiple processes.
   * `core.utility.string`: String related utilities.
 
 

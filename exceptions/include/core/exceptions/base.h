@@ -111,6 +111,9 @@ namespace exception {
   //! Thrown when the process wants to terminate cleanly.
   NO_ARG_EXCEPTION(SfException, CleanExit);
 
+  //! Thrown when an unitialised context variable is accessed.
+  MSG_EXCEPTION(SfException, ContextUninitialised);
+
   //! Thrown when corrupted data is read by the system.
   MSG_EXCEPTION(SfException, CorruptedData);
 

@@ -14,6 +14,7 @@ using sf::core::exception::SfException;
 
 using sf::core::exception::ChannelEmpty;
 using sf::core::exception::CleanExit;
+using sf::core::exception::ContextUninitialised;
 using sf::core::exception::CorruptedData;
 using sf::core::exception::DuplicateInjection;
 using sf::core::exception::ErrNoException;
@@ -98,6 +99,7 @@ int UnrecognisedEvent::getCode() {
 
 
 MSG_DEFINITION(SfException, CorruptedData, -10);
+MSG_DEFINITION(SfException, ContextUninitialised, -23);
 MSG_DEFINITION(SfException, DuplicateInjection, -18);
 MSG_DEFINITION(SfException, FileError, -11);
 MSG_DEFINITION(SfException, GroupNotFound, -12);

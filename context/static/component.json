@@ -1,0 +1,19 @@
+{
+  "name": "core.context.static",
+  "type": "c++",
+
+  "deps": [
+    "core.compile-time",
+    "core.exceptions",
+    "core.interface.posix"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": ["core.posix.test"],
+      "type": "lib"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "core.utility.forker",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static",
+    "core.exceptions",
+    "core.interface.posix"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": ["core.posix.test"],
+      "type": "lib"
+    }
+  }
+}

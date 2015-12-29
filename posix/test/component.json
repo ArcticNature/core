@@ -1,0 +1,10 @@
+{
+  "name": "core.posix.test",
+  "type": "c++",
+
+  "deps": ["core.interface.posix"],
+
+  "targets": {
+    "test": { "type": "lib" }
+  }
+}
