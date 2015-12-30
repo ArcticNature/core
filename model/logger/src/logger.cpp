@@ -9,6 +9,8 @@
 #include "core/model/logger/console.h"
 #include "core/utility/string.h"
 
+#define FALLBACK_PREFIX "[Fallback] "
+
 using sf::core::model::ConsoleLogger;
 using sf::core::model::Logger;
 using sf::core::model::LogLevel;
@@ -27,11 +29,12 @@ std::string LEVEL_NAMES[] = {
 std::shared_ptr<Logger> sf::core::model::Logger::fallback_instance;
 
 Logger* Logger::fallback() {
-  Logger* logger = Logger::fallback_instance.get();
-  if (logger == nullptr) {
-    logger = new ConsoleLogger("[F]" DEFAULT_LOG_FORMAT);
+  if (Logger::fallback_instance.get() == nullptr) {
+    Logger::fallback_instance = std::shared_ptr<Logger>(
+        new ConsoleLogger(FALLBACK_PREFIX DEFAULT_LOG_FORMAT)
+    );
   }
-  return logger;
+  return Logger::fallback_instance.get();
 }
 
 

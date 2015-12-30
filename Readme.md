@@ -6,6 +6,7 @@ This repository contains the core SnowFox components.
 Component groups
 ----------------
 
+  * `core.bin`: Components for core binaries.
   * `core.context`: Components to store the different execution contexts.
   * `core.interface`:
       Interfaces are components that define how other components interact
@@ -25,6 +26,17 @@ Component groups
 
 Components
 ----------
+
+
+### Binaries
+
+  * `core.bin.daemon`:
+      Main SnowFox executable for environment setup and daemon processes
+      orchestration.
+  * `core.bin.manager`: Unprivileged process with the logic of the system
+  * `core.bin.spawner`:
+      Privileged process for restricted operations on behalf of the
+      Manager process.
 
 
 ### Contexts

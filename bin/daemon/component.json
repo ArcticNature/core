@@ -1,0 +1,19 @@
+{
+  "name": "core.bin.daemon",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static",
+    "core.exceptions",
+    "core.model.cli-parser",
+    "core.model.logger",
+    "core.posix.restricted",
+    "core.registry.cli-parser"
+  ],
+
+  "targets": {
+    "debug":   { "type": "bin" },
+    "release": { "type": "bin" },
+    "test":    { "type": "bin" }
+  }
+}

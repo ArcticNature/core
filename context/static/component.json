@@ -5,7 +5,8 @@
   "deps": [
     "core.compile-time",
     "core.exceptions",
-    "core.interface.posix"
+    "core.interface.posix",
+    "core.model.cli-parser"
   ],
 
   "targets": {

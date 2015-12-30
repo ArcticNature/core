@@ -4,6 +4,7 @@
 
 #include "core/compile-time/options.h"
 #include "core/interface/posix.h"
+#include "core/model/cli-parser.h"
 
 
 namespace sf {
@@ -18,6 +19,7 @@ namespace context {
    */
   class Static {
    public:
+    static sf::core::model::CLIParser* parser();
     static sf::core::interface::Posix* posix();
 
     //! Initialise the context at process start.
@@ -25,6 +27,9 @@ namespace context {
      * @param posix The posix implementation to inject in the process.
      */
     static void initialise(sf::core::interface::Posix* posix);
+
+    //! Set the CLIParser instance in use.
+    static void parser(sf::core::model::CLIParser* parser);
 
 #ifdef DEBUG_BUILD
     static void reset();
