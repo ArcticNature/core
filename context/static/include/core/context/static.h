@@ -31,7 +31,7 @@ namespace context {
     //! Set the CLIParser instance in use.
     static void parser(sf::core::model::CLIParser* parser);
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
     static void reset();
 #endif  // DEBUG_BUILD
   };

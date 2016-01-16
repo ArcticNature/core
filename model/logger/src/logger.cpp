@@ -92,7 +92,7 @@ std::string Logger::formatMessage(
 
   buffer << format.substr(prev);
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
   if (vars.find("trace") != vars.end()) {
     buffer << " Trace: " << vars["trace"];
   }

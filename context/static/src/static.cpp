@@ -55,7 +55,7 @@ void Static::parser(CLIParser* parser) {
 
 // Some methods should not be used in release versions but
 // are needed for tests and could be helpful for debugging.
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
 
 void Static::reset() {
   parser_ref  = std::shared_ptr<CLIParser>();

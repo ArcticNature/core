@@ -64,7 +64,7 @@ namespace interface {
     //! Triggers an event and passes the given argument to the handlers.
     void trigger(std::string event, BaseLifecycleArg* arg = nullptr);
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
     //! Remove all events and handlers.
     void reset();
 #endif  // DEBUG_BUILD
@@ -81,7 +81,7 @@ namespace interface {
     static void on(std::string event, LifecycleHandlerRef handler);
     static void trigger(std::string event, BaseLifecycleArg* arg = nullptr);
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
     static void reset();
 #endif  // DEBUG_BUILD
   };

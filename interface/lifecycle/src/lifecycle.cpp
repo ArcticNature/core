@@ -72,7 +72,7 @@ void Lifecycle::trigger(std::string event, BaseLifecycleArg* arg) {
 }
 
 
-#ifdef DEBUG_BUILD
+#if DEBUG_BUILD
 void LifecycleInstance::reset() {
   this->handlers.clear();
 }
@@ -81,4 +81,3 @@ void Lifecycle::reset() {
   Lifecycle::getInstance()->reset();
 }
 #endif  // DEBUG_BUILD
-
