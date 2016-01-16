@@ -23,14 +23,14 @@
 class name : public base {          \
  public:                            \
   explicit name(std::string);       \
-  virtual int getCode();            \
+  virtual int getCode() const;      \
 };
 
 #define NO_ARG_EXCEPTION(base, name)  \
 class name : public base {            \
  public:                              \
   name();                             \
-  virtual int getCode();              \
+  virtual int getCode() const;        \
 };
 
 #define CHECK_POSITIVE_ERRNO(function, message, ...)   \
@@ -45,10 +45,10 @@ if (function(__VA_ARGS__) != 0) {                      \
 
 #define MSG_DEFINITION(base, name, code)     \
 name::name(std::string msg) : base(msg) { }  \
-int name::getCode() { return code; }
+int name::getCode() const { return code; }
 
 #define NO_ARG_DEFINITION(base, name, code, message)   \
-int name::getCode() { return code; }                   \
+int name::getCode() const { return code; }             \
 name::name() : base(message) { }
 
 
@@ -81,19 +81,40 @@ namespace exception {
     ~SfException() throw();
 
     //! Returns the error code for this exception.
-    virtual int getCode() = 0;
+    virtual int getCode() const = 0;
     virtual std::string getTrace() const;
+    virtual std::vector<std::string> stackTrace() const;
 
     virtual const char* what() const throw();
   };
 
-  class ErrNoException : virtual public SfException {
+  //! Abort the execution of the process due to an exception.
+  /*!
+   * Instances of this exception take the infirmation of the
+   * original exception.
+   */
+  class AbortException : public SfException {
+   protected:
+    int code;
+
+   public:
+    explicit AbortException(const SfException& origin);
+    AbortException(
+        std::string message, int code,
+        std::vector<std::string> trace
+    );
+
+    virtual int getCode() const;
+  };
+
+  //! Errno based wrapper for C errors.
+  class ErrNoException : public SfException {
    protected:
     int error_number;  //!< Store the errno at the time of creation.
 
    public:
     explicit ErrNoException(std::string message);
-    virtual int getCode();
+    virtual int getCode() const;
   };
 
   class SocketException : virtual public SfException {
@@ -102,7 +123,7 @@ namespace exception {
 
    public:
     SocketException(int code, std::string message);
-    virtual int getCode();
+    virtual int getCode() const;
   };
 
   //! Thrown when a read is attempted on a channel with no data.
@@ -152,6 +173,12 @@ namespace exception {
 
   //! Thrown when a requested service was not found.
   MSG_EXCEPTION(SfException, ServiceNotFound);
+
+  //! Thrown when the handling of an event needs to be interrupted.
+  NO_ARG_EXCEPTION(SfException, StopException);
+
+  //! Thrown when an invalid type is passed to an argument.
+  MSG_EXCEPTION(SfException, TypeError);
 
   //! Thrown when a source receives a request for an unknown event.
   MSG_EXCEPTION(SfException, UnrecognisedEvent);

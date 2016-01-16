@@ -1,10 +1,12 @@
 {
   "name": "core.bin.daemon",
   "type": "c++",
+  "load-all-archives": true,
 
   "deps": [
     "core.context.static",
     "core.exceptions",
+    "core.interface.lifecycle",
     "core.model.cli-parser",
     "core.model.logger",
     "core.posix.restricted",

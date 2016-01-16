@@ -1,0 +1,15 @@
+{
+  "name": "core.interface.lifecycle",
+  "type": "c++",
+
+  "deps": [
+    "core.compile-time",
+    "core.exceptions"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

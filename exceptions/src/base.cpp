@@ -12,6 +12,7 @@
 
 using sf::core::exception::SfException;
 
+using sf::core::exception::AbortException;
 using sf::core::exception::ChannelEmpty;
 using sf::core::exception::CleanExit;
 using sf::core::exception::ContextUninitialised;
@@ -30,9 +31,30 @@ using sf::core::exception::NotImplemented;
 using sf::core::exception::OperationNotPermitted;
 using sf::core::exception::ServiceNotFound;
 using sf::core::exception::SocketException;
+using sf::core::exception::StopException;
+using sf::core::exception::TypeError;
 using sf::core::exception::UnrecognisedEvent;
 using sf::core::exception::UnsupportedMode;
 using sf::core::exception::UserNotFound;
+
+
+AbortException::AbortException(const SfException& origin) : SfException(
+    origin.what()
+) {
+  this->code  = origin.getCode();
+  this->trace = origin.stackTrace();
+}
+
+AbortException::AbortException(
+    std::string message, int code, std::vector<std::string> trace
+) : SfException(message) {
+  this->code  = code;
+  this->trace = trace;
+}
+
+int AbortException::getCode() const {
+  return this->code;
+}
 
 
 SfException::SfException(std::string message) {
@@ -44,6 +66,8 @@ SfException::SfException(std::string message) {
   char** symbols = backtrace_symbols(buffer, total);
 
   for (size_t idx = 0; idx < total; idx++) {
+    // TODO(stefano): consider demangling names in trace for debug mode.
+    // https://panthema.net/2008/0901-stacktrace-demangled/
     this->trace.push_back(std::string(symbols[idx]));
   }
   free(symbols);
@@ -51,13 +75,22 @@ SfException::SfException(std::string message) {
 SfException::~SfException() throw() { }
 
 std::string SfException::getTrace() const {
-  std::stringstream full_trace;
+  if (this->trace.size() == 0) {
+    return "";
+  }
 
-  for (std::vector<std::string>::const_iterator it = this->trace.begin();
-       it != this->trace.end(); it++) {
-    full_trace << *it << std::endl;
+  std::stringstream full_trace;
+  std::vector<std::string>::const_iterator it = this->trace.begin();
+
+  full_trace << *it;
+  for (it++; it != this->trace.end(); it++) {
+    full_trace << std::endl << *it;
   }
   return full_trace.str();
+}
+
+std::vector<std::string> SfException::stackTrace() const {
+  return std::vector<std::string>(this->trace);
 }
 
 const char* SfException::what() const throw() {
@@ -74,7 +107,7 @@ ErrNoException::ErrNoException(std::string message) : SfException(message) {
   this->message = formatter.str();
 }
 
-int ErrNoException::getCode() {
+int ErrNoException::getCode() const {
   return this->error_number;
 }
 
@@ -85,7 +118,7 @@ SocketException::SocketException(int code, std::string message) : SfException(
   this->code = code;
 }
 
-int SocketException::getCode() {
+int SocketException::getCode() const {
   return -3000 * this->code;
 }
 
@@ -94,7 +127,7 @@ UnrecognisedEvent::UnrecognisedEvent(std::string event) : SfException(
     "Received unrecognised event '" + event + "'"
 ) { }
 
-int UnrecognisedEvent::getCode() {
+int UnrecognisedEvent::getCode() const {
   return -1;
 }
 
@@ -110,6 +143,7 @@ NO_ARG_DEFINITION(SfException, InvalidDaemonSession, -14, "setsid failed.");
 MSG_DEFINITION(SfException, InvalidValueOperation, -15);
 MSG_DEFINITION(SfException, NotImplemented, -16);
 MSG_DEFINITION(SfException, ServiceNotFound, -20);
+MSG_DEFINITION(SfException, TypeError, -25);
 MSG_DEFINITION(SfException, UserNotFound, -17);
 
 NO_ARG_DEFINITION(
@@ -128,6 +162,10 @@ NO_ARG_DEFINITION(
 NO_ARG_DEFINITION(
     SfException, OperationNotPermitted, -22,
     "The requested operation is not allowed within the context."
+);
+NO_ARG_DEFINITION(
+    SfException, StopException, -26,
+    "Handling of the event stopped."
 );
 NO_ARG_DEFINITION(
     SfException, UnsupportedMode, -4,
