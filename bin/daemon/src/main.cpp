@@ -33,10 +33,12 @@ int main(int argc, char** argv) {
     // Parse CLI.
     std::string parser_name = CLIParsers::nameParser(argc, argv);
     CLIParser* parser = CLIParsers::Get(parser_name)();
-    parser->parse(&argc, &argv);
 
-    // Add parser to static context.
+    // Prepare to parse.
     Static::parser(parser);
+    CLIParser::configOptions(parser);
+    CLIParser::daemonOptions(parser);
+    parser->parse(&argc, &argv);
 
     // TODO(stefano): run daemon.
 
@@ -53,10 +55,10 @@ int main(int argc, char** argv) {
         "Daemon terminating due to an error: ${error}", vars
     );
 
-    // TODO(stefano): Trigger process::exit lifecycle event.
+    Lifecycle::trigger("process::exit");
     return ex.getCode();
   }
 
-  // TODO(stefano): Trigger process::exit lifecycle event.
+  Lifecycle::trigger("process::exit");
   return 0;
 }
