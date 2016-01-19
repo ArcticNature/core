@@ -8,6 +8,7 @@ Component groups
 
   * `core.bin`: Components for core binaries.
   * `core.context`: Components to store the different execution contexts.
+  * `core.event`: Componets that form the base of the event model.
   * `core.interface`:
       Interfaces are components that define how other components interact
       among each other and define the overall architecture of the system.
@@ -51,6 +52,8 @@ interfaces.
   * `core.context.manager`: Extension of the static context for the Manager.
   * `core.context.spawner`: Extension of the static context for the Spawner.
 
+### Events
+
 
 ### Interfaces
 
@@ -64,12 +67,9 @@ interfaces.
 
   * `core.model.cli-parser`: Definition of a command line parser.
   * `core.model.connector`: Definition of a Spawner interface to processes.
-  * `core.model.event`: Definition of an event that travels the system.
-  * `core.model.event.drain`:
-      Definition of an event drain, a way for events to send responses.
-  * `core.model.event.manager`:
-      Definition of an event manager (manages sources and fetches events).
-  * `core.model.event.source`: Definition of and event source.
+  * `core.model.event`:
+      Base classes and features that form the event's subsystem.
+      Contains event, source, drain, and manager.
   * `core.model.logger`: Interface for logging events.
   * `core.model.options`: Access generic variables/options.
   * `core.model.repositoy`: The definition of a repository.
@@ -90,6 +90,8 @@ interfaces.
 
   * `core.registry.base`: Generic container for injectable instances.
   * `core.registry.cli-parser`: Regisrty for command line parsers.
+  * `core.registry.event.managers`: Registry for event managers.
+  * `core.registry.event.sources`: Registry for event sources.
 
 
 ### Utilities

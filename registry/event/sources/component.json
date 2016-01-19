@@ -1,0 +1,15 @@
+{
+  "name": "core.registry.event.sources",
+  "type": "c++",
+
+  "deps": [
+    "core.model.event",
+    "core.registry.base"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

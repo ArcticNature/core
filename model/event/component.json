@@ -1,0 +1,12 @@
+{
+  "name": "core.model.event",
+  "type": "c++",
+
+  "deps": ["core.exceptions"],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
