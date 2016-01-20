@@ -1,0 +1,17 @@
+{
+  "name": "core.utility.daemoniser",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+    "core.context.static",
+    "core.interface.posix",
+    "core.utility.forker"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

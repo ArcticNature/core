@@ -41,6 +41,14 @@ int main(int argc, char** argv) {
     parser->parse(&argc, &argv);
 
     // TODO(stefano): run daemon.
+    // 1. Daemonise if needed.
+    // 2. Create UNIX socket for spawner and manager.
+    // 3. Fork spawner.
+    // 4. Drop user.
+    // 5. Disable signal handlers.
+    // 6. Setup event subsystem.
+    // 7. Start manager.
+    // 8. Run event loop.
 
     // NOLINT(whitespace/blank_line)
   } catch (CleanExit& ex) {

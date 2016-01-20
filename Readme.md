@@ -48,7 +48,6 @@ interfaces.
 
   * `core.context.dynamic`: Evolving and configurable context for the manager.
   * `core.context.static`: Fixed context for all processes.
-
   * `core.context.manager`: Extension of the static context for the Manager.
   * `core.context.spawner`: Extension of the static context for the Spawner.
 
@@ -96,6 +95,8 @@ interfaces.
 
 ### Utilities
 
+  * `core.utility.daemoniser`:
+    Base class for instances that want to daemonise themselves.
   * `core.utility.forker`: Base class for forking into multiple processes.
   * `core.utility.string`: String related utilities.
 

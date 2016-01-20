@@ -15,4 +15,4 @@ namespace exception {
 }  // namespace core
 }  // namespace sf
 
-#endif  // CORE_EXCEPTIONS_OPTIONS_H_
+#endif  // CORE_EXCEPTIONS_EVENT_H_

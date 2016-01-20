@@ -2,9 +2,12 @@
 #ifndef CORE_INTERFACE_POSIX_H_
 #define CORE_INTERFACE_POSIX_H_
 
+#include <grp.h>
+#include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
 #include <sys/epoll.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 
@@ -24,6 +27,11 @@ namespace interface {
   class Posix {
    public:
     virtual ~Posix();
+
+    // Environment.
+    virtual int   clearenv(void);
+    virtual char* getenv(const char* name);
+    virtual int   setenv(const char* name, const char* value, int overwrite);
 
     // File descriptors.
     virtual int   close(int fd, bool silent = false);
@@ -61,7 +69,22 @@ namespace interface {
     virtual int sigemptyset(sigset_t* set);
     virtual int sigfillset(sigset_t* set);
     virtual int signalfd(int fd, const sigset_t* mask, int flags);
-    virtual int sigprocmask(int how, const sigset_t* set, sigset_t*old_set);
+    virtual int sigprocmask(int how, const sigset_t* set, sigset_t* old_set);
+
+    // Users.
+    virtual group  getgrnam(const char* name, char** buf);
+    virtual passwd getpwnam(const char* name, char** buf);
+
+    virtual int setgroups(int size, gid_t list[]);
+
+    virtual int setegid(gid_t egid);
+    virtual int seteuid(uid_t euid);
+
+    virtual int setgid(gid_t gid);
+    virtual int setuid(uid_t uid);
+
+    virtual int setregid(gid_t rgid, gid_t egid);
+    virtual int setreuid(uid_t ruid, uid_t euid);
   };
 
 }  // namespace interface

@@ -2,19 +2,40 @@
 #include "core/interface/posix.h"
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/signalfd.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <string>
 
 #include "core/exceptions/base.h"
 
 using sf::core::exception::ErrNoException;
+using sf::core::exception::GroupNotFound;
+using sf::core::exception::UserNotFound;
 using sf::core::interface::Posix;
 
 
 Posix::~Posix() {}
 
+
+// Environment.
+int Posix::clearenv() {
+  return ::clearenv();
+}
+
+char* Posix::getenv(const char* name) {
+  return ::getenv(name);
+}
+
+int Posix::setenv(const char* name, const char* value, int overwrite) {
+  return ::setenv(name, value, overwrite);
+}
+
+
+// File descriptors.
 int Posix::close(int fd, bool silent) {
   int res = ::close(fd);
   if (!silent && res == -1) {
@@ -56,6 +77,7 @@ ssize_t Posix::write(int fd, const void* buf, size_t size) {
 }
 
 
+// Epoll.
 int Posix::epoll_control(
     int epoll_fd, int op, int fd, epoll_event* event
 ) {
@@ -162,4 +184,76 @@ int Posix::sigprocmask(
     throw ErrNoException("Unable to mask signals:");
   }
   return res;
+}
+
+
+// Users.
+struct group Posix::getgrnam(const char* name, char** buf) {
+  size_t bufsize = sysconf(_SC_GETGR_R_SIZE_MAX);
+  if (bufsize == -1) {  /* Value was indeterminate */
+    bufsize = 16384;    /* Should be more than enough */
+  }
+
+  char* buffer = new char[bufsize];
+  *buf = buffer;
+
+  struct group  ginfo;
+  struct group* result;
+  ::getgrnam_r(name, &ginfo, buffer, bufsize, &result);
+
+  if (result == nullptr) {
+    throw GroupNotFound("Unable to find group '" + std::string(name) + "'.");
+  }
+  return ginfo;
+}
+
+struct passwd Posix::getpwnam(const char* name, char** buf) {
+  size_t bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
+  if (bufsize == -1) {  /* Value was indeterminate */
+    bufsize = 16384;    /* Should be more than enough */
+  }
+
+  char* buffer = new char[bufsize];
+  *buf = buffer;
+
+  struct passwd  uinfo;
+  struct passwd* result;
+  getpwnam_r(name, &uinfo, buffer, bufsize, &result);
+
+  if (result == nullptr) {
+    delete [] buffer;
+    throw UserNotFound("Unable to find user '" + std::string(name) + "'.");
+  }
+
+  return uinfo;
+}
+
+int Posix::setgroups(int size, gid_t list[]) {
+  CHECK_POSITIVE_ERRNO(
+    ::setgroups, "Unable to drop secondary groups.", 1, list
+  );
+}
+
+int Posix::setegid(gid_t egid) {
+  CHECK_POSITIVE_ERRNO(::setegid, "Unable to drop effective group.", egid);
+}
+
+int Posix::seteuid(uid_t euid) {
+  CHECK_POSITIVE_ERRNO(::seteuid, "Unable to drop effective user.", euid);
+}
+
+int Posix::setgid(gid_t gid) {
+  CHECK_POSITIVE_ERRNO(::setgid,  "Unable to drop group.", gid);
+}
+
+int Posix::setuid(uid_t uid) {
+  CHECK_POSITIVE_ERRNO(::setuid,  "Unable to drop user.", uid);
+}
+
+int Posix::setregid(gid_t rgid, gid_t egid) {
+  CHECK_POSITIVE_ERRNO(::setregid, "Unable to drop saved group.", egid, egid);
+}
+
+int Posix::setreuid(uid_t ruid, uid_t euid) {
+  CHECK_POSITIVE_ERRNO(::setreuid, "Unable to drop saved user.", euid, euid);
 }

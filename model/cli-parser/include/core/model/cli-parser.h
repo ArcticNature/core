@@ -3,6 +3,7 @@
 #define CORE_MODEL_CLI_PARSER_H_
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "core/model/options.h"
@@ -99,55 +100,57 @@ namespace model {
     bool validate();
   };
 
-  namespace cli {
+namespace cli {
 
-    //! Command line parser option for boolean values.
-    class BoolOption : public CLIOption {
-     protected:
-      bool _default;
-      std::string description;
-      std::string name;
-      bool required;
-      bool set_default;
+  //! Command line parser option for boolean values.
+  class BoolOption : public CLIOption {
+   protected:
+    bool _default;
+    std::string description;
+    std::string name;
+    bool required;
+    bool set_default;
 
-      bool _validate();
+    bool _validate();
 
-     public:
-      BoolOption(
-          std::string name, std::string description,
-          bool _default, bool required=false
-      );
-      BoolOption(
-          std::string name, std::string description, bool required=false
-      );
+   public:
+    BoolOption(
+        std::string name, std::string description,
+        bool _default, bool required = false
+    );
+    BoolOption(
+        std::string name, std::string description,
+        bool required = false
+    );
 
-      void setDefault();
-    };
+    void setDefault();
+  };
 
-    //! Command line parser option for string values.
-    class StringOption : public CLIOption {
-     protected:
-      std::string _default;
-      std::string description;
-      std::string name;
-      bool required;
-      bool set_default;
+  //! Command line parser option for string values.
+  class StringOption : public CLIOption {
+   protected:
+    std::string _default;
+    std::string description;
+    std::string name;
+    bool required;
+    bool set_default;
 
-      bool _validate();
+    bool _validate();
 
-     public:
-      StringOption(
-          std::string name, std::string description,
-          std::string _default, bool required=false
-      );
-      StringOption(
-          std::string name, std::string description, bool required=false
-      );
+   public:
+    StringOption(
+        std::string name, std::string description,
+        std::string _default, bool required = false
+    );
+    StringOption(
+        std::string name, std::string description,
+        bool required = false
+    );
 
-      void setDefault();
-    };
+    void setDefault();
+  };
 
-  }  // namespace cli
+}  // namespace cli
 
 }  // namespace model
 }  // namespace core

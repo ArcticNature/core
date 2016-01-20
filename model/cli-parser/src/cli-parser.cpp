@@ -1,6 +1,9 @@
 // Copyright 2015 Stefano Pogliani <stefano@spogliani.net>
 #include "core/model/cli-parser.h"
 
+#include <string>
+#include <vector>
+
 #include "core/exceptions/base.h"
 #include "core/exceptions/options.h"
 

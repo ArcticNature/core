@@ -1,1 +1,3 @@
 *.swp
+
+utility/daemoniser/tests/fixtures/daemonise.txt
