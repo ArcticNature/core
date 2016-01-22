@@ -4,13 +4,17 @@
   "load-all-archives": true,
 
   "deps": [
+    "core.compile-time",
     "core.context.static",
     "core.exceptions",
     "core.interface.lifecycle",
     "core.model.cli-parser",
+    "core.model.event",
     "core.model.logger",
     "core.posix.restricted",
-    "core.registry.cli-parser"
+    "core.registry.cli-parser",
+    "core.registry.event.managers",
+    "core.utility.daemoniser"
   ],
 
   "targets": {

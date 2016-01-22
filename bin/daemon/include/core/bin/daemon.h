@@ -3,6 +3,8 @@
 #define CORE_BIN_DAEMON_H_
 
 #include <string>
+
+#include "core/model/event.h"
 #include "core/utility/daemoniser.h"
 
 namespace sf {
@@ -12,15 +14,19 @@ namespace bin {
   //! Instances of this class initialise and run the daemon.
   class Daemon : public sf::core::utility::Daemoniser {
    protected:
+    sf::core::model::EventSourceManagerRef sources;
+
+    void cleanEnvironment();
     void daemonise();
     void dropUser();
 
     void createSocket(std::string path);
-    void forkSpawner();
+    void createSockets();
     void forkManager();
+    void forkSpawner();
 
-    void disableSignals();
     void configureEvents();
+    void disableSignals();
 
    public:
     void initialise();

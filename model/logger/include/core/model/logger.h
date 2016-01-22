@@ -96,7 +96,7 @@ namespace model {
 #define LLERROR   sf::core::model::LogLevel::LL_ERROR
 #define LLWARNING sf::core::model::LogLevel::LL_WARNING
 #define LLINFO    sf::core::model::LogLevel::LL_INFO
-#define LLDEBUG   sf::core:Lmodel::LogLevel::LL_DEBUG
+#define LLDEBUG   sf::core::model::LogLevel::LL_DEBUG
 
 #define ERROR(logger, message)   LOG(logger, LLERROR,   message)
 #define WARNING(logger, message) LOG(logger, LLWARNING, message)

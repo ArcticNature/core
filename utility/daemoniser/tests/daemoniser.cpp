@@ -33,6 +33,17 @@ class DaemonTestPosix : public Posix {
 
   bool chdir_called = false;
 
+  bool setgroups_called = false;
+  bool setegid_called = false;
+  bool seteuid_called = false;
+  bool setgid_called = false;
+  bool setuid_called = false;
+  bool setregid_called = false;
+  bool setreuid_called = false;
+
+  gid_t drop_group = -1;
+  uid_t drop_user  = -1;
+
   virtual int chdir(const char* path) {
     this->chdir_called = true;
     EXPECT_STREQ("/some/path", path);
@@ -50,6 +61,43 @@ class DaemonTestPosix : public Posix {
   virtual pid_t setsid() {
     this->setsid_called = true;
     return this->setsid_result;
+  }
+
+  int setgroups(int size, gid_t list[]) {
+    this->setgroups_called = true;
+    return 0;
+  }
+
+  int setegid(gid_t egid) {
+    this->setegid_called = true;
+    return 0;
+  }
+
+  int seteuid(uid_t euid) {
+    this->seteuid_called = true;
+    return 0;
+  }
+
+  int setgid(gid_t gid) {
+    this->drop_group = gid;
+    this->setgid_called = true;
+    return 0;
+  }
+
+  int setuid(uid_t uid) {
+    this->drop_user = uid;
+    this->setuid_called = true;
+    return 0;
+  }
+
+  int setregid(gid_t rgid, gid_t egid) {
+    this->setregid_called = true;
+    return 0;
+  }
+
+  int setreuid(uid_t ruid, uid_t euid) {
+    this->setreuid_called = true;
+    return 0;
   }
 };
 
@@ -114,10 +162,34 @@ TEST_F(DaemoniserTest, DetachParent) {
   ASSERT_THROW(daemoniser.detatchFromParentProcess(), ExitTestException);
 }
 
-// TODO(stefano): DropNoUser
-// TODO(stefano): DropNoGroup
-// TODO(stefano): Mock uid and gid functions and verify calls.
-// TODO(stefano): Check user name resolution
+// This test is usefull to bring attention to changes to the user
+// dropping code, it does not really test it.
+TEST_F(DaemoniserTest, DropUserGroupID) {
+  Daemoniser daemoniser;
+  daemoniser.dropPrivileges(1, 2);
+
+  ASSERT_TRUE(this->posix->setgroups_called);
+  ASSERT_TRUE(this->posix->setegid_called);
+  ASSERT_TRUE(this->posix->seteuid_called);
+  ASSERT_TRUE(this->posix->setgid_called);
+  ASSERT_TRUE(this->posix->setuid_called);
+  ASSERT_TRUE(this->posix->setregid_called);
+  ASSERT_TRUE(this->posix->setreuid_called);
+}
+
+TEST_F(DaemoniserTest, LookupRootRoot) {
+  Daemoniser daemoniser;
+  daemoniser.dropPrivileges("root", "root");
+  ASSERT_EQ(0, this->posix->drop_group);
+  ASSERT_EQ(0, this->posix->drop_user);
+}
+
+TEST_F(DaemoniserTest, LookupRootBin) {
+  Daemoniser daemoniser;
+  daemoniser.dropPrivileges("root", "bin");
+  ASSERT_EQ(1, this->posix->drop_group);
+  ASSERT_EQ(0, this->posix->drop_user);
+}
 
 TEST_F(DaemoniserTest, EnvEmpty) {
   Daemoniser daemoniser;

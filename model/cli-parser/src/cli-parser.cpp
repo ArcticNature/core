@@ -35,6 +35,11 @@ void CLIParser::daemonOptions(CLIParser* parser) {
   parser->addOption(CLIOptionRef(new BoolOption(
       "daemonise", "Run the process in daemon mode", true, true
   )));
+  parser->addOption(CLIOptionRef(new BoolOption(
+      "drop-privileges", "Drop prividelges even when not in daemon mode",
+      false, true
+  )));
+
   parser->addOption(CLIOptionRef(new StringOption(
       "group", "Group for the daemon to run as", "snow-fox", true
   )));
@@ -43,13 +48,13 @@ void CLIParser::daemonOptions(CLIParser* parser) {
   )));
 
   parser->addOption(CLIOptionRef(new StringOption(
-      "stderr", "Redirect stderr to this file", "/dev/null", true
+      "stderr", "Redirect stderr to this file", "", true
   )));
   parser->addOption(CLIOptionRef(new StringOption(
-      "stdin", "Redirect stdin to this file", "/dev/null", true
+      "stdin", "Redirect stdin to this file", "", true
   )));
   parser->addOption(CLIOptionRef(new StringOption(
-      "stdout", "Redirect stdout to this file", "/dev/null", true
+      "stdout", "Redirect stdout to this file", "", true
   )));
   parser->addOption(CLIOptionRef(new StringOption(
       "work-dir", "Change the working directory for the process", ".", true

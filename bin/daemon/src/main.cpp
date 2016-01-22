@@ -1,6 +1,8 @@
 // Copyright 2015 Stefano Pogliani <stefano@spogliani.net>
 #include <string>
 
+#include "core/bin/daemon.h"
+
 #include "core/context/static.h"
 #include "core/exceptions/base.h"
 #include "core/interface/lifecycle.h"
@@ -10,6 +12,8 @@
 
 #include "core/posix/restricted.h"
 #include "core/registry/cli-parser.h"
+
+using sf::core::bin::Daemon;
 
 using sf::core::context::Static;
 using sf::core::exception::CleanExit;
@@ -40,15 +44,10 @@ int main(int argc, char** argv) {
     CLIParser::daemonOptions(parser);
     parser->parse(&argc, &argv);
 
-    // TODO(stefano): run daemon.
-    // 1. Daemonise if needed.
-    // 2. Create UNIX socket for spawner and manager.
-    // 3. Fork spawner.
-    // 4. Drop user.
-    // 5. Disable signal handlers.
-    // 6. Setup event subsystem.
-    // 7. Start manager.
-    // 8. Run event loop.
+    // Run daemon.
+    Daemon daemon;
+    daemon.initialise();
+    daemon.run();
 
     // NOLINT(whitespace/blank_line)
   } catch (CleanExit& ex) {

@@ -13,6 +13,9 @@ namespace sf {
 namespace core {
 namespace model {
 
+  class EventDrain;
+  typedef std::shared_ptr<EventDrain> EventDrainRef;
+
 
   //! Base event definition.
   /**
@@ -80,7 +83,6 @@ namespace model {
     //! Sends a message down the drain.
     virtual void send() = 0;
   };
-  typedef std::shared_ptr<EventDrain> EventDrainRef;
 
 
   //! Manages a set of event drains.
