@@ -28,6 +28,8 @@ namespace bin {
     void configureEvents();
     void disableSignals();
 
+    void loop();
+
    public:
     void initialise();
     void run();

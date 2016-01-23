@@ -107,6 +107,35 @@ void Daemon::disableSignals() {
 }
 
 
+void Daemon::loop() {
+  while (true) {
+    EventRef event;
+
+    try {
+      event = this->sources->wait();
+      if (!event) { continue; }
+      event->handle();
+
+    } catch (CleanExit&) {
+      break;
+
+    } catch (SfException& ex) {
+      if (event) {
+        // TODO(stefano): Find drain to which to send error information.
+        //EventDrainRef drain = event->drain();
+        //if (drain->handleError(&ex)) { continue; }
+      }
+
+      LogInfo vars = { {"error", ex.what()}, {"trace", ex.getTrace()} };
+      ERRORV(
+          Logger::fallback(),
+          "Error (ignored) during run loop. ${error}", vars
+      );
+    }
+  }
+}
+
+
 void Daemon::initialise() {
   INFO(Logger::fallback(), "Initialising daemon.");
 
@@ -133,30 +162,6 @@ void Daemon::initialise() {
 
 void Daemon::run() {
   INFO(Logger::fallback(), "Starting daemon run loop.");
-
-  while (true) {
-    EventRef event;
-
-    try {
-      event = this->sources->wait();
-      if (!event) { continue; }
-      event->handle();
-
-    } catch (CleanExit&) {
-      break;
-
-    } catch (SfException& ex) {
-      if (event) {
-        // TODO(stefano): Find drain to which to send error information.
-        //EventDrainRef drain = event->drain();
-        //if (drain->handleError(&ex)) { continue; }
-      }
-
-      LogInfo vars = { {"error", ex.what()}, {"trace", ex.getTrace()} };
-      ERRORV(
-          Logger::fallback(),
-          "Error (ignored) during run loop. ${error}", vars
-      );
-    }
-  }
+  this->loop();
+  INFO(Logger::fallback(), "Terminating daemon cleanly.");
 }

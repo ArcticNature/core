@@ -15,6 +15,7 @@ using sf::core::model::EventDrain;
 using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventSource;
+using sf::core::model::EventSourceManager;
 
 
 Event::Event(std::string correlation, std::string drain) {
@@ -76,3 +77,6 @@ EventSource::~EventSource() {}
 std::string EventSource::id() const {
   return this->source_id;
 }
+
+
+EventSourceManager::~EventSourceManager() {}

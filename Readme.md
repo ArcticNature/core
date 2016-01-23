@@ -51,8 +51,6 @@ interfaces.
   * `core.context.manager`: Extension of the static context for the Manager.
   * `core.context.spawner`: Extension of the static context for the Spawner.
 
-### Events
-
 
 ### Interfaces
 

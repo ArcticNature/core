@@ -81,13 +81,17 @@ ssize_t Posix::write(int fd, const void* buf, size_t size) {
 int Posix::epoll_control(
     int epoll_fd, int op, int fd, epoll_event* event
 ) {
-  return epoll_ctl(epoll_fd, op, fd, event);
+  int result = ::epoll_ctl(epoll_fd, op, fd, event);
+  if (result == -1) {
+    throw ErrNoException("Epoll control failed:");
+  }
+  return result;
 }
 
 int Posix::epoll_create(int flags) {
-  int fd = epoll_create1(flags);
+  int fd = ::epoll_create1(flags);
   if (fd == -1) {
-    throw ErrNoException("EPoll failed:");
+    throw ErrNoException("EPoll create failed:");
   }
   return fd;
 }
@@ -95,7 +99,11 @@ int Posix::epoll_create(int flags) {
 int Posix::epoll_wait(
     int epfd, epoll_event* events, int max, int timeout
 ) {
-  return ::epoll_wait(epfd, events, max, timeout);
+  int result = ::epoll_wait(epfd, events, max, timeout);
+  if (result == -1) {
+    throw ErrNoException("Epoll wait failed:");
+  }
+  return result;
 }
 
 
