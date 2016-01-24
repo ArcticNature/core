@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "core/event/source/signal.h"
 #include "core/model/event.h"
 #include "core/utility/daemoniser.h"
 
@@ -33,6 +34,18 @@ namespace bin {
    public:
     void initialise();
     void run();
+  };
+
+
+  //! Signal event source for the Daemon process.
+  class DaemonSignalSource : public sf::core::event::SignalSource {
+  protected:
+    sf::core::model::EventRef handleReloadConfig();
+    sf::core::model::EventRef handleState();
+    sf::core::model::EventRef handleStop();
+
+  public:
+    DaemonSignalSource();
   };
 
 }  // namespace bin

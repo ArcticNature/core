@@ -8,15 +8,18 @@
 #include "core/registry/event/managers.h"
 
 using sf::core::bin::Daemon;
+using sf::core::bin::DaemonSignalSource;
 using sf::core::context::Static;
 
 using sf::core::exception::CleanExit;
 using sf::core::exception::SfException;
-
 using sf::core::model::CLIParser;
+
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceManagerRef;
+using sf::core::model::EventSourceRef;
+
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 
@@ -81,12 +84,10 @@ void Daemon::forkSpawner() {
 
 void Daemon::configureEvents() {
   DEBUG(Logger::fallback(), "Setting up event subsystem.");
-
   this->sources = EventSourceManager::instance()->get(
       DAEMON_EVENT_SOURCE_MANAGER
   )();
-
-  // TODO(stefano): Create and attach SignalSource.
+  this->sources->addSource(EventSourceRef(new DaemonSignalSource()));
 }
 
 void Daemon::disableSignals() {

@@ -52,6 +52,12 @@ interfaces.
   * `core.context.spawner`: Extension of the static context for the Spawner.
 
 
+### Events
+Some event components are more then a model and always required:
+
+  * `core.event.source.signal`: Event source triggered by process signals.
+
+
 ### Interfaces
 
   * `core.interface.lifecycle`: The lifecycle system implementation.

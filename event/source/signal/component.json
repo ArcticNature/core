@@ -1,0 +1,16 @@
+{
+  "name": "core.event.source.signal",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static",
+    "core.interface.posix",
+    "core.model.event"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

@@ -6,6 +6,7 @@
   "deps": [
     "core.compile-time",
     "core.context.static",
+    "core.event.source.signal",
     "core.exceptions",
     "core.interface.lifecycle",
     "core.model.cli-parser",
