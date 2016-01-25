@@ -31,7 +31,7 @@
 
 
 // System options.
-#define DAEMON_EVENT_SOURCE_MANAGER "epoll"
+#define DEAFULT_EVENT_SOURCE_MANAGER "epoll"
 #define DEBUG_BUILD {{debug}}
 #define TRAP_SIGINT {{trap-sigint}}
 

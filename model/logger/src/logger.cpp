@@ -1,7 +1,6 @@
 // Copyright 2015 Stefano Pogliani <stefano@spogliani.net>
 #include "core/model/logger.h"
 
-#include <memory>
 #include <sstream>
 #include <string>
 
@@ -13,6 +12,7 @@
 
 using sf::core::model::ConsoleLogger;
 using sf::core::model::Logger;
+using sf::core::model::LoggerRef;
 using sf::core::model::LogLevel;
 using sf::core::model::LogInfo;
 
@@ -26,15 +26,15 @@ std::string LEVEL_NAMES[] = {
 
 
 // Static code.
-std::shared_ptr<Logger> sf::core::model::Logger::fallback_instance;
+LoggerRef sf::core::model::Logger::fallback_instance;
 
-Logger* Logger::fallback() {
+LoggerRef Logger::fallback() {
   if (Logger::fallback_instance.get() == nullptr) {
-    Logger::fallback_instance = std::shared_ptr<Logger>(
+    Logger::fallback_instance = LoggerRef(
         new ConsoleLogger(FALLBACK_PREFIX DEFAULT_LOG_FORMAT)
     );
   }
-  return Logger::fallback_instance.get();
+  return Logger::fallback_instance;
 }
 
 

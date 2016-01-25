@@ -49,9 +49,9 @@ TEST(CLIParser, SetDefaults) {
   ASSERT_TRUE(parser.getBoolean("daemonise"));
   ASSERT_EQ("snow-fox", parser.getString("group"));
   ASSERT_EQ("snow-fox", parser.getString("user"));
-  ASSERT_EQ("/dev/null", parser.getString("stderr"));
-  ASSERT_EQ("/dev/null", parser.getString("stdin"));
-  ASSERT_EQ("/dev/null", parser.getString("stdout"));
+  ASSERT_EQ("", parser.getString("stderr"));
+  ASSERT_EQ("", parser.getString("stdin"));
+  ASSERT_EQ("", parser.getString("stdout"));
   ASSERT_EQ(".", parser.getString("work-dir"));
 
   // Misc options.

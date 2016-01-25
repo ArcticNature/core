@@ -1,28 +1,27 @@
 // Copyright 2016 Stefano Pogliani
 #include "core/bin/daemon.h"
 
+#include <string>
+
 #include "core/compile-time/options.h"
+#include "core/context/context.h"
 #include "core/context/static.h"
+
 #include "core/exceptions/base.h"
 #include "core/model/logger.h"
 #include "core/registry/event/managers.h"
 
 using sf::core::bin::Daemon;
 using sf::core::bin::DaemonSignalSource;
+using sf::core::context::Context;
 using sf::core::context::Static;
 
-using sf::core::exception::CleanExit;
-using sf::core::exception::SfException;
 using sf::core::model::CLIParser;
-
-using sf::core::model::EventDrainRef;
-using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::EventSourceManagerRef;
 
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
-
 using sf::core::registry::EventSourceManager;
 
 
@@ -55,7 +54,7 @@ void Daemon::dropUser() {
 
   LogInfo info = { {"group", group}, {"user", user} };
   DEBUGV(
-      Logger::fallback(), 
+      Logger::fallback(),
       "Dropping privileges to user ${user} and group ${group}.",
       info
   );
@@ -84,10 +83,9 @@ void Daemon::forkSpawner() {
 
 void Daemon::configureEvents() {
   DEBUG(Logger::fallback(), "Setting up event subsystem.");
-  this->sources = EventSourceManager::instance()->get(
-      DAEMON_EVENT_SOURCE_MANAGER
-  )();
-  this->sources->addSource(EventSourceRef(new DaemonSignalSource()));
+  this->registerDefaultSourceManager();
+  EventSourceManagerRef sources = Context::sourceManager();
+  sources->addSource(EventSourceRef(new DaemonSignalSource()));
 }
 
 void Daemon::disableSignals() {
@@ -105,35 +103,6 @@ void Daemon::disableSignals() {
 #endif
 
   Static::posix()->sigprocmask(SIG_BLOCK, &mask, nullptr);
-}
-
-
-void Daemon::loop() {
-  while (true) {
-    EventRef event;
-
-    try {
-      event = this->sources->wait();
-      if (!event) { continue; }
-      event->handle();
-
-    } catch (CleanExit&) {
-      break;
-
-    } catch (SfException& ex) {
-      if (event) {
-        // TODO(stefano): Find drain to which to send error information.
-        //EventDrainRef drain = event->drain();
-        //if (drain->handleError(&ex)) { continue; }
-      }
-
-      LogInfo vars = { {"error", ex.what()}, {"trace", ex.getTrace()} };
-      ERRORV(
-          Logger::fallback(),
-          "Error (ignored) during run loop. ${error}", vars
-      );
-    }
-  }
 }
 
 
@@ -159,10 +128,4 @@ void Daemon::initialise() {
 
   this->configureEvents();
   this->forkManager();
-}
-
-void Daemon::run() {
-  INFO(Logger::fallback(), "Starting daemon run loop.");
-  this->loop();
-  INFO(Logger::fallback(), "Terminating daemon cleanly.");
 }

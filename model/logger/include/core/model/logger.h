@@ -22,6 +22,9 @@ namespace model {
     LL_DEBUG   = 3
   };
 
+  class Logger;
+  typedef std::shared_ptr<Logger> LoggerRef;
+
   //! Abstract logging interface.
   /*!
    * GCC has some interesting macros that could be used in formats.
@@ -30,7 +33,7 @@ namespace model {
   class Logger {
    protected:
     //! Signleton Logger instance for fallback.
-    static std::shared_ptr<Logger> fallback_instance;
+    static LoggerRef fallback_instance;
 
    public:
     //! Returns the fallback Logger instance.
@@ -41,7 +44,7 @@ namespace model {
      * For cases where such instances cannot be used (for example during
      * initialisation or in the Spawner), the fallback instance can be used.
      */
-    static Logger* fallback();
+    static LoggerRef fallback();
 
    protected:
     //! Format of log messages.

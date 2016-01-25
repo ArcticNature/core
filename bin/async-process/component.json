@@ -1,13 +1,12 @@
 {
-  "name": "core.event.source.signal",
+  "name": "core.bin.async-process",
   "type": "c++",
 
   "deps": [
+    "core.compile-time",
     "core.context.dynamic",
-    "core.context.static",
-    "core.interface.posix",
-    "core.model.event",
-    "core.utility.string"
+    "core.exceptions",
+    "core.registry.event.managers"
   ],
 
   "targets": {

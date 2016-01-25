@@ -1,4 +1,6 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
+#include <string>
+
 #include "core/bin/daemon.h"
 #include "core/event/source/signal.h"
 #include "core/exceptions/base.h"
@@ -16,7 +18,7 @@ using sf::core::model::Logger;
 
 class DaemonStop : public Event {
  public:
-  DaemonStop(std::string correlation) : Event(correlation, "NULL") {}
+  explicit DaemonStop(std::string correlation) : Event(correlation, "NULL") {}
   void handle() {
     throw CleanExit();
   }

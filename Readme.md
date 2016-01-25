@@ -31,6 +31,8 @@ Components
 
 ### Binaries
 
+  * `core.bin.async-process`:
+      Common classes and helpers for event based processes.
   * `core.bin.daemon`:
       Main SnowFox executable for environment setup and daemon processes
       orchestration.

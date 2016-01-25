@@ -1,13 +1,11 @@
 {
-  "name": "core.event.source.signal",
+  "name": "core.context.dynamic",
   "type": "c++",
 
   "deps": [
-    "core.context.dynamic",
-    "core.context.static",
-    "core.interface.posix",
+    "core.compile-time",
     "core.model.event",
-    "core.utility.string"
+    "core.model.logger"
   ],
 
   "targets": {

@@ -3,16 +3,24 @@
 
 #include <string>
 
+#include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/exceptions/base.h"
-#include "core/model/event.h"
 
+#include "core/model/event.h"
+#include "core/model/logger.h"
+#include "core/utility/string.h"
+
+using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::event::SignalSource;
 using sf::core::exception::ErrNoException;
 
 using sf::core::model::EventRef;
 using sf::core::model::EventSource;
+using sf::core::model::LogInfo;
+
+using sf::core::utility::string::toString;
 
 
 SignalSource::SignalSource(std::string id) : EventSource("signal-" + id) {
@@ -58,13 +66,12 @@ EventRef SignalSource::parse() {
     case SIGUSR1: return this->handleState();
     case SIGUSR2: return this->handleReloadConfig();
     default:
-      // TODO(stefano): Log through (non-static) Context
-      //LogInfo vars = {{"signal", toString(signal_info.ssi_signo)}};
-      //ERRORV(
-      //    context->logger(),
-      //    "Received unrecognised signal ${signal}.",
-      //    vars
-      //);
+      LogInfo vars = {{"signal", toString(signal_info.ssi_signo)}};
+      ERRORV(
+          Context::logger(),
+          "Received unrecognised signal ${signal}.",
+          vars
+      );
       return EventRef();
   }
 }

@@ -1,22 +1,17 @@
 {
-  "name": "core.bin.daemon",
+  "name": "core.bin.spawner",
   "type": "c++",
   "load-all-archives": true,
 
   "deps": [
     "core.bin.async-process",
-    "core.compile-time",
     "core.context.static",
-    "core.event.source.signal",
     "core.exceptions",
     "core.interface.lifecycle",
     "core.model.cli-parser",
-    "core.model.event",
     "core.model.logger",
     "core.posix.restricted",
-    "core.registry.cli-parser",
-    "core.registry.event.managers",
-    "core.utility.daemoniser"
+    "core.registry.cli-parser"
   ],
 
   "targets": {

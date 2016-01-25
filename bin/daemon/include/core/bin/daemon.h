@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "core/bin/async-process.h"
 #include "core/event/source/signal.h"
 #include "core/model/event.h"
 #include "core/utility/daemoniser.h"
@@ -13,10 +14,8 @@ namespace core {
 namespace bin {
 
   //! Instances of this class initialise and run the daemon.
-  class Daemon : public sf::core::utility::Daemoniser {
+  class Daemon : public sf::core::utility::Daemoniser, public AsyncPorcess {
    protected:
-    sf::core::model::EventSourceManagerRef sources;
-
     void cleanEnvironment();
     void daemonise();
     void dropUser();
@@ -29,22 +28,19 @@ namespace bin {
     void configureEvents();
     void disableSignals();
 
-    void loop();
-
    public:
     void initialise();
-    void run();
   };
 
 
   //! Signal event source for the Daemon process.
   class DaemonSignalSource : public sf::core::event::SignalSource {
-  protected:
+   protected:
     sf::core::model::EventRef handleReloadConfig();
     sf::core::model::EventRef handleState();
     sf::core::model::EventRef handleStop();
 
-  public:
+   public:
     DaemonSignalSource();
   };
 
