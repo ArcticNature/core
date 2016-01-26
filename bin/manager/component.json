@@ -1,0 +1,20 @@
+{
+  "name": "core.bin.manager",
+  "type": "c++",
+  "load-all-archives": true,
+
+  "deps": [
+    "core.bin.async-process",
+    "core.context.static",
+    "core.exceptions",
+    "core.model.logger",
+    "core.posix.user",
+    "core.registry.cli-parser"
+  ],
+
+  "targets": {
+    "debug":   { "type": "bin" },
+    "release": { "type": "bin" },
+    "test":    { "type": "bin" }
+  }
+}

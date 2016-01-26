@@ -1,9 +1,9 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
-#include "core/bin/spawner.h"
+#include "core/bin/manager.h"
 
-using sf::core::bin::Spawner;
+using sf::core::bin::Manager;
 
 
-void Spawner::initialise() {
+void Manager::initialise() {
   this->registerDefaultSourceManager();
 }
