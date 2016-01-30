@@ -35,6 +35,20 @@ int Posix::setenv(const char* name, const char* value, int overwrite) {
 }
 
 
+// Files.
+int Posix::lstat(const char* path, struct stat* buf) {
+  return ::lstat(path, buf);
+}
+
+int Posix::stat(const char* path, struct stat* buf) {
+  return ::stat(path, buf);
+}
+
+ssize_t Posix::readlink(const char* path, char* buf, size_t size) {
+  return ::readlink(path, buf, size);
+}
+
+
 // File descriptors.
 int Posix::close(int fd, bool silent) {
   int res = ::close(fd);
@@ -124,6 +138,10 @@ char* Posix::strncpy(char* dest, const char* src, size_t len) {
 // Process.
 int Posix::chdir(const char* path) {
   return ::chdir(path);
+}
+
+char* Posix::getcwd(char* buf, size_t size) {
+  return ::getcwd(buf, size);
 }
 
 void Posix::exit(int status) {

@@ -47,6 +47,10 @@ if (function(__VA_ARGS__) != 0) {                      \
 name::name(std::string msg) : base(msg) { }  \
 int name::getCode() const { return code; }
 
+#define MSG_DEFINITION_PREFIX(base, name, code, prefix)  \
+name::name(std::string msg) : base(prefix + msg) { }     \
+int name::getCode() const { return code; }
+
 #define NO_ARG_DEFINITION(base, name, code, message)   \
 int name::getCode() const { return code; }             \
 name::name() : base(message) { }
@@ -170,6 +174,8 @@ namespace exception {
 
   //! Thrown when an operation that is not permitted is attempted.
   NO_ARG_EXCEPTION(SfException, OperationNotPermitted);
+
+  MSG_EXCEPTION(SfException, ProcessNotFound);
 
   //! Thrown when a requested service was not found.
   MSG_EXCEPTION(SfException, ServiceNotFound);

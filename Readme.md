@@ -104,6 +104,7 @@ Some event components are more then a model and always required:
   * `core.utility.daemoniser`:
     Base class for instances that want to daemonise themselves.
   * `core.utility.forker`: Base class for forking into multiple processes.
+  * `core.utility.process`: Process related utility functions.
   * `core.utility.string`: String related utilities.
 
 

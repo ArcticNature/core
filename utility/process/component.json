@@ -1,0 +1,14 @@
+{
+  "name": "core.utility.process",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

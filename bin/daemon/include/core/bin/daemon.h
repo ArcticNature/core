@@ -28,6 +28,9 @@ namespace bin {
     void configureEvents();
     void disableSignals();
 
+    std::string findManager();
+    std::string findSpawner();
+
    public:
     void initialise();
   };

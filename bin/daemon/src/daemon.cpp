@@ -2,6 +2,7 @@
 #include "core/bin/daemon.h"
 
 #include <string>
+#include <vector>
 
 #include "core/compile-time/options.h"
 #include "core/context/context.h"
@@ -10,11 +11,15 @@
 #include "core/exceptions/base.h"
 #include "core/model/logger.h"
 #include "core/registry/event/managers.h"
+#include "core/utility/process.h"
+
+#define CWD_LEN 4096
 
 using sf::core::bin::Daemon;
 using sf::core::bin::DaemonSignalSource;
 using sf::core::context::Context;
 using sf::core::context::Static;
+using sf::core::exception::ProcessNotFound;
 
 using sf::core::model::CLIParser;
 using sf::core::model::EventSourceRef;
@@ -23,6 +28,7 @@ using sf::core::model::EventSourceManagerRef;
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 using sf::core::registry::EventSourceManager;
+using sf::core::utility::processDirectory;
 
 
 void Daemon::cleanEnvironment() {
@@ -103,6 +109,50 @@ void Daemon::disableSignals() {
 #endif
 
   Static::posix()->sigprocmask(SIG_BLOCK, &mask, nullptr);
+}
+
+
+std::string Daemon::findManager() {
+  char raw_cwd[CWD_LEN];
+  std::string cwd(Static::posix()->getcwd(raw_cwd, CWD_LEN));
+  std::string base = processDirectory();
+
+  struct stat stat_info;
+  std::vector<std::string>::iterator it;
+  std::vector<std::string> paths = {
+    cwd + "/out/core/bin/manager/core.bin.manager",
+    base + "/snow-fox-manager"
+  };
+
+  for (it = paths.begin(); it != paths.end(); it++) {
+    if (Static::posix()->stat(it->c_str(), &stat_info) == 0) {
+      return *it;
+    }
+  }
+
+  throw ProcessNotFound("snow-fox-manager");
+}
+
+
+std::string Daemon::findSpawner() {
+  char raw_cwd[CWD_LEN];
+  std::string cwd(Static::posix()->getcwd(raw_cwd, CWD_LEN));
+  std::string base = processDirectory();
+
+  struct stat stat_info;
+  std::vector<std::string>::iterator it;
+  std::vector<std::string> paths = {
+    cwd + "/out/core/bin/spawner/core.bin.spawner",
+    base + "/snow-fox-spawner"
+  };
+
+  for (it = paths.begin(); it != paths.end(); it++) {
+    if (Static::posix()->stat(it->c_str(), &stat_info) == 0) {
+      return *it;
+    }
+  }
+
+  throw ProcessNotFound("snow-fox-spawner");
 }
 
 

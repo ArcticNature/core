@@ -16,7 +16,8 @@
     "core.posix.restricted",
     "core.registry.cli-parser",
     "core.registry.event.managers",
-    "core.utility.daemoniser"
+    "core.utility.daemoniser",
+    "core.utility.process"
   ],
 
   "targets": {

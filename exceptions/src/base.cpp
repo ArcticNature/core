@@ -29,6 +29,7 @@ using sf::core::exception::InvalidDaemonSession;
 using sf::core::exception::InvalidValueOperation;
 using sf::core::exception::NotImplemented;
 using sf::core::exception::OperationNotPermitted;
+using sf::core::exception::ProcessNotFound;
 using sf::core::exception::ServiceNotFound;
 using sf::core::exception::SocketException;
 using sf::core::exception::StopException;
@@ -162,6 +163,10 @@ NO_ARG_DEFINITION(
 NO_ARG_DEFINITION(
     SfException, OperationNotPermitted, -22,
     "The requested operation is not allowed within the context."
+);
+MSG_DEFINITION_PREFIX(
+    SfException, ProcessNotFound, -27,
+    "Unable to find binary process "
 );
 NO_ARG_DEFINITION(
     SfException, StopException, -26,

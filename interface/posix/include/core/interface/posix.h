@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <sys/epoll.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 
@@ -33,6 +34,11 @@ namespace interface {
     virtual char* getenv(const char* name);
     virtual int   setenv(const char* name, const char* value, int overwrite);
 
+    // Files.
+    virtual int lstat(const char* path, struct stat* buf);
+    virtual int stat(const char* path, struct stat* buf);
+    virtual ssize_t readlink(const char* path, char* buf, size_t size);
+
     // File descriptors.
     virtual int   close(int fd, bool silent = false);
     virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
@@ -57,6 +63,8 @@ namespace interface {
 
     // Processes.
     virtual int   chdir(const char* path);
+    virtual char* getcwd(char* buf, size_t size);
+
     virtual void  exit(int status);
     virtual pid_t fork();
     virtual pid_t getpid();
