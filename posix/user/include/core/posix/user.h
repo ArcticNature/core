@@ -36,7 +36,7 @@ namespace posix {
 
     // Files.
     virtual bool exists(std::string path);
-    virtual void lstat(const char *path, struct stat *buf);
+    virtual int  lstat(const char *path, struct stat *buf);
     virtual int  mkdir(const char *pathname, mode_t mode);
     virtual ssize_t readlink(const char *path, char *buf, size_t bufsiz);
     virtual int unlink(std::string filename);

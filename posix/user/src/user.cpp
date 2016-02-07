@@ -48,7 +48,7 @@ bool User::exists(std::string path) {
   return ::stat(path.c_str(), &buffer) == 0;
 }
 
-void User::lstat(const char* path, struct stat* buf) {
+int User::lstat(const char* path, struct stat* buf) {
   CHECK_ZERO_ERRNO(::lstat, "Unable to stat file:", path, buf);
 }
 

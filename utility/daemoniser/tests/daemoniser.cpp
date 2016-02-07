@@ -11,6 +11,8 @@
 #include "core/interface/posix.h"
 #include "core/utility/daemoniser.h"
 
+#include "core/posix/test.h"
+
 #define FIXTURE_BASE "core/utility/daemoniser/tests/fixtures/"
 #define FIXTURE_PATH(partial) FIXTURE_BASE partial
 
@@ -21,93 +23,18 @@ using sf::core::interface::Posix;
 using sf::core::utility::Daemoniser;
 using sf::core::utility::EnvMap;
 
-
-class ExitTestException : public std::exception {};
-
-
-class DaemonTestPosix : public Posix {
- public:
-  int  fork_result   = -1;
-  bool setsid_called = false;
-  int  setsid_result = 0;
-
-  bool chdir_called = false;
-
-  bool setgroups_called = false;
-  bool setegid_called = false;
-  bool seteuid_called = false;
-  bool setgid_called = false;
-  bool setuid_called = false;
-  bool setregid_called = false;
-  bool setreuid_called = false;
-
-  gid_t drop_group = -1;
-  uid_t drop_user  = -1;
-
-  virtual int chdir(const char* path) {
-    this->chdir_called = true;
-    EXPECT_STREQ("/some/path", path);
-  }
-
-  virtual void exit(int code) {
-    EXPECT_EQ(0, code);
-    throw ExitTestException();
-  }
-
-  virtual pid_t fork() {
-    return this->fork_result;
-  }
-
-  virtual pid_t setsid() {
-    this->setsid_called = true;
-    return this->setsid_result;
-  }
-
-  int setgroups(int size, gid_t list[]) {
-    this->setgroups_called = true;
-    return 0;
-  }
-
-  int setegid(gid_t egid) {
-    this->setegid_called = true;
-    return 0;
-  }
-
-  int seteuid(uid_t euid) {
-    this->seteuid_called = true;
-    return 0;
-  }
-
-  int setgid(gid_t gid) {
-    this->drop_group = gid;
-    this->setgid_called = true;
-    return 0;
-  }
-
-  int setuid(uid_t uid) {
-    this->drop_user = uid;
-    this->setuid_called = true;
-    return 0;
-  }
-
-  int setregid(gid_t rgid, gid_t egid) {
-    this->setregid_called = true;
-    return 0;
-  }
-
-  int setreuid(uid_t ruid, uid_t euid) {
-    this->setreuid_called = true;
-    return 0;
-  }
-};
+using sf::core::posix::TestPosix;
+using sf::core::posix::ExitTestException;
 
 
 class DaemoniserTest : public ::testing::Test {
  protected:
-  DaemonTestPosix* posix;
+  //DaemonTestPosix* posix;
+  TestPosix* posix;
 
   DaemoniserTest() {
-    this->posix = new DaemonTestPosix();
+    //this->posix = new DaemonTestPosix();
+    this->posix = new TestPosix();
     Static::initialise(this->posix);
   }
 
@@ -119,24 +46,9 @@ class DaemoniserTest : public ::testing::Test {
 
 TEST_F(DaemoniserTest, ChangeDir) {
   Daemoniser daemoniser;
+  this->posix->chdir_path = "/some/path";
   daemoniser.changeDirectory("/some/path");
   ASSERT_TRUE(this->posix->chdir_called);
-}
-
-TEST_F(DaemoniserTest, CloseFDs) {
-  std::string fixture = FIXTURE_PATH("daemonise.txt");
-  Daemoniser daemoniser;
-
-  FILE* handle = fopen(fixture.c_str(), "w"); 
-  ASSERT_NE(nullptr, handle);
-
-  ASSERT_EQ(fputc('A', handle), 'A');
-  fflush(handle);
-
-  daemoniser.closeNonStdFileDescriptors();
-  fputc('B', handle);
-  fflush(handle);
-  ASSERT_TRUE(ferror(handle));
 }
 
 TEST_F(DaemoniserTest, DetachChild) {
@@ -158,38 +70,11 @@ TEST_F(DaemoniserTest, DetachFail) {
 TEST_F(DaemoniserTest, DetachParent) {
   Daemoniser daemoniser;
   this->posix->fork_result = 1;  // > 0 to be the parent.
-
+  this->posix->exit_code  = 0;
+  this->posix->exit_raise = true;
   ASSERT_THROW(daemoniser.detatchFromParentProcess(), ExitTestException);
 }
 
-// This test is usefull to bring attention to changes to the user
-// dropping code, it does not really test it.
-TEST_F(DaemoniserTest, DropUserGroupID) {
-  Daemoniser daemoniser;
-  daemoniser.dropPrivileges(1, 2);
-
-  ASSERT_TRUE(this->posix->setgroups_called);
-  ASSERT_TRUE(this->posix->setegid_called);
-  ASSERT_TRUE(this->posix->seteuid_called);
-  ASSERT_TRUE(this->posix->setgid_called);
-  ASSERT_TRUE(this->posix->setuid_called);
-  ASSERT_TRUE(this->posix->setregid_called);
-  ASSERT_TRUE(this->posix->setreuid_called);
-}
-
-TEST_F(DaemoniserTest, LookupRootRoot) {
-  Daemoniser daemoniser;
-  daemoniser.dropPrivileges("root", "root");
-  ASSERT_EQ(0, this->posix->drop_group);
-  ASSERT_EQ(0, this->posix->drop_user);
-}
-
-TEST_F(DaemoniserTest, LookupRootBin) {
-  Daemoniser daemoniser;
-  daemoniser.dropPrivileges("root", "bin");
-  ASSERT_EQ(1, this->posix->drop_group);
-  ASSERT_EQ(0, this->posix->drop_user);
-}
 
 TEST_F(DaemoniserTest, EnvEmpty) {
   Daemoniser daemoniser;
@@ -239,15 +124,4 @@ TEST_F(DaemoniserTest, EnvOverridePath) {
 
   std::string path(getenv("PATH"));
   ASSERT_EQ(path, "ABC");
-}
-
-TEST_F(DaemoniserTest, RedirectStdin) {
-  Daemoniser daemoniser;
-  daemoniser.redirectStdFileDescriptors(FIXTURE_PATH("stdin.txt"), "", "");
-
-  ASSERT_EQ(std::cin.get(), 'A');
-  ASSERT_EQ(std::cin.get(), 'B');
-  ASSERT_EQ(std::cin.get(), 'C');
-  ASSERT_EQ(std::cin.get(), EOF);
-  ASSERT_TRUE(std::cin.eof());
 }

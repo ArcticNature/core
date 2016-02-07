@@ -11,6 +11,7 @@
 using sf::core::bin::AsyncPorcess;
 using sf::core::context::Context;
 
+using sf::core::exception::AbortException;
 using sf::core::exception::CleanExit;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::SfException;
@@ -31,7 +32,7 @@ void AsyncPorcess::handleLoopError(
     try {
       // TODO(stefano): Find drain to which to send error information.
     } catch (SfException& drain_ex) {
-      this->handleLoopError(event, &drain_ex, drain);
+      this->handleLoopError(event, &drain_ex, false);
     }
   }
 
@@ -60,6 +61,11 @@ void AsyncPorcess::loop() {
       event->handle();
     } catch (CleanExit&) {
       break;
+
+    } catch (AbortException& ex) {
+      this->handleLoopError(event, &ex, true);
+      throw;
+
     } catch (SfException& ex) {
       this->handleLoopError(event, &ex, true);
     }

@@ -42,9 +42,6 @@ namespace utility {
     //! Changes the current working directory to a safe location.
     void changeDirectory(std::string new_dir = "/");
 
-    //! Closes all open file descriptors except for stdin, stdout and stderr.
-    void closeNonStdFileDescriptors();
-
     //! Performs the standard daemonisation sequence.
     /*!
      * The daemonisaztion sequence is the following:
@@ -72,25 +69,6 @@ namespace utility {
     //! Detaches the process from the parent and becomes child of init.
     void detatchFromParentProcess();
 
-    //! Drops the privileges of the current user/group.
-    /*!
-     * @param user  The user name to drop to.
-     * @param group The group name to drop to.
-     */
-    void dropPrivileges(
-        std::string user = "nobody", std::string group = "nobody"
-    );
-
-    //! Drops the privileges of the current user/group.
-    /*!
-     * Similar to the string version but assumes that the arguments
-     * are already the user ID and the group ID to which to drop.
-     * 
-     * \param user  The user id to drop to.
-     * \param group The group id to drop to.
-     */
-    void dropPrivileges(uid_t user = 1, gid_t group = 1);
-
     //! Disable handling of the SIGHUP signal.
     /*!
      * SIGHUP is sent to the process when the controlling process dies.
@@ -104,17 +82,6 @@ namespace utility {
      * This method masks SIGHUP so that the child process is not terminated.
      */
     void maskSigHup();
-
-    //! Redirects stdin, stdout and stderr to safe files.
-    /*!
-     * @param stdin  The path to the file to open for standard input.
-     * @param stdout The path to the file to open for standard output.
-     * @param stderr The path to the file to open for standard error.
-     */
-    void redirectStdFileDescriptors(
-        std::string stdin = "/dev/null", std::string stdout = "/dev/null",
-        std::string stderr = "/dev/null"
-    );
 
     //! Enables SIGHUP processing.
     void restoreSigHup();

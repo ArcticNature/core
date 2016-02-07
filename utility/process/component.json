@@ -3,7 +3,8 @@
   "type": "c++",
 
   "deps": [
-    "core.context.static"
+    "core.context.static",
+    "core.utility.forker"
   ],
 
   "targets": {

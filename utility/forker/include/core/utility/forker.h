@@ -3,6 +3,7 @@
 #define CORE_UTILITY_FORKER_H_
 
 #include <sys/types.h>
+#include <string>
 
 
 namespace sf {
@@ -27,6 +28,39 @@ namespace utility {
 
     //! What should the child process do after fork.
     virtual int child() = 0;
+
+    //! Closes all open file descriptors except for stdin, stdout and stderr.
+    void closeNonStdFileDescriptors();
+
+    //! Drops the privileges of the current user/group.
+    /*!
+     * @param user  The user name to drop to.
+     * @param group The group name to drop to.
+     */
+    void dropPrivileges(
+        std::string user = "nobody", std::string group = "nobody"
+    );
+
+    //! Drops the privileges of the current user/group.
+    /*!
+     * Similar to the string version but assumes that the arguments
+     * are already the user ID and the group ID to which to drop.
+     * 
+     * \param user  The user id to drop to.
+     * \param group The group id to drop to.
+     */
+    void dropPrivileges(uid_t user = 1, gid_t group = 1);
+
+    //! Redirects stdin, stdout and stderr to safe files.
+    /*!
+     * @param stdin  The path to the file to open for standard input.
+     * @param stdout The path to the file to open for standard output.
+     * @param stderr The path to the file to open for standard error.
+     */
+    void redirectStdFileDescriptors(
+        std::string stdin = "/dev/null", std::string stdout = "/dev/null",
+        std::string stderr = "/dev/null"
+    );
 
    public:
     //! Fork the current process and run child/parent methods.
