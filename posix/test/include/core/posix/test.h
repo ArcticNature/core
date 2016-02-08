@@ -59,6 +59,11 @@ namespace posix {
     gid_t drop_group;
     uid_t drop_user;
 
+    bool sigfillset_called;
+    bool sigprocmask_called;
+    sigset_t* sigfillset_set;
+    const sigset_t* sigprocmask_set;
+
     virtual int   execvp(const char* file, char* const argv[]);
     virtual void  exit(int code);
     virtual pid_t fork();
@@ -77,6 +82,9 @@ namespace posix {
     virtual int setuid(uid_t uid);
     virtual int setregid(gid_t rgid, gid_t egid);
     virtual int setreuid(uid_t ruid, uid_t euid);
+
+    virtual int sigfillset(sigset_t* set);
+    virtual int sigprocmask(int how, const sigset_t* set, sigset_t* old_set);
   };
 
 }  // namespace posix

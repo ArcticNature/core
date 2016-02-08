@@ -1,5 +1,6 @@
 // Copyright 2015 Stefano Pogliani <stefano@spogliani.net>
 #include <gtest/gtest.h>
+#include <string>
 
 #include "core/posix/test.h"
 
@@ -39,11 +40,16 @@ TestPosix::TestPosix() {
 
   this->drop_group = -1;
   this->drop_user  = -1;
+
+  this->sigfillset_called  = false;
+  this->sigprocmask_called = false;
+  this->sigfillset_set  = nullptr;
+  this->sigprocmask_set = nullptr;
 }
 
 TestPosix::~TestPosix() {
   if (this->execvp_args != nullptr) {
-    this->free((void*)this->execvp_args);
+    this->free(const_cast<char**>(this->execvp_args));
   }
 }
 
@@ -56,7 +62,7 @@ void TestPosix::exit(int code) {
 
 int TestPosix::execvp(const char* file, char* const argv[]) {
   if (this->execvp_args != nullptr) {
-    this->free((void*)this->execvp_args);
+    this->free(const_cast<char**>(this->execvp_args));
   }
 
   this->execvp_args   = argv;
@@ -129,5 +135,17 @@ int TestPosix::setregid(gid_t rgid, gid_t egid) {
 
 int TestPosix::setreuid(uid_t ruid, uid_t euid) {
   this->setreuid_called = true;
+  return 0;
+}
+
+int TestPosix::sigfillset(sigset_t* set) {
+  this->sigfillset_called = true;
+  this->sigfillset_set = set;
+  return 0;
+}
+
+int TestPosix::sigprocmask(int how, const sigset_t* set, sigset_t* old_set) {
+  this->sigprocmask_called = true;
+  this->sigprocmask_set = set;
   return 0;
 }

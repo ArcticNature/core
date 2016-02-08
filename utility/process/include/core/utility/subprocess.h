@@ -17,6 +17,9 @@ namespace utility {
     std::vector<std::string> arguments;
     std::string binary;
 
+    std::string group;
+    std::string user;
+
     int child();
     int parent();
 

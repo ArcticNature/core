@@ -115,3 +115,10 @@ TEST(LoggerTest, Unicode) {
       LogLevel::LL_INFO, "A=>${£a} B=>${b£} C=>${£c}", vars
   ));
 }
+
+
+// TODO(stefano): log-groups
+//   1. Add an optional string to the static context.
+//   2. If the string is set, `formatMessage` will add it to variables.
+//   3. If the string is not use the empty string.
+//   4. Format can include the ${log-group} variable.

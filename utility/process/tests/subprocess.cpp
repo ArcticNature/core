@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "core/context/static.h"
+#include "core/interface/posix.h"
 #include "core/utility/subprocess.h"
 
 #include "core/posix/test.h"
@@ -9,6 +10,7 @@
 using sf::core::context::Static;
 using sf::core::utility::SubProcess;
 
+using sf::core::interface::Posix;
 using sf::core::posix::TestPosix;
 
 
@@ -68,6 +70,16 @@ TEST_F(SubProcessTest, Binary) {
   ASSERT_STREQ("ls", this->posix->execvp_args[0]);
 }
 
+TEST_F(SubProcessTest, ClearSignals) {
+  this->makeChild();
+  SubProcess cmd("ls");
+  cmd.wait();
+
+  ASSERT_TRUE(this->posix->sigfillset_called);
+  ASSERT_TRUE(this->posix->sigprocmask_called);
+  ASSERT_EQ(this->posix->sigfillset_set, this->posix->sigprocmask_set);
+}
+
 TEST_F(SubProcessTest, RunChild) {
   this->makeChild();
   SubProcess cmd("ls");
@@ -106,7 +118,35 @@ TEST_F(SubProcessTest, WaitParent) {
   ASSERT_EQ(1, result);
 }
 
-
-// Clear signals.
 // User & group.
 // Redirects.
+
+
+// Real subprocess tests
+class RealSubProcessTest : public ::testing::Test {
+ protected:
+ public:
+  RealSubProcessTest() {
+    Static::initialise(new Posix());
+  }
+
+  ~RealSubProcessTest() {
+    Static::reset();
+  }
+};
+
+
+TEST_F(RealSubProcessTest, ExitError) {
+  SubProcess cmd("cat");
+  cmd.appendArgument("not a real file");
+  int result = cmd.wait();
+  ASSERT_EQ(1, result);
+}
+
+TEST_F(RealSubProcessTest, ExitSuccess) {
+  SubProcess cmd("echo");
+  cmd.appendArgument("-n");
+  int result = cmd.wait();
+  ASSERT_EQ(0, result);
+}
+//  I/O redirect.

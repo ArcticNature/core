@@ -11,9 +11,19 @@ using sf::core::utility::SubProcess;
 
 
 int SubProcess::child() {
-  this->closeNonStdFileDescriptors();
   // Clear signals.
+  sigset_t signals;
+  Static::posix()->sigfillset(&signals);
+  Static::posix()->sigprocmask(SIG_UNBLOCK, &signals, nullptr);
+
   // Redirect std streams.
+  this->closeNonStdFileDescriptors();
+
+  // Drop group/user if needed.
+  if (this->user != "") {
+    std::string group = this->group == "" ? this->user : this->group;
+    this->dropPrivileges(this->user, group);
+  }
 
   // Build command.
   int argc = 2 + this->arguments.size();  // binary + nullptr
@@ -46,6 +56,9 @@ int SubProcess::parent() {
 SubProcess::SubProcess(std::string binary) : Forker() {
   this->_wait  = false;
   this->binary = binary;
+
+  this->group = "";
+  this->user  = "";
 }
 
 void SubProcess::appendArgument(std::string argument) {
