@@ -25,6 +25,7 @@ namespace posix {
   class TestPosix : public sf::core::interface::Posix {
    public:
     TestPosix();
+    ~TestPosix();
 
     bool chdir_called;
     std::string chdir_path;
@@ -32,6 +33,14 @@ namespace posix {
     int  exit_code;
     bool exit_raise;
 
+    char* const* execvp_args;
+    std::string  execvp_binary;
+    bool execvp_called;
+
+    bool  waitpid_called;
+    pid_t waitpid_pid;
+
+    bool  fork_called;
     pid_t fork_child;
     pid_t fork_parent;
     pid_t fork_result;
@@ -50,10 +59,13 @@ namespace posix {
     gid_t drop_group;
     uid_t drop_user;
 
-    virtual int  chdir(const char* path);
-    virtual void exit(int code);
-
+    virtual int   execvp(const char* file, char* const argv[]);
+    virtual void  exit(int code);
     virtual pid_t fork();
+    virtual pid_t waitpid(pid_t pid, int* status, int options);
+
+    virtual int  chdir(const char* path);
+
     virtual pid_t getpid();
     virtual pid_t getppid();
 

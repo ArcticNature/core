@@ -14,6 +14,14 @@ TestPosix::TestPosix() {
   this->exit_code = 0;
   this->exit_raise = false;
 
+  this->execvp_args    = nullptr;
+  this->execvp_binary  = "";
+  this->execvp_called  = false;
+
+  this->waitpid_called = false;
+  this->waitpid_pid    = -1;
+
+  this->fork_called = false;
   this->fork_child  = -1;
   this->fork_parent = -1;
   this->fork_result = -1;
@@ -33,11 +41,28 @@ TestPosix::TestPosix() {
   this->drop_user  = -1;
 }
 
+TestPosix::~TestPosix() {
+  if (this->execvp_args != nullptr) {
+    this->free((void*)this->execvp_args);
+  }
+}
+
 void TestPosix::exit(int code) {
   EXPECT_EQ(this->exit_code, code);
   if (this->exit_raise) {
     throw ExitTestException();
   }
+}
+
+int TestPosix::execvp(const char* file, char* const argv[]) {
+  if (this->execvp_args != nullptr) {
+    this->free((void*)this->execvp_args);
+  }
+
+  this->execvp_args   = argv;
+  this->execvp_binary = std::string(file);
+  this->execvp_called = true;
+  return 0;
 }
 
 int TestPosix::chdir(const char* path) {
@@ -46,7 +71,15 @@ int TestPosix::chdir(const char* path) {
 }
 
 pid_t TestPosix::fork() {
+  this->fork_called = true;
   return this->fork_result;
+}
+
+pid_t TestPosix::waitpid(pid_t pid, int* status, int options) {
+  this->waitpid_called = true;
+  this->waitpid_pid = pid;
+  *status = 1 << 8;
+  return 0;
 }
 
 pid_t TestPosix::getpid() {

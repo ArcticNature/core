@@ -62,14 +62,17 @@ namespace interface {
     virtual char* strncpy(char* dest, const char* src, size_t n);
 
     // Processes.
+    virtual void  exit(int status);
+    virtual int   execvp(const char* file, char* const argv[]);
+    virtual pid_t fork();
+    virtual int   kill(pid_t pid, int sig);
+    virtual pid_t waitpid(pid_t pid, int* status, int options);
+
     virtual int   chdir(const char* path);
     virtual char* getcwd(char* buf, size_t size);
 
-    virtual void  exit(int status);
-    virtual pid_t fork();
     virtual pid_t getpid();
     virtual pid_t getppid();
-    virtual int   kill(pid_t pid, int sig);
     virtual pid_t setsid();
 
     // Signals.

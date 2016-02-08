@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/signalfd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include <string>
@@ -136,6 +137,26 @@ char* Posix::strncpy(char* dest, const char* src, size_t len) {
 
 
 // Process.
+void Posix::exit(int status) {
+  ::exit(status);
+}
+
+int Posix::execvp(const char* file, char* const argv[]) {
+  return ::execvp(file, argv);
+}
+
+pid_t Posix::fork() {
+  return ::fork();
+}
+
+int Posix::kill(pid_t pid, int sig) {
+  return ::kill(pid, sig);
+}
+
+pid_t Posix::waitpid(pid_t pid, int* status, int options) {
+  return ::waitpid(pid, status, options);
+}
+
 int Posix::chdir(const char* path) {
   return ::chdir(path);
 }
@@ -144,24 +165,12 @@ char* Posix::getcwd(char* buf, size_t size) {
   return ::getcwd(buf, size);
 }
 
-void Posix::exit(int status) {
-  ::exit(status);
-}
-
-pid_t Posix::fork() {
-  return ::fork();
-}
-
 pid_t Posix::getpid() {
   return ::getpid();
 }
 
 pid_t Posix::getppid() {
   return ::getppid();
-}
-
-int Posix::kill(pid_t pid, int sig) {
-  return ::kill(pid, sig);
 }
 
 pid_t Posix::setsid() {

@@ -26,6 +26,9 @@ namespace utility {
     //! Appeds an argument to the command to run.
     void appendArgument(std::string argument);
 
+    //! Waits for a subproces that was started with `run`.
+    int join();
+
     //! Runs the process and moves on.
     void run();
 
