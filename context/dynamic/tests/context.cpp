@@ -30,6 +30,7 @@ class ContextTest : public ::testing::Test {
   }
   ~ContextTest() {
     Context::reset();
+    Logger::destroyFallback();
   }
 };
 

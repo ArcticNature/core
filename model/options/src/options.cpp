@@ -30,6 +30,18 @@ std::string Options::getString(std::string name) {
   return this->strings[name];
 }
 
+bool Options::hasBoolean(std::string name) {
+  return this->booleans.find(name) != this->booleans.end();
+}
+
+bool Options::hasInteger(std::string name) {
+  return this->integers.find(name) != this->integers.end();
+}
+
+bool Options::hasString(std::string name) {
+  return this->strings.find(name) != this->strings.end();
+}
+
 void Options::setBoolean(std::string name, bool value) {
   this->booleans[name] = value;
 }

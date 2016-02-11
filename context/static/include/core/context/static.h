@@ -5,6 +5,7 @@
 #include "core/compile-time/options.h"
 #include "core/interface/posix.h"
 #include "core/model/cli-parser.h"
+#include "core/model/options.h"
 
 
 namespace sf {
@@ -19,6 +20,7 @@ namespace context {
    */
   class Static {
    public:
+    static sf::core::model::Options*   options();
     static sf::core::model::CLIParser* parser();
     static sf::core::interface::Posix* posix();
 
@@ -30,6 +32,9 @@ namespace context {
 
     //! Set the CLIParser instance in use.
     static void parser(sf::core::model::CLIParser* parser);
+
+    //! Cleans up all the allocated resources.
+    static void destroy();
 
 #if DEBUG_BUILD
     static void reset();

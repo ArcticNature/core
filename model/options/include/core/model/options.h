@@ -29,6 +29,10 @@ namespace model {
     int  getInteger(std::string name);
     std::string getString(std::string name);
 
+    bool hasBoolean(std::string name);
+    bool hasInteger(std::string name);
+    bool hasString(std::string name);
+
     void setBoolean(std::string name, bool value);
     void setInteger(std::string name, int value);
     void setString(std::string name, std::string value);

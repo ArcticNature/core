@@ -9,9 +9,6 @@ using sf::core::posix::ExitTestException;
 
 
 TestPosix::TestPosix() {
-  this->freopen_called = false;
-  this->freopen_path   = "";
-
   this->chdir_path = "";
   this->chdir_called = false;
 
@@ -66,12 +63,6 @@ void TestPosix::exit(int code) {
   if (this->exit_raise) {
     throw ExitTestException();
   }
-}
-
-FILE* TestPosix::freopen(const char* path, const char* mode, FILE* stream) {
-  this->freopen_called = true;
-  this->freopen_path   = std::string(path);
-  return stream;
 }
 
 int TestPosix::execvp(const char* file, char* const argv[]) {

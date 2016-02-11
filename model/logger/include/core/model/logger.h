@@ -46,6 +46,9 @@ namespace model {
      */
     static LoggerRef fallback();
 
+    //! Cleans up the fallback logger.
+    static void destroyFallback();
+
    protected:
     //! Format of log messages.
     /*!

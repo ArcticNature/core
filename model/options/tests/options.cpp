@@ -43,3 +43,24 @@ TEST(Options, ThorwsVariableNotFound) {
   ASSERT_THROW(options.getInteger("not.a.var"), VariableNotFound);
   ASSERT_THROW(options.getString("not.a.var"), VariableNotFound);
 }
+
+TEST(Options, HasBoolean) {
+  Options options;
+  options.setBoolean("key", true);
+  ASSERT_TRUE(options.hasBoolean("key"));
+  ASSERT_FALSE(options.hasBoolean("value"));
+}
+
+TEST(Options, HasInteger) {
+  Options options;
+  options.setInteger("key", 1);
+  ASSERT_TRUE(options.hasInteger("key"));
+  ASSERT_FALSE(options.hasInteger("value"));
+}
+
+TEST(Options, HasString) {
+  Options options;
+  options.setString("key", "value");
+  ASSERT_TRUE(options.hasString("key"));
+  ASSERT_FALSE(options.hasString("value"));
+}

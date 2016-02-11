@@ -27,9 +27,6 @@ namespace posix {
     TestPosix();
     ~TestPosix();
 
-    bool freopen_called;
-    std::string freopen_path;
-
     bool chdir_called;
     std::string chdir_path;
 
@@ -71,8 +68,6 @@ namespace posix {
     bool sigprocmask_called;
     sigset_t* sigfillset_set;
     const sigset_t* sigprocmask_set;
-
-    virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
 
     virtual int   execvp(const char* file, char* const argv[]);
     virtual void  exit(int code);

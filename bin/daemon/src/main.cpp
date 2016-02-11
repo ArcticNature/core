@@ -3,6 +3,7 @@
 
 #include "core/bin/daemon.h"
 
+#include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/exceptions/base.h"
 #include "core/interface/lifecycle.h"
@@ -15,7 +16,9 @@
 
 using sf::core::bin::Daemon;
 
+using sf::core::context::Context;
 using sf::core::context::Static;
+
 using sf::core::exception::CleanExit;
 using sf::core::exception::SfException;
 using sf::core::interface::Lifecycle;
@@ -31,6 +34,7 @@ using sf::core::registry::CLIParsers;
 int main(int argc, char** argv) {
   // Initialise static context and trigger process::init lifecycle event.
   Static::initialise(new Restricted());
+  Static::options()->setString("log-group", "Daemon");
   Lifecycle::trigger("process::init");
 
   try {
@@ -63,9 +67,15 @@ int main(int argc, char** argv) {
     );
 
     Lifecycle::trigger("process::exit");
+    Context::destroy();
+    Logger::destroyFallback();
+    Static::destroy();
     return ex.getCode();
   }
 
   Lifecycle::trigger("process::exit");
+  Context::destroy();
+  Logger::destroyFallback();
+  Static::destroy();
   return 0;
 }

@@ -28,6 +28,9 @@ namespace context {
     static void initialise(ContextRef context);
     static ContextRef instance();
 
+    //! Cleans up all the allocated resources.
+    static void destroy();
+
 #if DEBUG_BUILD
     static void reset();
 #endif  // DEBUG_BUILD

@@ -47,6 +47,11 @@ void Context::initialise(EventSourceManagerRef manager) {
 }
 
 
+void Context::destroy() {
+  Context::_instance = ContextRef();
+}
+
+
 // Some methods should not be used in release versions but
 // are needed for tests and could be helpful for debugging.
 #if DEBUG_BUILD

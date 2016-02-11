@@ -1,8 +1,10 @@
 // Copyright 2015 Stefano Pogliani
 #include <gtest/gtest.h>
 
+#include "core/context/static.h"
 #include "core/model/logger.h"
 
+using sf::core::context::Static;
 using sf::core::model::LogLevel;
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
@@ -44,7 +46,7 @@ TEST(LoggerTest, PopulateMacro) {
 
   ASSERT_EQ(4, populated.size());
   ASSERT_EQ("set", populated["test"]);
-  ASSERT_EQ("42",  populated["line"]);
+  ASSERT_EQ("44",  populated["line"]);
   ASSERT_EQ("core/model/logger/tests/logger.cpp", populated["file"]);
   ASSERT_EQ(
       "virtual void LoggerTest_PopulateMacro_Test::TestBody()",
@@ -60,8 +62,8 @@ TEST(LoggerTest, Log) {
   logger.log(LogLevel::LL_ERROR, "Test", variables);
 
   ASSERT_EQ(LogLevel::LL_ERROR, logger.level);
-  ASSERT_EQ("Test",             logger.message);
-  ASSERT_EQ(3,                  logger.vars.size());
+  ASSERT_EQ("Test", logger.message);
+  ASSERT_EQ(3, logger.vars.size());
 }
 
 TEST(LoggerTest, ShortMacro) {
@@ -69,8 +71,8 @@ TEST(LoggerTest, ShortMacro) {
   INFO((&logger), "Test");
 
   ASSERT_EQ(LogLevel::LL_INFO, logger.level);
-  ASSERT_EQ("Test",            logger.message);
-  ASSERT_EQ(3,                 logger.vars.size());
+  ASSERT_EQ("Test", logger.message);
+  ASSERT_EQ(3, logger.vars.size());
 }
 
 TEST(LoggerTest, LongMacro) {
@@ -81,10 +83,10 @@ TEST(LoggerTest, LongMacro) {
   ERRORV((&logger), "Test", vars);
 
   ASSERT_EQ(LogLevel::LL_ERROR, logger.level);
-  ASSERT_EQ("Test",             logger.message);
-  ASSERT_EQ(4,                  logger.vars.size());
-  ASSERT_EQ("81",               logger.vars["line"]);
-  ASSERT_EQ("value",            logger.vars["before"]);
+  ASSERT_EQ("Test", logger.message);
+  ASSERT_EQ(4, logger.vars.size());
+  ASSERT_EQ("83", logger.vars["line"]);
+  ASSERT_EQ("value", logger.vars["before"]);
 }
 
 TEST(LoggerTest, Format) {
@@ -117,8 +119,28 @@ TEST(LoggerTest, Unicode) {
 }
 
 
-// TODO(stefano): log-groups
-//   1. Add an optional string to the static context.
-//   2. If the string is set, `formatMessage` will add it to variables.
-//   3. If the string is not use the empty string.
-//   4. Format can include the ${log-group} variable.
+class StaticLoggerTest : public ::testing::Test {
+ public:
+  ~StaticLoggerTest() {
+    Static::reset();
+  }
+};
+
+
+TEST_F(StaticLoggerTest, LogGroupMissing) {
+  TestLogger logger("${<log-group>}::${level}::${message}");
+  LogInfo    vars;
+
+  ASSERT_EQ("Global::INFO::A", logger.externalFormatMessage(
+      LogLevel::LL_INFO, "A", vars
+  ));
+}
+
+TEST_F(StaticLoggerTest, LogGroupSet) {
+  TestLogger logger("${<log-group>}::${level}::${message}");
+  LogInfo    vars;
+  Static::options()->setString("log-group", "Test");
+  ASSERT_EQ("Test::INFO::A", logger.externalFormatMessage(
+      LogLevel::LL_INFO, "A", vars
+  ));
+}

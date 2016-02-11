@@ -13,6 +13,7 @@ using sf::core::exception::DuplicateInjection;
 
 using sf::core::interface::Posix;
 using sf::core::model::CLIParser;
+using sf::core::model::Options;
 
 using sf::core::posix::TestPosix;
 
@@ -31,8 +32,8 @@ class TestParser : public CLIParser {
 };
 
 
-TEST_F(StaticTest, DoubleInitialiseFails) {
-  Static::initialise(nullptr);
+TEST_F(StaticTest, DoublePosixFails) {
+  Static::initialise(new TestPosix());
   ASSERT_THROW(Static::initialise(nullptr), DuplicateInjection);
 }
 
@@ -61,4 +62,16 @@ TEST_F(StaticTest, HasParser) {
   CLIParser* parser = new TestParser();
   Static::parser(parser);
   ASSERT_EQ(parser, Static::parser());
+}
+
+TEST_F(StaticTest, OptionsIsSingleton) {
+  Options* options1 = Static::options();
+  Options* options2 = Static::options();
+  ASSERT_EQ(options1, options2);
+}
+
+TEST_F(StaticTest, OptionsIsReset) {
+  Static::options()->setString("key", "value");
+  Static::reset();
+  ASSERT_FALSE(Static::options()->hasString("key"));
 }

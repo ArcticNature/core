@@ -4,6 +4,7 @@
 
   "deps": [
     "core.compile-time",
+    "core.context.static",
     "core.utility.string"
   ],
 

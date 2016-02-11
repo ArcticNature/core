@@ -11,15 +11,23 @@ using sf::core::exception::DuplicateInjection;
 
 using sf::core::interface::Posix;
 using sf::core::model::CLIParser;
+using sf::core::model::Options;
 
 
 // Static variables to store injected instances.
-static bool initialised = false;
+static std::shared_ptr<Options> options_ref;
 static std::shared_ptr<CLIParser> parser_ref;
 static std::shared_ptr<Posix> posix_ref;
 
 
 // Static class.
+Options* Static::options() {
+  if (options_ref.get() == nullptr) {
+    options_ref = std::shared_ptr<Options>(new Options());
+  }
+  return options_ref.get();
+}
+
 CLIParser* Static::parser() {
   if (parser_ref.get() == nullptr) {
     throw ContextUninitialised("Static cli-parser not initialised.");
@@ -35,12 +43,10 @@ Posix* Static::posix() {
 }
 
 void Static::initialise(Posix* posix) {
-  if (initialised) {
+  if (posix_ref.get() != nullptr) {
     throw DuplicateInjection("Attempted to initialise static context twice.");
   }
-
-  posix_ref   = std::shared_ptr<Posix>(posix);
-  initialised = true;
+  posix_ref = std::shared_ptr<Posix>(posix);
 }
 
 void Static::parser(CLIParser* parser) {
@@ -53,14 +59,21 @@ void Static::parser(CLIParser* parser) {
 }
 
 
+void Static::destroy() {
+  options_ref = std::shared_ptr<Options>();
+  parser_ref  = std::shared_ptr<CLIParser>();
+  posix_ref   = std::shared_ptr<Posix>();
+}
+
+
 // Some methods should not be used in release versions but
 // are needed for tests and could be helpful for debugging.
 #if DEBUG_BUILD
 
 void Static::reset() {
+  options_ref = std::shared_ptr<Options>();
   parser_ref  = std::shared_ptr<CLIParser>();
   posix_ref   = std::shared_ptr<Posix>();
-  initialised = false;
 }
 
 #endif  // DEBUG_BUILD

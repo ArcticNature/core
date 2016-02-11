@@ -5,10 +5,13 @@
 #include <string>
 
 #include "core/compile-time/options.h"
+#include "core/context/static.h"
 #include "core/model/logger/console.h"
 #include "core/utility/string.h"
 
 #define FALLBACK_PREFIX "[Fallback] "
+
+using sf::core::context::Static;
 
 using sf::core::model::ConsoleLogger;
 using sf::core::model::Logger;
@@ -35,6 +38,10 @@ LoggerRef Logger::fallback() {
     );
   }
   return Logger::fallback_instance;
+}
+
+void Logger::destroyFallback() {
+  Logger::fallback_instance = LoggerRef();
 }
 
 
@@ -71,6 +78,12 @@ std::string Logger::formatMessage(
     vars["<now>"] = currentTimestamp();
   }
 
+  vars["<log-group>"] = "Global";
+  if (Static::options()->hasString("log-group")) {
+    vars["<log-group>"] = Static::options()->getString("log-group");
+  }
+
+  // Replace variables.
   buffer.clear();
   buffer.str("");
   std::string::size_type close = 0;
@@ -93,6 +106,7 @@ std::string Logger::formatMessage(
   buffer << format.substr(prev);
 
 #if DEBUG_BUILD
+  // Append a stack trace if possible.
   if (vars.find("trace") != vars.end()) {
     buffer << " Trace: " << vars["trace"];
   }
