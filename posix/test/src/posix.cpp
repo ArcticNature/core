@@ -9,6 +9,9 @@ using sf::core::posix::ExitTestException;
 
 
 TestPosix::TestPosix() {
+  this->freopen_called = false;
+  this->freopen_path   = "";
+
   this->chdir_path = "";
   this->chdir_called = false;
 
@@ -29,6 +32,11 @@ TestPosix::TestPosix() {
 
   this->setsid_called = false;
   this->setsid_result = 0;
+
+  this->getgrnam_called = false;
+  this->getgrnam_name   = "";
+  this->getpwnam_called = false;
+  this->getpwnam_name   = "";
 
   this->setgroups_called = false;
   this->setegid_called = false;
@@ -58,6 +66,12 @@ void TestPosix::exit(int code) {
   if (this->exit_raise) {
     throw ExitTestException();
   }
+}
+
+FILE* TestPosix::freopen(const char* path, const char* mode, FILE* stream) {
+  this->freopen_called = true;
+  this->freopen_path   = std::string(path);
+  return stream;
 }
 
 int TestPosix::execvp(const char* file, char* const argv[]) {
@@ -94,6 +108,18 @@ pid_t TestPosix::getpid() {
 
 pid_t TestPosix::getppid() {
   return this->fork_parent;
+}
+
+struct group TestPosix::getgrnam(const char* name, char** buf) {
+  this->getgrnam_called = true;
+  this->getgrnam_name   = std::string(name);
+  return Posix::getgrnam(name, buf);
+}
+
+struct passwd TestPosix::getpwnam(const char* name, char** buf) {
+  this->getpwnam_called = true;
+  this->getpwnam_name   = std::string(name);
+  return Posix::getpwnam(name, buf);
 }
 
 pid_t TestPosix::setsid() {

@@ -17,6 +17,7 @@ int SubProcess::child() {
   Static::posix()->sigprocmask(SIG_UNBLOCK, &signals, nullptr);
 
   // Redirect std streams.
+  this->redirectStdFileDescriptors(this->stdin, this->stdout, this->stderr);
   this->closeNonStdFileDescriptors();
 
   // Drop group/user if needed.
@@ -59,10 +60,31 @@ SubProcess::SubProcess(std::string binary) : Forker() {
 
   this->group = "";
   this->user  = "";
+
+  this->stderr = "";
+  this->stdin  = "";
+  this->stdout = "";
 }
 
 void SubProcess::appendArgument(std::string argument) {
   this->arguments.push_back(argument);
+}
+
+void SubProcess::impersonate(std::string user, std::string group) {
+  this->user  = user;
+  this->group = group;
+}
+
+void SubProcess::redirectErrorOutput(std::string path) {
+  this->stderr = path;
+}
+
+void SubProcess::redirctStandardInput(std::string path) {
+  this->stdin = path;
+}
+
+void SubProcess::redirctStandardOutput(std::string path) {
+  this->stdout = path;
 }
 
 int SubProcess::join() {

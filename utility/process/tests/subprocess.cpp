@@ -1,5 +1,6 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <gtest/gtest.h>
+#include <fstream>
 
 #include "core/context/static.h"
 #include "core/interface/posix.h"
@@ -16,6 +17,9 @@ using sf::core::posix::TestPosix;
 
 #define CHILD_PID  3
 #define PARENT_PID 2
+
+#define FIXTURE_BASE "core/utility/process/tests/fixtures/"
+#define FIXTURE_PATH(partial) FIXTURE_BASE partial
 
 
 class SubProcessTest : public ::testing::Test {
@@ -119,7 +123,29 @@ TEST_F(SubProcessTest, WaitParent) {
 }
 
 // User & group.
-// Redirects.
+TEST_F(SubProcessTest, DropUser) {
+  this->makeChild();
+  SubProcess cmd("ls");
+  cmd.impersonate("root");
+  cmd.wait();
+
+  ASSERT_TRUE(this->posix->getgrnam_called);
+  ASSERT_TRUE(this->posix->getpwnam_called);
+  ASSERT_EQ("root", this->posix->getgrnam_name);
+  ASSERT_EQ("root", this->posix->getpwnam_name);
+}
+
+TEST_F(SubProcessTest, DropUserAndGroup) {
+  this->makeChild();
+  SubProcess cmd("ls");
+  cmd.impersonate("root", "bin");
+  cmd.wait();
+
+  ASSERT_TRUE(this->posix->getgrnam_called);
+  ASSERT_TRUE(this->posix->getpwnam_called);
+  ASSERT_EQ("bin",  this->posix->getgrnam_name);
+  ASSERT_EQ("root", this->posix->getpwnam_name);
+}
 
 
 // Real subprocess tests
@@ -149,4 +175,45 @@ TEST_F(RealSubProcessTest, ExitSuccess) {
   int result = cmd.wait();
   ASSERT_EQ(0, result);
 }
-//  I/O redirect.
+
+TEST_F(RealSubProcessTest, RedirectStdError) {
+  std::string err_path = FIXTURE_PATH("error.txt");
+  SubProcess cmd("cat");
+  cmd.appendArgument("not a real file");
+  cmd.redirectErrorOutput(err_path);
+  cmd.wait();
+
+  std::ifstream file(err_path);
+  std::string line;
+  std::getline(file, line);
+  ASSERT_EQ("cat: not a real file: No such file or directory", line);
+}
+
+TEST_F(RealSubProcessTest, RedirectStdIn) {
+  std::string in_path  = FIXTURE_PATH("input.txt");
+  std::string out_path = FIXTURE_PATH("output1.txt");
+
+  SubProcess cmd("tee");
+  cmd.appendArgument(out_path);
+  cmd.redirctStandardInput(in_path);
+  cmd.wait();
+
+  std::ifstream file(out_path);
+  std::string line;
+  std::getline(file, line);
+  ASSERT_EQ("This comes from a file", line);
+}
+
+TEST_F(RealSubProcessTest, RedirectStdOut) {
+  std::string out_path = FIXTURE_PATH("output2.txt");
+
+  SubProcess cmd("echo");
+  cmd.appendArgument("This is written to a file");
+  cmd.redirctStandardOutput(out_path);
+  cmd.wait();
+
+  std::ifstream file(out_path);
+  std::string line;
+  std::getline(file, line);
+  ASSERT_EQ("This is written to a file", line);
+}

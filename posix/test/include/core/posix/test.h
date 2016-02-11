@@ -27,6 +27,9 @@ namespace posix {
     TestPosix();
     ~TestPosix();
 
+    bool freopen_called;
+    std::string freopen_path;
+
     bool chdir_called;
     std::string chdir_path;
 
@@ -48,6 +51,11 @@ namespace posix {
     bool setsid_called;
     int  setsid_result;
 
+    bool getgrnam_called;
+    std::string getgrnam_name;
+    bool getpwnam_called;
+    std::string getpwnam_name;
+
     bool setgroups_called;
     bool setegid_called;
     bool seteuid_called;
@@ -64,6 +72,8 @@ namespace posix {
     sigset_t* sigfillset_set;
     const sigset_t* sigprocmask_set;
 
+    virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
+
     virtual int   execvp(const char* file, char* const argv[]);
     virtual void  exit(int code);
     virtual pid_t fork();
@@ -73,6 +83,9 @@ namespace posix {
 
     virtual pid_t getpid();
     virtual pid_t getppid();
+
+    virtual group  getgrnam(const char* name, char** buf);
+    virtual passwd getpwnam(const char* name, char** buf);
 
     virtual pid_t setsid();
     virtual int setgroups(int size, gid_t list[]);

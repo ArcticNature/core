@@ -1,3 +1,6 @@
 *.swp
 
 utility/forker/tests/fixtures/streams.txt
+utility/process/tests/fixtures/error.txt
+utility/process/tests/fixtures/output1.txt
+utility/process/tests/fixtures/output2.txt

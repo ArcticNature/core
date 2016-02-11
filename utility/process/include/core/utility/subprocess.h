@@ -20,6 +20,10 @@ namespace utility {
     std::string group;
     std::string user;
 
+    std::string stderr;
+    std::string stdin;
+    std::string stdout;
+
     int child();
     int parent();
 
@@ -28,6 +32,18 @@ namespace utility {
 
     //! Appeds an argument to the command to run.
     void appendArgument(std::string argument);
+
+    //! Drops privileges to the specified user/group.
+    void impersonate(std::string user, std::string group = "");
+
+    //! Redirects standard error output.
+    void redirectErrorOutput(std::string path);
+
+    //! Redirects standard input.
+    void redirctStandardInput(std::string path);
+
+    //! Redirects standard output.
+    void redirctStandardOutput(std::string path);
 
     //! Waits for a subproces that was started with `run`.
     int join();
