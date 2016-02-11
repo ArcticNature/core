@@ -6,6 +6,7 @@
   "deps": [
     "core.bin.async-process",
     "core.compile-time",
+    "core.context.daemon",
     "core.context.static",
     "core.event.source.signal",
     "core.exceptions",
@@ -17,7 +18,10 @@
     "core.registry.cli-parser",
     "core.registry.event.managers",
     "core.utility.daemoniser",
-    "core.utility.process"
+    "core.utility.process",
+
+    "core.bin.manager",
+    "core.bin.spawner"
   ],
 
   "targets": {

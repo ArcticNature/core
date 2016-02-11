@@ -40,7 +40,7 @@ class PosixMock : public Posix {
 
   int stat(const char* path, struct stat* buf) {
     std::string p(path);
-    std::string debug = "/test/path/out/core/bin/";
+    std::string debug = "/test/path/out/dist/debug/core/bin/";
     debug += this->binType + "/core.bin." + this->binType;
 
     if (this->find == "debug" && p == debug) {
@@ -85,7 +85,10 @@ TEST_F(DaemonTest, FindManagerFoundDebug) {
 
   DaemonAccessor daemon;
   std::string path = daemon.findManager();
-  ASSERT_EQ("/test/path/out/core/bin/manager/core.bin.manager", path);
+  ASSERT_EQ(
+      "/test/path/out/dist/debug/core/bin/manager/core.bin.manager",
+      path
+  );
 }
 
 TEST_F(DaemonTest, FindManagerFoundRelease) {
@@ -108,7 +111,10 @@ TEST_F(DaemonTest, FindSpownerFoundDebug) {
 
   DaemonAccessor daemon;
   std::string path = daemon.findSpawner();
-  ASSERT_EQ("/test/path/out/core/bin/spawner/core.bin.spawner", path);
+  ASSERT_EQ(
+      "/test/path/out/dist/debug/core/bin/spawner/core.bin.spawner",
+      path
+  );
 }
 
 TEST_F(DaemonTest, FindSpawnerFoundRelease) {

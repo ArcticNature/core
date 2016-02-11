@@ -3,8 +3,10 @@
 
 #include "core/bin/daemon.h"
 
+#include "core/context/daemon.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
+
 #include "core/exceptions/base.h"
 #include "core/interface/lifecycle.h"
 
@@ -67,6 +69,7 @@ int main(int argc, char** argv) {
     );
 
     Lifecycle::trigger("process::exit");
+    sf::core::context::Daemon::destroy();
     Context::destroy();
     Logger::destroyFallback();
     Static::destroy();
@@ -74,6 +77,7 @@ int main(int argc, char** argv) {
   }
 
   Lifecycle::trigger("process::exit");
+  sf::core::context::Daemon::destroy();
   Context::destroy();
   Logger::destroyFallback();
   Static::destroy();

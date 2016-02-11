@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "core/compile-time/options.h"
+#include "core/context/daemon.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -17,6 +18,7 @@
 
 using sf::core::bin::Daemon;
 using sf::core::bin::DaemonSignalSource;
+
 using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::exception::ProcessNotFound;
@@ -28,6 +30,9 @@ using sf::core::model::EventSourceManagerRef;
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 using sf::core::registry::EventSourceManager;
+
+using sf::core::utility::SubProcess;
+using sf::core::utility::SubProcessRef;
 using sf::core::utility::processDirectory;
 
 
@@ -79,11 +84,23 @@ void Daemon::createSockets() {
 }
 
 void Daemon::forkManager() {
-  // TODO(stefano): Start manager.
+  std::string path = this->findManager();
+  SubProcessRef manager(new SubProcess(path));
+
+  // TODO(stefano): add arguments.
+
+  manager->run();
+  sf::core::context::Daemon::instance()->setManager(manager);
 }
 
 void Daemon::forkSpawner() {
-  // TODO(stefano): Fork spawner.
+  std::string path = this->findSpawner();
+  SubProcessRef spawner(new SubProcess(path));
+
+  // TODO(stefano): add arguments.
+
+  spawner->run();
+  sf::core::context::Daemon::instance()->setSpawner(spawner);
 }
 
 
@@ -113,17 +130,24 @@ void Daemon::disableSignals() {
 
 
 std::string Daemon::findManager() {
+  std::vector<std::string> paths;
+
+  // When running from build the mode determines the location.
   char raw_cwd[CWD_LEN];
   std::string cwd(Static::posix()->getcwd(raw_cwd, CWD_LEN));
-  std::string base = processDirectory();
+  std::string mode = DEBUG_BUILD ? "debug" : "release";
+  paths.push_back(
+      cwd + "/out/dist/" + mode +
+      "/core/bin/manager/core.bin.manager"
+  );
 
+  // Production installations have the binaries in the same dir.
+  std::string base = processDirectory();
+  paths.push_back(base + "/snow-fox-manager");
+
+  // Check with files exists.
   struct stat stat_info;
   std::vector<std::string>::iterator it;
-  std::vector<std::string> paths = {
-    cwd + "/out/core/bin/manager/core.bin.manager",
-    base + "/snow-fox-manager"
-  };
-
   for (it = paths.begin(); it != paths.end(); it++) {
     if (Static::posix()->stat(it->c_str(), &stat_info) == 0) {
       return *it;
@@ -135,17 +159,24 @@ std::string Daemon::findManager() {
 
 
 std::string Daemon::findSpawner() {
+  std::vector<std::string> paths;
+
+  // When running from build the mode determines the location.
   char raw_cwd[CWD_LEN];
   std::string cwd(Static::posix()->getcwd(raw_cwd, CWD_LEN));
-  std::string base = processDirectory();
+  std::string mode = DEBUG_BUILD ? "debug" : "release";
+  paths.push_back(
+      cwd + "/out/dist/" + mode +
+      "/core/bin/spawner/core.bin.spawner"
+  );
 
+  // Production installations have the binaries in the same dir.
+  std::string base = processDirectory();
+  paths.push_back(base + "/snow-fox-spawner");
+
+  // Check with files exists.
   struct stat stat_info;
   std::vector<std::string>::iterator it;
-  std::vector<std::string> paths = {
-    cwd + "/out/core/bin/spawner/core.bin.spawner",
-    base + "/snow-fox-spawner"
-  };
-
   for (it = paths.begin(); it != paths.end(); it++) {
     if (Static::posix()->stat(it->c_str(), &stat_info) == 0) {
       return *it;

@@ -1,0 +1,20 @@
+{
+  "name": "core.context.daemon",
+  "type": "c++",
+
+  "deps": [
+    "core.utility.process"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": [
+        "core.context.static",
+        "core.posix.user"
+      ],
+      "type": "lib"
+    }
+  }
+}

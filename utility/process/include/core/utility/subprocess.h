@@ -2,6 +2,7 @@
 #ifndef CORE_UTILITY_SUBPROCESS_H_
 #define CORE_UTILITY_SUBPROCESS_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -10,6 +11,7 @@
 namespace sf {
 namespace core {
 namespace utility {
+
   //! Runs applications programmatically.
   class SubProcess : public Forker {
    protected:
@@ -54,6 +56,9 @@ namespace utility {
     //! Runs the process and waits for it to complete.
     int wait();
   };
+
+  //! Reference to a subprocess.
+  typedef std::shared_ptr<SubProcess> SubProcessRef;
 
 }  // namespace utility
 }  // namespace core

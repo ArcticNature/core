@@ -21,10 +21,7 @@ int Restricted::kill(pid_t pid, int sig) {
 
 
 pid_t Restricted::waitpid(pid_t pid, int* status, int options) {
-  if (!(
-      pid > 1 && status == nullptr &&
-      (options == 0 || options == WNOHANG)
-  )) {
+  if (pid <= 1) {
     throw OperationNotPermitted();
   }
   return ::waitpid(pid, status, options);
