@@ -2,27 +2,35 @@
 #include <string>
 
 #include "core/bin/daemon.h"
+#include "core/context/daemon.h"
 #include "core/event/source/signal.h"
-#include "core/exceptions/base.h"
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
 using sf::core::bin::DaemonSignalSource;
+using sf::core::bin::SigChild;
+using sf::core::bin::TerminateDaemon;
+
+using sf::core::context::DaemonRef;
 using sf::core::event::SignalSource;
-using sf::core::exception::CleanExit;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
 using sf::core::model::Logger;
 
 
-class DaemonStop : public Event {
- public:
-  explicit DaemonStop(std::string correlation) : Event(correlation, "NULL") {}
-  void handle() {
-    throw CleanExit();
+sigset_t DaemonSignalSource::getSignalsMask() {
+  sigset_t mask = SignalSource::getSignalsMask();
+  sigaddset(&mask, SIGCHLD);
+  return mask;
+}
+
+EventRef DaemonSignalSource::handleSignal(int signo) {
+  if (signo != SIGCHLD) {
+    return SignalSource::handleSignal(signo);
   }
-};
+  return EventRef(new SigChild("daemon-signal-0"));
+}
 
 
 DaemonSignalSource::DaemonSignalSource() : SignalSource("daemon") {}
@@ -38,6 +46,11 @@ EventRef DaemonSignalSource::handleState() {
 }
 
 EventRef DaemonSignalSource::handleStop() {
-  DEBUG(Logger::fallback(), "Requested system termination.");
-  return EventRef(new DaemonStop("daemon-signal-0"));
+  DaemonRef context = sf::core::context::Daemon::instance();
+  if (context->terminating()) {
+    context->shutdownForced();
+  }
+
+  WARNING(Logger::fallback(), "Requested system termination.");
+  return EventRef(new TerminateDaemon("daemon-signal-0"));
 }

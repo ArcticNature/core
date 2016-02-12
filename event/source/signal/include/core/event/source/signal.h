@@ -19,6 +19,15 @@ namespace event {
    protected:
     int signal_fd;
 
+    //! Initialises the signalfd to return to the event manager.
+    void createSignalFd();
+
+    //! Returns the set of signals to mask and wait on.
+    virtual sigset_t getSignalsMask();
+
+    //! Returns the appropriate event to handle with the signal.
+    virtual sf::core::model::EventRef handleSignal(int signo);
+
     //! Returns the event responable for configuration reload.
     virtual sf::core::model::EventRef handleReloadConfig() = 0;
 

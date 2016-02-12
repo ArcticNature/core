@@ -23,7 +23,15 @@ using sf::core::model::LogInfo;
 using sf::core::utility::string::toString;
 
 
-SignalSource::SignalSource(std::string id) : EventSource("signal-" + id) {
+void SignalSource::createSignalFd() {
+  sigset_t mask = this->getSignalsMask();
+  Static::posix()->sigprocmask(SIG_BLOCK, &mask, nullptr);
+  this->signal_fd = Static::posix()->signalfd(
+      -1, &mask, SFD_NONBLOCK | SFD_CLOEXEC
+  );
+}
+
+sigset_t SignalSource::getSignalsMask() {
   sigset_t mask;
   sigemptyset(&mask);
   sigaddset(&mask, SIGTERM);
@@ -34,18 +42,39 @@ SignalSource::SignalSource(std::string id) : EventSource("signal-" + id) {
   sigaddset(&mask, SIGINT);
 #endif
 
-  Static::posix()->sigprocmask(SIG_BLOCK, &mask, nullptr);
-  this->signal_fd = Static::posix()->signalfd(
-      -1, &mask, SFD_NONBLOCK | SFD_CLOEXEC
-  );
+  return mask;
+}
+
+EventRef SignalSource::handleSignal(int signo) {
+  switch (signo) {
+    case SIGINT:
+    case SIGTERM: return this->handleStop();
+    case SIGUSR1: return this->handleState();
+    case SIGUSR2: return this->handleReloadConfig();
+    default:
+      LogInfo vars = {{"signal", toString(signo)}};
+      ERRORV(
+          Context::logger(),
+          "Received unrecognised signal ${signal}.",
+          vars
+      );
+      return EventRef();
+  }
+}
+
+
+SignalSource::SignalSource(std::string id) : EventSource("signal-" + id) {
+  this->signal_fd = -1;
 }
 
 SignalSource::~SignalSource() {
   Static::posix()->close(this->signal_fd);
 }
 
-
 int SignalSource::getFD() {
+  if (this->signal_fd == -1) {
+    this->createSignalFd();
+  }
   return this->signal_fd;
 }
 
@@ -60,18 +89,5 @@ EventRef SignalSource::parse() {
     throw ErrNoException("Read error on signalfd:");
   }
 
-  switch (signal_info.ssi_signo) {
-    case SIGINT:
-    case SIGTERM: return this->handleStop();
-    case SIGUSR1: return this->handleState();
-    case SIGUSR2: return this->handleReloadConfig();
-    default:
-      LogInfo vars = {{"signal", toString(signal_info.ssi_signo)}};
-      ERRORV(
-          Context::logger(),
-          "Received unrecognised signal ${signal}.",
-          vars
-      );
-      return EventRef();
-  }
+  return this->handleSignal(signal_info.ssi_signo);
 }

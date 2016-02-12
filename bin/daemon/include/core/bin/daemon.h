@@ -5,9 +5,11 @@
 #include <string>
 
 #include "core/bin/async-process.h"
+#include "core/context/daemon.h"
 #include "core/event/source/signal.h"
 #include "core/model/event.h"
 #include "core/utility/daemoniser.h"
+
 
 namespace sf {
 namespace core {
@@ -39,12 +41,45 @@ namespace bin {
   //! Signal event source for the Daemon process.
   class DaemonSignalSource : public sf::core::event::SignalSource {
    protected:
+    sigset_t getSignalsMask();
+    sf::core::model::EventRef handleSignal(int signo);
+
+    sf::core::model::EventRef handleChild();
     sf::core::model::EventRef handleReloadConfig();
     sf::core::model::EventRef handleState();
     sf::core::model::EventRef handleStop();
 
    public:
     DaemonSignalSource();
+  };
+
+  //! Handles a child termination.
+  class SigChild : public sf::core::model::Event {
+   protected:
+    bool checkChild(pid_t pid);
+
+   public:
+    explicit SigChild(std::string correlation);
+    void handle();
+  };
+
+  //! Handles daemon termination.
+  class TerminateDaemon : public sf::core::model::Event {
+   protected:
+    sf::core::context::DaemonRef context;
+
+    //! Kills the subpocesses and stops immediatelly.
+    void rudeStop();
+
+    //! Request the termination of the manager.
+    void stopManager();
+
+    //! Request the termination of the spawner.
+    void stopSpawner();
+
+   public:
+    explicit TerminateDaemon(std::string correlation);
+    void handle();
   };
 
 }  // namespace bin

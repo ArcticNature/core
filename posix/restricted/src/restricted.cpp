@@ -13,7 +13,7 @@ using sf::core::posix::Restricted;
 Restricted::~Restricted() {}
 
 int Restricted::kill(pid_t pid, int sig) {
-  if (!(pid > 1 && (sig == SIGINT || sig == SIGTERM))) {
+  if (!(pid > 1 && (sig == SIGINT || sig == SIGTERM || sig == SIGKILL))) {
     throw OperationNotPermitted();
   }
   return ::kill(pid, sig);

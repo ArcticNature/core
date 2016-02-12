@@ -24,7 +24,10 @@ namespace context {
     static void destroy();
 
    protected:
-    int exit_code;
+    bool _exiting;
+    int  exit_code;
+    bool forced_exit;
+
     sf::core::utility::SubProcessRef manager;
     sf::core::utility::SubProcessRef spawner;
 
@@ -33,8 +36,20 @@ namespace context {
    public:
     ~Daemon();
 
+    void exiting(int code);
+    void shutdown();
+    void shutdownForced();
+    bool terminating();
+    bool terminatingForced();
+
+    void clearManager();
+    void clearSpawner();
+
     void setManager(sf::core::utility::SubProcessRef manager);
     void setSpawner(sf::core::utility::SubProcessRef spawner);
+
+    pid_t managerPid();
+    pid_t spawnerPid();
   };
 
 }  // namespace context
