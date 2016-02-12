@@ -76,10 +76,11 @@ int main(int argc, char** argv) {
     return ex.getCode();
   }
 
+  int exit_code = sf::core::context::Daemon::instance()->exitCode();
   Lifecycle::trigger("process::exit");
   sf::core::context::Daemon::destroy();
   Context::destroy();
   Logger::destroyFallback();
   Static::destroy();
-  return 0;
+  return exit_code;
 }

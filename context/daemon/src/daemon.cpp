@@ -40,6 +40,10 @@ Daemon::~Daemon() {
   }
 }
 
+int Daemon::exitCode() {
+  return this->exit_code;
+}
+
 void Daemon::exiting(int code) {
   this->_exiting = true;
   if (code != 0) {

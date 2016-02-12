@@ -36,7 +36,9 @@ namespace context {
    public:
     ~Daemon();
 
+    int  exitCode();
     void exiting(int code);
+
     void shutdown();
     void shutdownForced();
     bool terminating();
