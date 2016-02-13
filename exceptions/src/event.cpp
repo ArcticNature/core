@@ -12,5 +12,5 @@ EventDrainNotFound::EventDrainNotFound(std::string drain) : SfException(
 ) {}
 
 int EventDrainNotFound::getCode() const {
-  return -27;
+  return -28;
 }

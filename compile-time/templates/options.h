@@ -26,6 +26,8 @@
 #define DEFAULT_AUTOSTART_DELAY_NAME    "delay"
 #define DEFAULT_AUTOSTART_INTERVAL_NAME "interval"
 
+#define DEFAULT_BUFFER_SIZE 1024
+
 #define DEFAULT_LOG_FORMAT "{{default-log-format}}"  // NOLINT(whitespace/line_length)
 #define DEFAULT_TICK 1
 

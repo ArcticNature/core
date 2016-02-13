@@ -3,6 +3,8 @@
 
 #include <string>
 
+
+using sf::core::exception::InvalidOption;
 using sf::core::exception::SfException;
 using sf::core::exception::VariableNotFound;
 
@@ -14,3 +16,5 @@ VariableNotFound::VariableNotFound(std::string msg) : SfException(
 int VariableNotFound::getCode() const {
   return -21;
 }
+
+MSG_DEFINITION(SfException, InvalidOption, -29);

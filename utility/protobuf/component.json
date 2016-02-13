@@ -1,0 +1,18 @@
+{
+  "name": "core.utility.protobuf",
+  "type": "c++",
+
+  "deps": [
+    "core.compile-time",
+    "core.context.static"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": ["core.posix.user"],
+      "type": "lib"
+    }
+  }
+}

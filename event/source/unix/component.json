@@ -1,0 +1,15 @@
+{
+  "name": "core.event.source.unix",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static",
+    "core.model.event"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

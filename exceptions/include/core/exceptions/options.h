@@ -11,6 +11,9 @@ namespace exception {
   //! Thrown when a non-existent variable or oprion name is used.
   MSG_EXCEPTION(SfException, VariableNotFound);
 
+  //! Thrown when an invalid option or value is used.
+  MSG_EXCEPTION(SfException, InvalidOption);
+
 }  // namespace exception
 }  // namespace core
 }  // namespace sf
