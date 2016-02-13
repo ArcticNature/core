@@ -1,0 +1,14 @@
+{
+  "name": "core.protocol.test",
+  "type": "protobuf",
+  "libs": ["protobuf"],
+
+  "generate": {
+    "c++": true,
+    "js":  true
+  },
+
+  "targets": {
+    "test": { "type": "lib" }
+  }
+}

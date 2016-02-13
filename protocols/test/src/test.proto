@@ -1,0 +1,19 @@
+// Import the base message to extend it.
+import "message.proto";
+
+// And all extentions are in the same package as the base message.
+package sf.core.protocol.test;
+
+
+/*
+ * Extentions are defined to type check the fileds of a message
+ * while codes are used to present all messages with a common interface.
+ */
+message Test {
+  required string data   = 1;
+  optional int64  number = 2;
+
+  extend Message {
+    optional Test msg = 50;
+  }
+}

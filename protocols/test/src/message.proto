@@ -1,0 +1,29 @@
+// All protocols should have their own package
+// defined under sf.core.protocol.
+package sf.core.protocol.test;
+
+
+/*
+ * All protocols have the same structrue:
+ *  * All messages extend the `Message`.
+ *  * The base `Message` has a required `code` field.
+ *  * The base `Message` contains the `Code` enumeration for the
+ *    `code` field.
+ *  * Message payload is stored in extentions.
+ *    The extention depends on the message code. 
+ *    Used extention codes are listed at the end of the message
+ *    to have a quick overview of the available extentions.
+ */
+message Message {
+  enum Code {
+    Test = 1;
+  }
+
+  required Code code = 1;
+  extensions 50 to max;
+
+  /*
+   * Used extentions:
+   *  - 50: Test [test extension].
+   */
+}

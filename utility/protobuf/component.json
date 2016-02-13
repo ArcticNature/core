@@ -11,7 +11,10 @@
     "debug":   { "type": "lib" },
     "release": { "type": "lib" },
     "test":    {
-      "deps": ["core.posix.user"],
+      "deps": [
+        "core.posix.user",
+        "core.protocol.test"
+      ],
       "type": "lib"
     }
   }
