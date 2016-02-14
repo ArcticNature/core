@@ -17,8 +17,10 @@ namespace event {
     int socket_fd;
     std::string path;
 
+    void openSocket();
+
    public:
-    explicit UnixSource(std::string id);
+    UnixSource(std::string socket, std::string id);
     ~UnixSource();
 
     int getFD();

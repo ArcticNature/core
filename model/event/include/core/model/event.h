@@ -62,8 +62,11 @@ namespace model {
     explicit EventDrain(std::string id);
     virtual ~EventDrain();
 
-    //! @returns the ID of the event drain.
+    //! \returns the ID of the event drain.
     std::string id() const;
+
+    //! \returns The writable file descriptor to send data to.
+    virtual int getFD() = 0;
 
     //! Handles exceptions that were thrown while handling an event.
     /**
@@ -76,12 +79,12 @@ namespace model {
      * Any exception that is thrown from this method will result in
      * the termination of the server.
      *
-     * @returns True to indicate that the exception was handled.
+     * \returns True to indicate that the exception was handled.
      */
     virtual bool handleError(sf::core::exception::SfException* ex);
 
-    //! Sends a message down the drain.
-    virtual void send() = 0;
+    //! Sends an ack down the drain.
+    virtual void sendAck() = 0;
   };
 
 
@@ -104,7 +107,7 @@ namespace model {
     //! Adds an event drain to the set.
     void add(EventDrainRef drain);
 
-    //! @returns an EventDrain by reference.
+    //! \returns an EventDrain by reference.
     EventDrainRef get(std::string id) const;
 
     //! Removes an EventDrain from the set.
@@ -130,17 +133,17 @@ namespace model {
     explicit EventSource(std::string id);
     virtual ~EventSource();
 
-    //! @returns the ID of the event source.
+    //! \returns the ID of the event source.
     std::string id() const;
 
-    //! @returns the file descriptor to wait for events on.
+    //! \returns the file descriptor to wait for events on.
     virtual int getFD() = 0;
 
     //! Parses an event from the source.
     /**
      * Called when the EventSourceManager determines that the source is ready
      * for reading.
-     * @returns an Event to handle or nullptr if no event needs handling.
+     * \returns an Event to handle or nullptr if no event needs handling.
      */
     virtual EventRef parse() = 0;
   };
@@ -176,7 +179,7 @@ namespace model {
      * an event is returned or until timeout expires.
      *
      * 
-     * @param timeout How long (in ms) to block for before giving up.
+     * \param timeout How long (in ms) to block for before giving up.
      * The default of -1 will block indefinitely.
      */
     virtual EventRef wait(int timeout = -1) = 0;

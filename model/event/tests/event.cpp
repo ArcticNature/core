@@ -26,7 +26,11 @@ class TestEvent : public Event {
 class TestDrain : public EventDrain {
  public:
   TestDrain(std::string drain) : EventDrain(drain) {}
-  void send() {}
+  void sendAck() {}
+
+  int getFD() {
+    return 0;
+  }
 };
 
 

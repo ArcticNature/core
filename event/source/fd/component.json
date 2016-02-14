@@ -1,11 +1,8 @@
 {
-  "name": "core.model.event",
+  "name": "core.event.source.fd",
   "type": "c++",
 
-  "deps": [
-    "core.context.static",
-    "core.exceptions"
-  ],
+  "deps": [],
 
   "targets": {
     "debug":   { "type": "lib" },

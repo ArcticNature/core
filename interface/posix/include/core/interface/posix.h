@@ -7,8 +7,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <sys/epoll.h>
-#include <sys/types.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 
@@ -38,10 +39,12 @@ namespace interface {
     virtual int lstat(const char* path, struct stat* buf);
     virtual int stat(const char* path, struct stat* buf);
     virtual ssize_t readlink(const char* path, char* buf, size_t size);
+    virtual int unlink(const char* path);
 
     // File descriptors.
     virtual int   close(int fd, bool silent = false);
     virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
+    virtual int   open(const char* path, int flags, mode_t mode);
     virtual int   pipe(int fildes[2], int flags = 0);
     virtual ssize_t read(int fd, void *buf, size_t count, bool silent = false);
     virtual ssize_t write(int df, const void* buf, size_t count);
@@ -81,6 +84,13 @@ namespace interface {
     virtual int sigfillset(sigset_t* set);
     virtual int signalfd(int fd, const sigset_t* mask, int flags);
     virtual int sigprocmask(int how, const sigset_t* set, sigset_t* old_set);
+
+    // Socket.
+    virtual int bind(
+        int sockfd, const struct sockaddr* addr,
+        socklen_t addrlen
+    );
+    virtual int socket(int domain, int type, int protocol);
 
     // Users.
     virtual group  getgrnam(const char* name, char** buf);

@@ -57,7 +57,11 @@ interfaces.
 ### Events
 Some event components are more then a model and always required:
 
-  * `core.event.source.signal`: Event source triggered by process signals.
+  * `core.event.drain.fd`: EventDrain that writes to a file descriptor.
+  * `core.event.source.fd`: EventSource that reads from a file descriptor.
+  * `core.event.source.signal`: EventSource triggered by process signals.
+  * `core.event.source.unix`:
+      EventSource that waits for connections over a UNIX socket.
 
 
 ### Interfaces

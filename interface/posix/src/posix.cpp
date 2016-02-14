@@ -49,6 +49,11 @@ ssize_t Posix::readlink(const char* path, char* buf, size_t size) {
   return ::readlink(path, buf, size);
 }
 
+int Posix::unlink(const char* path) {
+  CHECK_ZERO_ERRNO(::unlink, "Unable to unlink file:", path);
+  return 0;
+}
+
 
 // File descriptors.
 int Posix::close(int fd, bool silent) {
@@ -61,6 +66,14 @@ int Posix::close(int fd, bool silent) {
 
 FILE* Posix::freopen(const char* path, const char* mode, FILE* stream) {
   return ::freopen(path, mode, stream);
+}
+
+int Posix::open(const char* path, int flags, mode_t mode) {
+  int fd = ::open(path, flags, mode);
+  if (fd == -1) {
+    throw ErrNoException("Unable to open file:");
+  }
+  return fd;
 }
 
 int Posix::pipe(int ends[2], int flags) {
@@ -219,6 +232,23 @@ int Posix::sigprocmask(
     throw ErrNoException("Unable to mask signals:");
   }
   return res;
+}
+
+
+// Socket.
+int Posix::bind(
+    int sockfd, const struct sockaddr* addr, socklen_t addrlen
+) {
+  CHECK_ZERO_ERRNO(::bind, "Unable to bind socket:", sockfd, addr, addrlen);
+  return 0;
+}
+
+int Posix::socket(int domain, int type, int protocol) {
+  int fd = ::socket(domain, type, protocol);
+  if (fd == -1) {
+    throw ErrNoException("Unable to open socket:");
+  }
+  return fd;
 }
 
 
