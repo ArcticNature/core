@@ -1,5 +1,5 @@
 {
-  "name": "core.event.source.fd",
+  "name": "core.event.drain.fd",
   "type": "c++",
 
   "deps": [

@@ -21,7 +21,7 @@ using sf::core::posix::TestPosix;
 class StaticTest : public ::testing::Test {
  protected:
   ~StaticTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 
@@ -72,6 +72,6 @@ TEST_F(StaticTest, OptionsIsSingleton) {
 
 TEST_F(StaticTest, OptionsIsReset) {
   Static::options()->setString("key", "value");
-  Static::reset();
+  Static::destroy();
   ASSERT_FALSE(Static::options()->hasString("key"));
 }

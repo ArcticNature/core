@@ -7,6 +7,8 @@
 
 #include "core/context/static.h"
 
+// http://beej.us/guide/bgipc/output/html/multipage/unixsock.html
+
 
 using sf::core::context::Static;
 using sf::core::event::UnixSource;
@@ -17,7 +19,9 @@ using sf::core::model::EventSource;
 
 void UnixSource::openSocket() {
   // Create the socket.
-  this->socket_fd = Static::posix()->socket(AF_UNIX, SOCK_STREAM, 0);
+  this->socket_fd = Static::posix()->socket(
+      AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0
+  );
 
   // Bind to path.
   struct sockaddr_un local;
@@ -26,6 +30,9 @@ void UnixSource::openSocket() {
   Static::posix()->bind(
       this->socket_fd, (struct sockaddr*)&local, sizeof(sockaddr_un)
   );
+
+  // Enter listen mode.
+  // TODO(stefano): listen
 }
 
 

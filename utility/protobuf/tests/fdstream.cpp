@@ -44,7 +44,7 @@ class FdStreamBufTest : public ::testing::Test {
   ~FdStreamBufTest() {
     Static::posix()->close(this->read_fd);
     Static::posix()->close(this->write_fd);
-    Static::reset();
+    Static::destroy();
   }
 };
 

@@ -1,17 +1,13 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/model/event.h"
 
-#include <fcntl.h>
-
 #include <map>
 #include <string>
 #include <utility>
 
-#include "core/context/static.h"
 #include "core/exceptions/event.h"
 
 
-using sf::core::context::Static;
 using sf::core::exception::SfException;
 using sf::core::exception::EventDrainNotFound;
 
@@ -43,36 +39,6 @@ bool EventDrain::handleError(SfException* ex) {
   return false;
 }
 
-
-class NullDrain : public EventDrain {
- protected:
-  int null_fd;
-
- public:
-  NullDrain() : EventDrain("NULL") {
-    this->null_fd = -1;
-  }
-
-  ~NullDrain() {
-    if (this->null_fd != -1) {
-      Static::posix()->close(this->null_fd);
-    }
-  }
-
-  int getFD() {
-    if (this->null_fd == -1) {
-      this->null_fd = Static::posix()->open("/dev/null", O_WRONLY, 0);
-    }
-    return this->null_fd;
-  }
-
-  void sendAck() {}
-};
-
-
-EventDrainManager::EventDrainManager() {
-  this->add(EventDrainRef(new NullDrain()));
-}
 
 void EventDrainManager::add(EventDrainRef drain) {
   this->drains.insert(

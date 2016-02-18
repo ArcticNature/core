@@ -8,19 +8,29 @@
 using sf::core::context::Static;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::DuplicateInjection;
-
 using sf::core::interface::Posix;
+
 using sf::core::model::CLIParser;
+using sf::core::model::EventDrainManager;
+using sf::core::model::EventDrainManagerRef;
 using sf::core::model::Options;
 
 
 // Static variables to store injected instances.
+static EventDrainManagerRef drains_ref;
 static std::shared_ptr<Options> options_ref;
 static std::shared_ptr<CLIParser> parser_ref;
 static std::shared_ptr<Posix> posix_ref;
 
 
 // Static class.
+EventDrainManager* Static::drains() {
+  if (!drains_ref) {
+    drains_ref = EventDrainManagerRef(new EventDrainManager());
+  }
+  return drains_ref.get();
+}
+
 Options* Static::options() {
   if (options_ref.get() == nullptr) {
     options_ref = std::shared_ptr<Options>(new Options());
@@ -60,20 +70,8 @@ void Static::parser(CLIParser* parser) {
 
 
 void Static::destroy() {
+  drains_ref  = EventDrainManagerRef();
   options_ref = std::shared_ptr<Options>();
   parser_ref  = std::shared_ptr<CLIParser>();
   posix_ref   = std::shared_ptr<Posix>();
 }
-
-
-// Some methods should not be used in release versions but
-// are needed for tests and could be helpful for debugging.
-#if DEBUG_BUILD
-
-void Static::reset() {
-  options_ref = std::shared_ptr<Options>();
-  parser_ref  = std::shared_ptr<CLIParser>();
-  posix_ref   = std::shared_ptr<Posix>();
-}
-
-#endif  // DEBUG_BUILD

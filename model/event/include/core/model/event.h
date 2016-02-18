@@ -102,8 +102,6 @@ namespace model {
     std::map<std::string, EventDrainRef> drains;
 
    public:
-    EventDrainManager();
-
     //! Adds an event drain to the set.
     void add(EventDrainRef drain);
 

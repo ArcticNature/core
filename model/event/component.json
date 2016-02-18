@@ -3,7 +3,6 @@
   "type": "c++",
 
   "deps": [
-    "core.context.static",
     "core.exceptions"
   ],
 

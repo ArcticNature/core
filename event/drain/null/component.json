@@ -1,10 +1,17 @@
 {
-  "name": "core.event.source.fd",
+  "name": "core.event.drain.null",
   "type": "c++",
 
   "deps": [
     "core.context.static",
+    "core.interface.lifecycle",
     "core.model.event"
+  ],
+
+  "inject": [
+    "core.bin.daemon",
+    "core.bin.manager",
+    "core.bin.spawner"
   ],
 
   "targets": {

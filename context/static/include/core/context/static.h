@@ -2,9 +2,9 @@
 #ifndef CORE_CONTEXT_STATIC_H_
 #define CORE_CONTEXT_STATIC_H_
 
-#include "core/compile-time/options.h"
 #include "core/interface/posix.h"
 #include "core/model/cli-parser.h"
+#include "core/model/event.h"
 #include "core/model/options.h"
 
 
@@ -20,6 +20,8 @@ namespace context {
    */
   class Static {
    public:
+    static sf::core::model::EventDrainManager* drains();
+
     static sf::core::model::Options*   options();
     static sf::core::model::CLIParser* parser();
     static sf::core::interface::Posix* posix();
@@ -35,10 +37,6 @@ namespace context {
 
     //! Cleans up all the allocated resources.
     static void destroy();
-
-#if DEBUG_BUILD
-    static void reset();
-#endif  // DEBUG_BUILD
   };
 
 }  // namespace context

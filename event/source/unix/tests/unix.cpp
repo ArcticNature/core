@@ -32,7 +32,7 @@ class UnixSourceTest : public ::testing::Test {
   }
 
   ~UnixSourceTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 

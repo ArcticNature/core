@@ -39,7 +39,7 @@ class DaemoniserTest : public ::testing::Test {
   }
 
   ~DaemoniserTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 

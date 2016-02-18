@@ -45,7 +45,7 @@ class SubProcessTest : public ::testing::Test {
   }
 
   ~SubProcessTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 
@@ -157,7 +157,7 @@ class RealSubProcessTest : public ::testing::Test {
   }
 
   ~RealSubProcessTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 

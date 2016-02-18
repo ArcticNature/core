@@ -75,12 +75,6 @@ TEST(EventDrainManager, getFails) {
   EXPECT_THROW(manager.get("drain"), EventDrainNotFound);
 }
 
-TEST(EventDrainManager, getNull) {
-  EventDrainManager manager;
-  EventDrainRef drain = manager.get("NULL");
-  ASSERT_EQ("NULL", drain->id());
-}
-
 TEST(EventDrainManager, remove) {
   EventDrainManager manager;
   EventDrainRef drain1(new TestDrain("drain1"));

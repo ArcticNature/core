@@ -6,7 +6,8 @@
     "core.compile-time",
     "core.exceptions",
     "core.interface.posix",
-    "core.model.cli-parser"
+    "core.model.cli-parser",
+    "core.model.event"
   ],
 
   "targets": {

@@ -63,7 +63,7 @@ class ForkerTest : public ::testing::Test {
   }
 
   ~ForkerTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 

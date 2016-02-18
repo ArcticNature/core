@@ -28,7 +28,7 @@ class DaemonContextTest : public ::testing::Test {
    }
   ~DaemonContextTest() {
     Daemon::destroy();
-    Static::reset();
+    Static::destroy();
   }
 
   SubProcessRef mockProcess() {

@@ -69,7 +69,7 @@ class DaemonTest : public ::testing::Test {
     Static::initialise(this->posix);
   }
   ~DaemonTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 

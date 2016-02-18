@@ -122,7 +122,7 @@ TEST(LoggerTest, Unicode) {
 class StaticLoggerTest : public ::testing::Test {
  public:
   ~StaticLoggerTest() {
-    Static::reset();
+    Static::destroy();
   }
 };
 

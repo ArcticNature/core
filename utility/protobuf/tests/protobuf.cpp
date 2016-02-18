@@ -41,7 +41,7 @@ class IOTest : public ::testing::Test {
   ~IOTest() {
     Static::posix()->close(this->read_fd);
     Static::posix()->close(this->write_fd);
-    Static::reset();
+    Static::destroy();
   }
 };
 
