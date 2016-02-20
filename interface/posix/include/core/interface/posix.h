@@ -90,6 +90,10 @@ namespace interface {
         int sockfd, const struct sockaddr* addr,
         socklen_t addrlen
     );
+    virtual int connect(
+        int sockfd, const struct sockaddr* addr, socklen_t addrlen
+    );
+    virtual int listen(int sockfd, int backlog);
     virtual int socket(int domain, int type, int protocol);
 
     // Users.

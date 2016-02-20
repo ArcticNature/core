@@ -14,6 +14,7 @@ namespace event {
   //! Unix socket source.
   class UnixSource : public sf::core::model::EventSource {
    protected:
+    int backlog;
     int socket_fd;
     std::string path;
 

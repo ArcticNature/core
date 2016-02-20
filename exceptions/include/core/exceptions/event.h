@@ -11,6 +11,9 @@ namespace exception {
   //! Thrown when a non-existent drain is looked up.
   MSG_EXCEPTION(SfException, EventDrainNotFound);
 
+  //! Thrown when a non-existent source is looked up.
+  MSG_EXCEPTION(SfException, EventSourceNotFound);
+
 }  // namespace exception
 }  // namespace core
 }  // namespace sf

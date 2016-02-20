@@ -5,6 +5,7 @@
 
 using sf::core::exception::SfException;
 using sf::core::exception::EventDrainNotFound;
+using sf::core::exception::EventSourceNotFound;
 
 
 EventDrainNotFound::EventDrainNotFound(std::string drain) : SfException(
@@ -13,4 +14,13 @@ EventDrainNotFound::EventDrainNotFound(std::string drain) : SfException(
 
 int EventDrainNotFound::getCode() const {
   return -28;
+}
+
+
+EventSourceNotFound::EventSourceNotFound(std::string source) : SfException(
+    "Event source '" + source + "' not found."
+) {}
+
+int EventSourceNotFound::getCode() const {
+  return -29;
 }

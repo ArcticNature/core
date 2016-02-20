@@ -5,16 +5,20 @@
 #include <sys/un.h>
 #include <string>
 
+#include "core/context/context.h"
 #include "core/context/static.h"
+#include "core/model/logger.h"
 
 // http://beej.us/guide/bgipc/output/html/multipage/unixsock.html
 
 
+using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::event::UnixSource;
 
 using sf::core::model::EventRef;
 using sf::core::model::EventSource;
+using sf::core::model::LogInfo;
 
 
 void UnixSource::openSocket() {
@@ -32,13 +36,22 @@ void UnixSource::openSocket() {
   );
 
   // Enter listen mode.
-  // TODO(stefano): listen
+  Static::posix()->listen(this->socket_fd, this->backlog);
+
+  // Log the opening of the server socket.
+  LogInfo info = { {"socket",  this->path} };
+  INFOV(
+      Context::logger(),
+      "Listening for UNIX connections on socket at ${socket}.",
+      info
+  );
 }
 
 
 UnixSource::UnixSource(std::string path, std::string id) : EventSource(
     "unix-" + id
 ) {
+  this->backlog = 1;
   this->socket_fd = -1;
   this->path = path;
 }
@@ -51,7 +64,7 @@ UnixSource::~UnixSource() {
 
   // And delete file if needed.
   struct stat stat_info;
-  if(Static::posix()->stat(this->path.c_str(), &stat_info) == 0) {
+  if (Static::posix()->stat(this->path.c_str(), &stat_info) == 0) {
     Static::posix()->unlink(this->path.c_str());
   }
 }

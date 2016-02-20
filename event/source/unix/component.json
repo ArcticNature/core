@@ -3,6 +3,7 @@
   "type": "c++",
 
   "deps": [
+    "core.context.dynamic",
     "core.context.static",
     "core.model.event"
   ],
@@ -11,7 +12,10 @@
     "debug":   { "type": "lib" },
     "release": { "type": "lib" },
     "test":    {
-      "deps": ["core.posix.user"],
+      "deps": [
+        "core.posix.user",
+        "ext.event.manager.epoll"
+      ],
       "type": "lib"
     }
   }

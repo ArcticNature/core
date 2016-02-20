@@ -243,6 +243,21 @@ int Posix::bind(
   return 0;
 }
 
+int Posix::connect(
+    int sockfd, const struct sockaddr* addr, socklen_t addrlen
+) {
+  CHECK_ZERO_ERRNO(
+      ::connect, "Unable to connect to socket:",
+      sockfd, addr, addrlen
+  );
+  return 0;
+}
+
+int Posix::listen(int sockfd, int backlog) {
+  CHECK_ZERO_ERRNO(::listen, "Unable to listen on socket:", sockfd, backlog);
+  return 0;
+}
+
 int Posix::socket(int domain, int type, int protocol) {
   int fd = ::socket(domain, type, protocol);
   if (fd == -1) {
