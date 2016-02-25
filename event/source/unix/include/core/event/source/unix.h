@@ -20,6 +20,36 @@ namespace event {
 
     void openSocket();
 
+    //! Returns the event drain for the client.
+    /*!
+     * Different protocols and components require serialisation
+     * and processing of different messages.
+     *
+     * To account for that, the client drain is created on behalf
+     * of the unix socket source by a subclass.
+     *
+     * \param fd The client connection fd.
+     * \param id The id of the client drain.
+     */
+    virtual sf::core::model::EventDrainRef clientDrain(
+        int fd, std::string id
+    ) = 0;
+
+    //! Returns the event source for the client.
+    /*!
+     * Different protocols and components require serialisation
+     * and processing of different messages.
+     *
+     * To account for that, the client source is created on behalf
+     * of the unix socket source by a subclass.
+     *
+     * \param fd The client connection fd.
+     * \param id The id of the client source.
+     */
+    virtual sf::core::model::EventSourceRef clientSource(
+        int fd, std::string id
+    ) = 0;
+
    public:
     UnixSource(std::string socket, std::string id);
     ~UnixSource();

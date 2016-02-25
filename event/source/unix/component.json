@@ -13,7 +13,11 @@
     "release": { "type": "lib" },
     "test":    {
       "deps": [
+        "core.event.drain.fd",
+        "core.event.source.fd",
         "core.posix.user",
+        "core.protocol.test",
+        "core.utility.protobuf",
         "ext.event.manager.epoll"
       ],
       "type": "lib"

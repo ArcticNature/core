@@ -64,6 +64,22 @@ int Posix::close(int fd, bool silent) {
   return res;
 }
 
+int Posix::dup(int fd) {
+  int res = ::dup(fd);
+  if (fd == -1) {
+    throw ErrNoException("Unable to dup fd:");
+  }
+  return res;
+}
+
+int Posix::fcntl(int fd, int cmd, int option) {
+  int res = ::fcntl(fd, cmd, option);
+  if (res == -1) {
+    throw ErrNoException("fcntl error:");
+  }
+  return res;
+}
+
 FILE* Posix::freopen(const char* path, const char* mode, FILE* stream) {
   return ::freopen(path, mode, stream);
 }
@@ -236,6 +252,16 @@ int Posix::sigprocmask(
 
 
 // Socket.
+int Posix::accept(
+    int sockfd, struct sockaddr* addr, socklen_t* addrlen, int flags
+) {
+  int res = ::accept4(sockfd, addr, addrlen, flags);
+  if (res == -1) {
+    throw ErrNoException("Unable to accept socket:");
+  }
+  return res;
+}
+
 int Posix::bind(
     int sockfd, const struct sockaddr* addr, socklen_t addrlen
 ) {
@@ -264,6 +290,10 @@ int Posix::socket(int domain, int type, int protocol) {
     throw ErrNoException("Unable to open socket:");
   }
   return fd;
+}
+
+int Posix::shutdown(int sockfd, int how) {
+  CHECK_ZERO_ERRNO(::shutdown, "Unable to shutdown socket:", sockfd, how);
 }
 
 

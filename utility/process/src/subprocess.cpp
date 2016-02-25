@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/utility/subprocess.h"
 
+#include <string.h>
 #include <string>
 
 #include "core/context/static.h"
@@ -28,18 +29,19 @@ int SubProcess::child() {
 
   // Build command.
   int argc = 2 + this->arguments.size();  // binary + nullptr
-  char** arguments = reinterpret_cast<char**>(
+  char** argv = reinterpret_cast<char**>(
       Static::posix()->malloc(argc * sizeof(char*))
   );
 
   for (int idx = 1; idx < argc - 1; idx++) {
-    arguments[idx] = const_cast<char*>(this->arguments[idx - 1].c_str());
+    std::string arg = this->arguments[idx - 1];
+    argv[idx] = strndup(arg.c_str(), arg.length());
   }
-  arguments[0] = const_cast<char*>(this->binary.c_str());
-  arguments[argc - 1] = nullptr;
+  argv[0] = strndup(this->binary.c_str(), this->binary.length());
+  argv[argc - 1] = nullptr;
 
   // Now become the other process.
-  Static::posix()->execvp(this->binary.c_str(), arguments);
+  Static::posix()->execvp(this->binary.c_str(), argv);
   return 0;
 }
 

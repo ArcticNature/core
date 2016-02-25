@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/event/drain/fd.h"
 
+#include <sys/socket.h>
 #include <string>
 
 #include "core/context/static.h"
@@ -17,6 +18,7 @@ FdDrain::FdDrain(int fd, std::string id) : EventDrain("fd-" + id) {
 }
 
 FdDrain::~FdDrain() {
+  Static::posix()->shutdown(this->fd, SHUT_WR);
   Static::posix()->close(this->fd);
 }
 

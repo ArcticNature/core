@@ -1,24 +1,31 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/event/source/unix.h"
 
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <string>
 
 #include "core/context/context.h"
 #include "core/context/static.h"
-#include "core/model/logger.h"
 
-// http://beej.us/guide/bgipc/output/html/multipage/unixsock.html
+#include "core/event/source/fd.h"
+#include "core/model/logger.h"
+#include "core/utility/string.h"
 
 
 using sf::core::context::Context;
 using sf::core::context::Static;
+
+using sf::core::event::FdSource;
 using sf::core::event::UnixSource;
 
 using sf::core::model::EventRef;
 using sf::core::model::EventSource;
+using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
+
+using sf::core::utility::string::toString;
 
 
 void UnixSource::openSocket() {
@@ -42,7 +49,7 @@ void UnixSource::openSocket() {
   LogInfo info = { {"socket",  this->path} };
   INFOV(
       Context::logger(),
-      "Listening for UNIX connections on socket at ${socket}.",
+      "Listening for connections on UNIX socket at ${socket}.",
       info
   );
 }
@@ -77,5 +84,22 @@ int UnixSource::getFD() {
 }
 
 EventRef UnixSource::parse() {
+  // Connect to the client.
+  int client_fd = Static::posix()->accept(
+      this->socket_fd, nullptr, nullptr,
+      SOCK_NONBLOCK | SOCK_CLOEXEC
+  );
+  std::string client_id = this->id() + "-client-" + toString(client_fd);
+
+  Context::sourceManager()->addSource(
+      this->clientSource(client_fd, client_id)
+  );
+
+  int drain_fd = Static::posix()->dup(client_fd);
+  int flags = Static::posix()->fcntl(drain_fd, F_GETFD);
+  Static::posix()->fcntl(drain_fd, F_SETFD, flags | FD_CLOEXEC);
+  Static::drains()->add(this->clientDrain(drain_fd, client_id));
+
+  // Done.
   return EventRef();
 }

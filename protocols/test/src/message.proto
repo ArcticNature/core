@@ -16,6 +16,7 @@ package sf.core.protocol.test;
  */
 message Message {
   enum Code {
+    Noop = 2;
     Test = 1;
   }
 

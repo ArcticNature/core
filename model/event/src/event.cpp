@@ -57,6 +57,9 @@ EventDrainRef EventDrainManager::get(std::string id) const {
 }
 
 void EventDrainManager::remove(std::string id) {
+  if (this->drains.find(id) == this->drains.end()) {
+    throw EventDrainNotFound(id);
+  }
   this->drains.erase(id);
 }
 

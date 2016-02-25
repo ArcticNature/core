@@ -43,6 +43,8 @@ namespace interface {
 
     // File descriptors.
     virtual int   close(int fd, bool silent = false);
+    virtual int   dup(int fd);
+    virtual int   fcntl(int fd, int cmd, int option = -1);
     virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
     virtual int   open(const char* path, int flags, mode_t mode);
     virtual int   pipe(int fildes[2], int flags = 0);
@@ -86,6 +88,10 @@ namespace interface {
     virtual int sigprocmask(int how, const sigset_t* set, sigset_t* old_set);
 
     // Socket.
+    virtual int accept(
+        int sockfd, struct sockaddr* addr,
+        socklen_t* addrlen, int flags = 0
+    );
     virtual int bind(
         int sockfd, const struct sockaddr* addr,
         socklen_t addrlen
@@ -95,6 +101,7 @@ namespace interface {
     );
     virtual int listen(int sockfd, int backlog);
     virtual int socket(int domain, int type, int protocol);
+    virtual int shutdown(int sockfd, int how);
 
     // Users.
     virtual group  getgrnam(const char* name, char** buf);
