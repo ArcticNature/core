@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
 
     // Prepare to parse.
     Static::parser(parser);
+    CLIParser::spawnerOptions(parser);
     parser->parse(&argc, &argv);
 
     // Run spawner.

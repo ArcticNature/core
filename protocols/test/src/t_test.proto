@@ -1,5 +1,5 @@
 // Import the base message to extend it.
-import "message.proto";
+import "t_message.proto";
 
 // And all extentions are in the same package as the base message.
 package sf.core.protocol.test;

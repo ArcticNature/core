@@ -87,12 +87,12 @@ Some event components are more then a model and always required:
 
 ### Protocols
 
-  * `core.protocol.daemon`:
-    The daemon to Manager and Spawner messages, internal use.
+  * `core.protocol.manager_spawner`: The Manager to Spawner messages.
+  * `core.protocol.daemon_manager`: The Daemon to Manager messages.
+  * `core.protocol.daemon_spawner`: The Daemon to Spawner messages.
   * `core.protocol.public`:
     The public protocol for clients to interact with the daemon.
-  * `core.protocol.spawner`:
-    The protocols used by the Manager and Spawner to interact with each other.
+  * `core.protocol.test`: Protocol used for tests.
 
 
 ### Registries

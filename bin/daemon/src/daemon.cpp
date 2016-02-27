@@ -18,6 +18,7 @@
 
 using sf::core::bin::Daemon;
 using sf::core::bin::DaemonSignalSource;
+using sf::core::bin::DaemonSpawnerSource;
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -74,13 +75,14 @@ void Daemon::dropUser() {
 }
 
 
-void Daemon::createSocket(std::string path) {
-  // TODO(stefano): Create UNIX socket for spawner and manager.
-}
-
 void Daemon::createSockets() {
-  this->createSocket("/var/run/spawner.socket");
-  this->createSocket("/var/run/manager.socket");
+  CLIParser*  parser = Static::parser();
+  std::string manager_path = parser->getString("manager-socket");
+  std::string spawner_path = parser->getString("spawner-socket");
+
+  // Link to Spawner.
+  EventSourceManagerRef sources = Context::sourceManager();
+  sources->addSource(EventSourceRef(new DaemonSpawnerSource(spawner_path)));
 }
 
 void Daemon::forkManager() {
@@ -94,10 +96,13 @@ void Daemon::forkManager() {
 }
 
 void Daemon::forkSpawner() {
+  CLIParser*  parser = Static::parser();
   std::string path = this->findSpawner();
   SubProcessRef spawner(new SubProcess(path));
 
-  // TODO(stefano): add arguments.
+  // Add arguments.
+  spawner->appendArgument("--spawner_socket");
+  spawner->appendArgument(parser->getString("spawner-socket"));
 
   spawner->run();
   sf::core::context::Daemon::instance()->setSpawner(spawner);
@@ -201,12 +206,12 @@ void Daemon::initialise() {
   }
 
   this->disableSignals();
+  this->configureEvents();
+
   this->createSockets();
   this->forkSpawner();
   if (drop_root) {
     this->dropUser();
   }
-
-  this->configureEvents();
   this->forkManager();
 }

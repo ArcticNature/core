@@ -1,0 +1,16 @@
+{
+  "name": "core.protocol.daemon_spawner",
+  "type": "protobuf",
+  "libs": ["protobuf"],
+
+  "generate": {
+    "c++": true,
+    "js":  false
+  },
+
+  "targets": {
+    "debug":   { },
+    "release": { },
+    "test":    { }
+  }
+}

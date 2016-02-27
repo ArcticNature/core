@@ -1,0 +1,16 @@
+package sf.core.protocol.daemon_spanwer;
+
+message Message {
+  enum Code {
+    Ack = 1;
+    Shutdown = 2;
+  }
+
+  required Code code = 1;
+  extensions 50 to max;
+
+  /*
+   * Used extentions:
+   *  - 50: ?.
+   */
+}

@@ -9,7 +9,7 @@
 #include "core/utility/protobuf.h"
 
 #include "core/posix/user.h"
-#include "core/protocols/test/message.pb.h"
+#include "core/protocols/test/t_message.pb.h"
 
 #define WRITE_BUFFER_SIZE 512
 

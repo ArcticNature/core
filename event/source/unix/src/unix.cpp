@@ -9,7 +9,6 @@
 #include "core/context/context.h"
 #include "core/context/static.h"
 
-#include "core/event/source/fd.h"
 #include "core/model/logger.h"
 #include "core/utility/string.h"
 
@@ -17,7 +16,7 @@
 using sf::core::context::Context;
 using sf::core::context::Static;
 
-using sf::core::event::FdSource;
+using sf::core::event::UnixClient;
 using sf::core::event::UnixSource;
 
 using sf::core::model::EventRef;
@@ -102,4 +101,58 @@ EventRef UnixSource::parse() {
 
   // Done.
   return EventRef();
+}
+
+
+void UnixClient::openSocket() {
+  // Create the socket.
+  this->socket_fd = Static::posix()->socket(
+      AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0
+  );
+
+  // Connect to it.
+  struct sockaddr_un remote;
+  remote.sun_family = AF_UNIX;
+  strncpy(remote.sun_path, this->path.c_str(), sizeof(remote.sun_path));
+
+  Static::posix()->connect(
+      this->socket_fd, (struct sockaddr*)&remote,
+      sizeof(sockaddr_un)
+  );
+
+  // Log the opening of the server socket.
+  LogInfo info = { {"socket",  this->path} };
+  INFOV(
+      Context::logger(),
+      "Connected to UNIX socket at ${socket}.",
+      info
+  );
+}
+
+
+UnixClient::UnixClient(std::string path, std::string id) : EventSource(
+    "unix-client-" + id
+) {
+  this->socket_fd = -1;
+  this->path = path;
+}
+
+UnixClient::~UnixClient() {
+  // Close socket.
+  if (this->socket_fd != -1) {
+    Static::posix()->close(this->socket_fd);
+  }
+
+  // And delete file if needed.
+  struct stat stat_info;
+  if (Static::posix()->stat(this->path.c_str(), &stat_info) == 0) {
+    Static::posix()->unlink(this->path.c_str());
+  }
+}
+
+int UnixClient::getFD() {
+  if (this->socket_fd == -1) {
+    this->openSocket();
+  }
+  return this->socket_fd;
 }

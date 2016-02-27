@@ -25,6 +25,7 @@ namespace model {
    public:
     static void configOptions(CLIParser* parser);
     static void daemonOptions(CLIParser* parser);
+    static void spawnerOptions(CLIParser* parser);
 
    protected:
     std::vector<CLIOptionRef> options;
@@ -39,8 +40,18 @@ namespace model {
     CLIParser();
     virtual ~CLIParser();
 
+    //! Adds a boolean option to the partser.
+    void addBool(std::string name, std::string description, bool _default);
+
     //! Adds an option to the parser.
     void addOption(CLIOptionRef option);
+
+    //! Adds a string option to the parser.
+    void addString(std::string name, std::string description);
+    void addString(
+        std::string name, std::string description,
+        std::string _default
+    );
 
     //! Parses the command line options.
     /*!
@@ -108,19 +119,13 @@ namespace cli {
     bool _default;
     std::string description;
     std::string name;
-    bool required;
-    bool set_default;
 
     bool _validate();
 
    public:
     BoolOption(
         std::string name, std::string description,
-        bool _default, bool required = false
-    );
-    BoolOption(
-        std::string name, std::string description,
-        bool required = false
+        bool _default
     );
 
     void setDefault();
@@ -132,19 +137,15 @@ namespace cli {
     std::string _default;
     std::string description;
     std::string name;
-    bool required;
     bool set_default;
 
     bool _validate();
 
    public:
+    StringOption(std::string name, std::string description);
     StringOption(
         std::string name, std::string description,
-        std::string _default, bool required = false
-    );
-    StringOption(
-        std::string name, std::string description,
-        bool required = false
+        std::string _default
     );
 
     void setDefault();

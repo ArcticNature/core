@@ -2,11 +2,15 @@
 #include <string>
 
 #include "core/bin/daemon.h"
+#include "core/context/daemon.h"
 #include "core/context/static.h"
 #include "core/exceptions/base.h"
 
 #include "core/model/event.h"
 #include "core/model/logger.h"
+
+#include "core/protocols/daemon_spanwer/ds_message.pb.h"
+#include "core/utility/protobuf.h"
 #include "core/utility/string.h"
 
 
@@ -20,6 +24,8 @@ using sf::core::model::Event;
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 
+using sf::core::protocol::daemon_spanwer::Message;
+using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
 
 
@@ -61,14 +67,19 @@ void TerminateDaemon::rudeStop() {
 
 void TerminateDaemon::stopManager() {
   WARNING(Logger::fallback(), "Stopping manager.");
+  // TODO(stefano): replace this with sending a message.
   pid_t manager = this->context->managerPid();
   signalProcess(manager, SIGTERM);
 }
 
 void TerminateDaemon::stopSpawner() {
   WARNING(Logger::fallback(), "Stopping spawner.");
-  pid_t spawner = this->context->spawnerPid();
-  signalProcess(spawner, SIGTERM);
+
+  Message message;
+  message.set_code(Message::Shutdown);
+
+  int drain = this->context->spawnerDrain()->getFD();
+  MessageIO<Message>::send(drain, message);
 }
 
 

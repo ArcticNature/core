@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include "core/model/event.h"
 #include "core/utility/subprocess.h"
 
 
@@ -52,6 +53,8 @@ namespace context {
 
     pid_t managerPid();
     pid_t spawnerPid();
+
+    sf::core::model::EventDrainRef spawnerDrain();
   };
 
 }  // namespace context

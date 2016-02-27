@@ -6,7 +6,10 @@
 
 #include "core/bin/async-process.h"
 #include "core/context/daemon.h"
+
 #include "core/event/source/signal.h"
+#include "core/event/source/unix.h"
+
 #include "core/model/event.h"
 #include "core/utility/daemoniser.h"
 
@@ -22,7 +25,6 @@ namespace bin {
     void daemonise();
     void dropUser();
 
-    void createSocket(std::string path);
     void createSockets();
     void forkManager();
     void forkSpawner();
@@ -80,6 +82,17 @@ namespace bin {
    public:
     explicit TerminateDaemon(std::string correlation);
     void handle();
+  };
+
+
+  //! Unix event source for the Spawner.
+  class DaemonSpawnerSource : public sf::core::event::UnixSource {
+   protected:
+    sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
+    sf::core::model::EventSourceRef clientSource(int fd, std::string id);
+
+   public:
+    explicit DaemonSpawnerSource(std::string path);
   };
 
 }  // namespace bin

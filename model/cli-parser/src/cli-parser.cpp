@@ -20,55 +20,100 @@ using sf::core::model::cli::StringOption;
 
 
 void CLIParser::configOptions(CLIParser* parser) {
-  parser->addOption(CLIOptionRef(new StringOption(
-      "repo-type", "The type of configuration repository", "git", true
-  )));
-  parser->addOption(CLIOptionRef(new StringOption(
-      "repo-path", "The path to the configuration repsitory", true
-  )));
-  parser->addOption(CLIOptionRef(new StringOption(
-      "repo-version", "Version of the configuration to use", "<latest>", true
-  )));
+  parser->addString(
+      "repo-type", "The type of configuration repository", "git"
+  );
+  parser->addString(
+      "repo-path", "The path to the configuration repsitory"
+  );
+  parser->addString(
+      "repo-version", "Version of the configuration to use", "<latest>"
+  );
 }
 
 void CLIParser::daemonOptions(CLIParser* parser) {
-  parser->addOption(CLIOptionRef(new BoolOption(
-      "daemonise", "Run the process in daemon mode", true, true
-  )));
-  parser->addOption(CLIOptionRef(new BoolOption(
+  // Daemonise behaviour.
+  parser->addBool(
+      "daemonise", "Run the process in daemon mode", true
+  );
+  parser->addBool(
       "drop-privileges", "Drop prividelges even when not in daemon mode",
-      false, true
-  )));
+      false
+  );
 
-  parser->addOption(CLIOptionRef(new StringOption(
-      "group", "Group for the daemon to run as", "snow-fox", true
-  )));
-  parser->addOption(CLIOptionRef(new StringOption(
-      "user", "User for the daemon to run as", "snow-fox", true
-  )));
+  // Identity options.
+  parser->addString(
+      "group", "Group for the daemon to run as", "snow-fox"
+  );
+  parser->addString(
+      "user", "User for the daemon to run as", "snow-fox"
+  );
 
-  parser->addOption(CLIOptionRef(new StringOption(
-      "stderr", "Redirect stderr to this file", "", true
-  )));
-  parser->addOption(CLIOptionRef(new StringOption(
-      "stdin", "Redirect stdin to this file", "", true
-  )));
-  parser->addOption(CLIOptionRef(new StringOption(
-      "stdout", "Redirect stdout to this file", "", true
-  )));
-  parser->addOption(CLIOptionRef(new StringOption(
-      "work-dir", "Change the working directory for the process", ".", true
-  )));
+  // I/O redirects.
+  parser->addString("stderr", "Redirect stderr to this file", "");
+  parser->addString("stdin", "Redirect stdin to this file", "");
+  parser->addString("stdout", "Redirect stdout to this file", "");
+  parser->addString(
+      "work-dir", "Change the working directory for the process", "."
+  );
+
+  // Unix sockets paths.
+  parser->addString(
+      "manager-socket",
+      "Path to the socket file to connect daemon and manager.",
+      "/var/run/snow-fox-manager.socket"
+  );
+  parser->addString(
+      "spawner-socket",
+      "Path to the socket file to connect daemon and spawner.",
+      "/var/run/snow-fox-spawner.socket"
+  );
+  parser->addString(
+      "spawner-manager-socket",
+      "Path to the socket file to connect manager and spawner.",
+      "/var/run/snow-fox-manager-spawner.socket"
+  );
+}
+
+void CLIParser::spawnerOptions(CLIParser* parser) {
+  // Unix sockets paths.
+  parser->addString(
+      "spawner-socket",
+      "Path to the socket file to connect daemon and spawner.",
+      "/var/run/snow-fox-spawner.socket"
+  );
+  parser->addString(
+      "spawner-manager-socket",
+      "Path to the socket file to connect manager and spawner.",
+      "/var/run/snow-fox-manager-spawner.socket"
+  );
 }
 
 
 CLIParser::CLIParser() { }
 CLIParser::~CLIParser() { }
 
+void CLIParser::addBool(
+    std::string name, std::string description, bool _default
+) {
+  this->addOption(CLIOptionRef(new BoolOption(name, description, _default)));
+}
+
 void CLIParser::addOption(CLIOptionRef option) {
   this->options.push_back(option);
   option->setParser(this);
   option->setDefault();
+}
+
+void CLIParser::addString(std::string name, std::string description) {
+  this->addOption(CLIOptionRef(new StringOption(name, description)));
+}
+
+void CLIParser::addString(
+    std::string name, std::string description,
+    std::string _default
+) {
+  this->addOption(CLIOptionRef(new StringOption(name, description, _default)));
 }
 
 void CLIParser::parse(int* argc, char*** argv) {
@@ -125,27 +170,16 @@ void CLIOption::setParser(CLIParser* parser) {
 
 bool CLIOption::validate() {
   if (this->parser == nullptr) {
-    throw ContextUninitialised("option's parser not set");
+    throw ContextUninitialised("Option's parser not set");
   }
   return this->_validate();
 }
 
 
 BoolOption::BoolOption(
-    std::string name, std::string description, bool required
-) : CLIOption(CLIOptionType::CLIT_BOOL, name, description) {
-  this->_default = false;
-  this->required = required;
-  this->set_default = false;
-}
-
-BoolOption::BoolOption(
-    std::string name, std::string description,
-    bool _default, bool required
+    std::string name, std::string description, bool _default
 ) : CLIOption(CLIOptionType::CLIT_BOOL, name, description) {
   this->_default = _default;
-  this->required = required;
-  this->set_default = true;
 }
 
 bool BoolOption::_validate() {
@@ -153,32 +187,27 @@ bool BoolOption::_validate() {
     this->parser->getBoolean(this->_name);
     return true;
   } catch(VariableNotFound& ex) {
-    return !this->required;
+    return false;
   }
 }
 
 void BoolOption::setDefault() {
   CLIOption::setDefault();
-  if (this->set_default) {
-    this->parser->setBoolean(this->_name, this->_default);
-  }
+  this->parser->setBoolean(this->_name, this->_default);
 }
 
 
 StringOption::StringOption(
-    std::string name, std::string description, bool required
+    std::string name, std::string description
 ) : CLIOption(CLIOptionType::CLIT_STRING, name, description) {
   this->_default = "";
-  this->required = required;
   this->set_default = false;
 }
 
 StringOption::StringOption(
-    std::string name, std::string description,
-    std::string _default, bool required
+    std::string name, std::string description, std::string _default
 ) : CLIOption(CLIOptionType::CLIT_STRING, name, description) {
   this->_default = _default;
-  this->required = required;
   this->set_default = true;
 }
 
@@ -187,7 +216,7 @@ bool StringOption::_validate() {
     this->parser->getString(this->_name);
     return true;
   } catch(VariableNotFound& ex) {
-    return !this->required;
+    return false;
   }
 }
 

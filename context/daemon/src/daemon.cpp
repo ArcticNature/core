@@ -1,5 +1,6 @@
 // Copyright 2016 Stefano Pogliani
 #include "core/context/daemon.h"
+#include "core/context/static.h"
 
 #include "core/exceptions/base.h"
 
@@ -7,6 +8,9 @@
 using sf::core::exception::DuplicateInjection;
 using sf::core::context::Daemon;
 using sf::core::context::DaemonRef;
+using sf::core::context::Static;
+
+using sf::core::model::EventDrainRef;
 using sf::core::utility::SubProcessRef;
 
 
@@ -102,4 +106,8 @@ pid_t Daemon::spawnerPid() {
     return this->spawner->getChildPid();
   }
   return -1;
+}
+
+EventDrainRef Daemon::spawnerDrain() {
+  return Static::drains()->get(Static::options()->getString("spawner-drain"));
 }

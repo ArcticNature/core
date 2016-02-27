@@ -58,6 +58,22 @@ namespace event {
     sf::core::model::EventRef parse();
   };
 
+
+  //! Unix socket client source..
+  class UnixClient : public sf::core::model::EventSource {
+   protected:
+    int socket_fd;
+    std::string path;
+
+    void openSocket();
+
+   public:
+    UnixClient(std::string socket, std::string id);
+    ~UnixClient();
+
+    int getFD();
+  };
+
 }  // namespace event
 }  // namespace core
 }  // namespace sf

@@ -7,6 +7,10 @@
     "core.bin.async-process",
     "core.context.static",
     "core.exceptions",
+
+    "core.event.drain.fd",
+    "core.event.source.unix",
+
     "core.interface.lifecycle",
     "core.model.cli-parser",
     "core.model.logger",
