@@ -54,6 +54,7 @@ namespace context {
     pid_t managerPid();
     pid_t spawnerPid();
 
+    sf::core::model::EventDrainRef managerDrain();
     sf::core::model::EventDrainRef spawnerDrain();
   };
 

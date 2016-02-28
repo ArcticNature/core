@@ -13,7 +13,7 @@
 #include "core/utility/protobuf.h"
 
 
-using sf::core::bin::DaemonSpawnerSource;
+using sf::core::bin::DaemonToSpawnerSource;
 using sf::core::context::Context;
 using sf::core::context::Static;
 
@@ -52,22 +52,25 @@ class SpawnerFdSource : public FdSource {
 };
 
 
-DaemonSpawnerSource::DaemonSpawnerSource(std::string path) : UnixSource(
+DaemonToSpawnerSource::DaemonToSpawnerSource(std::string path) : UnixSource(
     path, "daemon-to-spawner"
 ) {}
 
 
-EventDrainRef DaemonSpawnerSource::clientDrain(int fd, std::string id) {
-  LogInfo info = {{"drain-id", id}};
-  DEBUGV(Context::logger(), "Create spawner drain ${drain-id}", info);
-
+EventDrainRef DaemonToSpawnerSource::clientDrain(int fd, std::string id) {
   EventDrainRef drain(new SpawnerFdDrain(fd, id));
-  Static::options()->setString("spawner-drain", id);
+  std::string   drain_id = drain->id();
+
+  LogInfo info = {{"drain-id", drain_id}};
+  DEBUGV(Context::logger(), "Created spawner drain ${drain-id}", info);
+
+  Static::drains()->add(drain);
+  Static::options()->setString("spawner-drain", drain_id);
   return drain;
 }
 
-EventSourceRef DaemonSpawnerSource::clientSource(int fd, std::string id) {
+EventSourceRef DaemonToSpawnerSource::clientSource(int fd, std::string id) {
   LogInfo info = {{"source-id", id}};
-  DEBUGV(Context::logger(), "Create spawner source ${source-id}", info);
+  DEBUGV(Context::logger(), "Creating spawner source ${source-id}", info);
   return EventSourceRef(new SpawnerFdSource(fd, id));
 }

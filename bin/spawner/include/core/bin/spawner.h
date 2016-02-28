@@ -6,6 +6,9 @@
 
 #include "core/bin/async-process.h"
 #include "core/event/source/unix.h"
+#include "core/model/event.h"
+#include "core/protocols/daemon_spanwer/ds_message.pb.h"
+
 
 namespace sf {
 namespace core {
@@ -21,11 +24,12 @@ namespace bin {
   };
 
 
-  //! Spawner to daemon source.
+  //! Spawner to Daemon source.
   class SpawnerToDaemon : public sf::core::event::UnixClient {
    protected:
-    sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
-    sf::core::model::EventSourceRef clientSource(int fd, std::string id);
+    sf::core::model::EventRef process(
+        sf::core::protocol::daemon_spanwer::Message message
+    );
 
    public:
     explicit SpawnerToDaemon(std::string path);

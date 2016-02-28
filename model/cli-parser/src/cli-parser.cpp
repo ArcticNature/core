@@ -75,6 +75,20 @@ void CLIParser::daemonOptions(CLIParser* parser) {
   );
 }
 
+void CLIParser::managerOptions(CLIParser* parser) {
+  // Unix sockets paths.
+  parser->addString(
+      "manager-socket",
+      "Path to the socket file to connect daemon and manager.",
+      "/var/run/snow-fox-manager.socket"
+  );
+  parser->addString(
+      "spawner-manager-socket",
+      "Path to the socket file to connect manager and spawner.",
+      "/var/run/snow-fox-manager-spawner.socket"
+  );
+}
+
 void CLIParser::spawnerOptions(CLIParser* parser) {
   // Unix sockets paths.
   parser->addString(

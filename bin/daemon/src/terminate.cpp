@@ -9,7 +9,9 @@
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
+#include "core/protocols/daemon_manager/dm_message.pb.h"
 #include "core/protocols/daemon_spanwer/ds_message.pb.h"
+
 #include "core/utility/protobuf.h"
 #include "core/utility/string.h"
 
@@ -24,9 +26,12 @@ using sf::core::model::Event;
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 
-using sf::core::protocol::daemon_spanwer::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+typedef sf::core::protocol::daemon_manager::Message ManagerMessage;
+typedef sf::core::protocol::daemon_spanwer::Message SpwanerMessage;
 
 
 void signalProcess(pid_t pid, int signal) {
@@ -67,19 +72,22 @@ void TerminateDaemon::rudeStop() {
 
 void TerminateDaemon::stopManager() {
   WARNING(Logger::fallback(), "Stopping manager.");
-  // TODO(stefano): replace this with sending a message.
-  pid_t manager = this->context->managerPid();
-  signalProcess(manager, SIGTERM);
+
+  ManagerMessage message;
+  message.set_code(ManagerMessage::Shutdown);
+
+  int drain = this->context->managerDrain()->getFD();
+  MessageIO<ManagerMessage>::send(drain, message);
 }
 
 void TerminateDaemon::stopSpawner() {
   WARNING(Logger::fallback(), "Stopping spawner.");
 
-  Message message;
-  message.set_code(Message::Shutdown);
+  SpwanerMessage message;
+  message.set_code(SpwanerMessage::Shutdown);
 
   int drain = this->context->spawnerDrain()->getFD();
-  MessageIO<Message>::send(drain, message);
+  MessageIO<SpwanerMessage>::send(drain, message);
 }
 
 

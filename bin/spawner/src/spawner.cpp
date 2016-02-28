@@ -13,8 +13,8 @@
 using sf::core::bin::Spawner;
 using sf::core::bin::SpawnerToDaemon;
 
-using sf::core::context::Static;
 using sf::core::context::Context;
+using sf::core::context::Static;
 
 using sf::core::model::CLIParser;
 using sf::core::model::EventSourceRef;

@@ -21,6 +21,7 @@
     "core.model.logger",
 
     "core.posix.restricted",
+    "core.protocol.daemon_manager",
     "core.protocol.daemon_spawner",
 
     "core.registry.cli-parser",

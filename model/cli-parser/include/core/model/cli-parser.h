@@ -25,6 +25,7 @@ namespace model {
    public:
     static void configOptions(CLIParser* parser);
     static void daemonOptions(CLIParser* parser);
+    static void managerOptions(CLIParser* parser);
     static void spawnerOptions(CLIParser* parser);
 
    protected:

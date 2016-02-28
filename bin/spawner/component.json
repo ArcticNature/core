@@ -14,8 +14,11 @@
     "core.interface.lifecycle",
     "core.model.cli-parser",
     "core.model.logger",
+
     "core.posix.restricted",
-    "core.registry.cli-parser"
+    "core.protocol.daemon_spawner",
+    "core.registry.cli-parser",
+    "core.utility.protobuf"
   ],
 
   "targets": {

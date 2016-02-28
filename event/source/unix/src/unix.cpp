@@ -95,8 +95,8 @@ EventRef UnixSource::parse() {
   );
 
   int drain_fd = Static::posix()->dup(client_fd);
-  int flags = Static::posix()->fcntl(drain_fd, F_GETFD);
-  Static::posix()->fcntl(drain_fd, F_SETFD, flags | FD_CLOEXEC);
+  int flags = Static::posix()->fcntl(client_fd, F_GETFD);
+  Static::posix()->fcntl(drain_fd, F_SETFD, flags);
   Static::drains()->add(this->clientDrain(drain_fd, client_id));
 
   // Done.

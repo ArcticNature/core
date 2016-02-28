@@ -18,7 +18,8 @@
 
 using sf::core::bin::Daemon;
 using sf::core::bin::DaemonSignalSource;
-using sf::core::bin::DaemonSpawnerSource;
+using sf::core::bin::DaemonToManagerSource;
+using sf::core::bin::DaemonToSpawnerSource;
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -80,16 +81,23 @@ void Daemon::createSockets() {
   std::string manager_path = parser->getString("manager-socket");
   std::string spawner_path = parser->getString("spawner-socket");
 
-  // Link to Spawner.
+  // Link to Manager and Spawner.
   EventSourceManagerRef sources = Context::sourceManager();
-  sources->addSource(EventSourceRef(new DaemonSpawnerSource(spawner_path)));
+  sources->addSource(EventSourceRef(new DaemonToManagerSource(manager_path)));
+  sources->addSource(EventSourceRef(new DaemonToSpawnerSource(spawner_path)));
 }
 
 void Daemon::forkManager() {
+  CLIParser*  parser = Static::parser();
   std::string path = this->findManager();
   SubProcessRef manager(new SubProcess(path));
 
-  // TODO(stefano): add arguments.
+  // Specify the parser to avoid compatibility issues.
+  manager->appendArgument("--parser=gflags");
+
+  // Add arguments.
+  manager->appendArgument("--manager_socket");
+  manager->appendArgument(parser->getString("manager-socket"));
 
   manager->run();
   sf::core::context::Daemon::instance()->setManager(manager);
@@ -99,6 +107,9 @@ void Daemon::forkSpawner() {
   CLIParser*  parser = Static::parser();
   std::string path = this->findSpawner();
   SubProcessRef spawner(new SubProcess(path));
+
+  // Specify the parser to avoid compatibility issues.
+  spawner->appendArgument("--parser=gflags");
 
   // Add arguments.
   spawner->appendArgument("--spawner_socket");

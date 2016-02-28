@@ -5,11 +5,21 @@
 
   "deps": [
     "core.bin.async-process",
+    "core.context.dynamic",
     "core.context.static",
+
+    "core.event.drain.fd",
+    "core.event.source.unix",
     "core.exceptions",
+
+    "core.model.event",
     "core.model.logger",
+
     "core.posix.user",
-    "core.registry.cli-parser"
+    "core.protocol.daemon_manager",
+
+    "core.registry.cli-parser",
+    "core.utility.protobuf"
   ],
 
   "targets": {

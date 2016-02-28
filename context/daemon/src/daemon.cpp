@@ -108,6 +108,10 @@ pid_t Daemon::spawnerPid() {
   return -1;
 }
 
+EventDrainRef Daemon::managerDrain() {
+  return Static::drains()->get(Static::options()->getString("manager-drain"));
+}
+
 EventDrainRef Daemon::spawnerDrain() {
   return Static::drains()->get(Static::options()->getString("spawner-drain"));
 }
