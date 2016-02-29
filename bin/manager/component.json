@@ -17,6 +17,7 @@
 
     "core.posix.user",
     "core.protocol.daemon_manager",
+    "core.protocol.manager_spawner",
 
     "core.registry.cli-parser",
     "core.utility.protobuf"

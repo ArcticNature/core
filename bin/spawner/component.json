@@ -9,6 +9,7 @@
     "core.exceptions",
 
     "core.event.drain.fd",
+    "core.event.source.fd",
     "core.event.source.unix",
 
     "core.interface.lifecycle",
@@ -17,6 +18,8 @@
 
     "core.posix.restricted",
     "core.protocol.daemon_spawner",
+    "core.protocol.manager_spawner",
+
     "core.registry.cli-parser",
     "core.utility.protobuf"
   ],

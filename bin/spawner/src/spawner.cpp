@@ -12,6 +12,7 @@
 
 using sf::core::bin::Spawner;
 using sf::core::bin::SpawnerToDaemon;
+using sf::core::bin::SpawnerToManagerSource;
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -29,7 +30,17 @@ void Spawner::connectDaemon() {
   ));
 }
 
+void Spawner::managerSocket() {
+  CLIParser*  parser = Static::parser();
+  std::string manager_path = parser->getString("spawner-manager-socket");
+
+  Context::sourceManager()->addSource(EventSourceRef(
+      new SpawnerToManagerSource(manager_path)
+  ));
+}
+
 void Spawner::initialise() {
   this->registerDefaultSourceManager();
   this->connectDaemon();
+  this->managerSocket();
 }

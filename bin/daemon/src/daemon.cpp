@@ -98,6 +98,8 @@ void Daemon::forkManager() {
   // Add arguments.
   manager->appendArgument("--manager_socket");
   manager->appendArgument(parser->getString("manager-socket"));
+  manager->appendArgument("--spawner_manager_socket");
+  manager->appendArgument(parser->getString("spawner-manager-socket"));
 
   manager->run();
   sf::core::context::Daemon::instance()->setManager(manager);
@@ -114,6 +116,8 @@ void Daemon::forkSpawner() {
   // Add arguments.
   spawner->appendArgument("--spawner_socket");
   spawner->appendArgument(parser->getString("spawner-socket"));
+  spawner->appendArgument("--spawner_manager_socket");
+  spawner->appendArgument(parser->getString("spawner-manager-socket"));
 
   spawner->run();
   sf::core::context::Daemon::instance()->setSpawner(spawner);

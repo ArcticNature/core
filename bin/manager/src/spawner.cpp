@@ -2,7 +2,7 @@
 #include <fcntl.h>
 #include <string>
 
-#include "core/bin/spawner.h"
+#include "core/bin/manager.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -13,12 +13,12 @@
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
-#include "core/protocols/daemon_spanwer/ds_message.pb.h"
+#include "core/protocols/manager_spawner/ms_message.pb.h"
 #include "core/utility/protobuf.h"
 #include "core/utility/string.h"
 
 
-using sf::core::bin::SpawnerToDaemon;
+using sf::core::bin::ManagerToSpawner;
 using sf::core::context::Context;
 using sf::core::context::Static;
 
@@ -31,15 +31,15 @@ using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
 
-using sf::core::protocol::daemon_spanwer::Message;
+using sf::core::protocol::manager_spawner::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
 
 
-class SpawnerToDaemonFdDrain : public FdDrain {
+class ManagerToSpawnerFdDrain : public FdDrain {
  public:
-  explicit SpawnerToDaemonFdDrain(int fd) : FdDrain(
-      fd, "spawner-to-daemon" + toString(fd)
+  explicit ManagerToSpawnerFdDrain(int fd) : FdDrain(
+      fd, "manager-to-spawner" + toString(fd)
   ) {}
 
   void sendAck() {
@@ -50,17 +50,12 @@ class SpawnerToDaemonFdDrain : public FdDrain {
 };
 
 
-EventRef SpawnerToDaemon::process(Message message) {
-  switch (message.code()) {
-    case Message::Shutdown:
-      throw CleanExit();
-      break;
-  }
+EventRef ManagerToSpawner::process(Message message) {
   return EventRef();
 }
 
-SpawnerToDaemon::SpawnerToDaemon(std::string path) : UnixClient(
-    path, "spawner-to-daemon"
+ManagerToSpawner::ManagerToSpawner(std::string path) : UnixClient(
+    path, "manager-to-spawner"
 ) {
   // Connect to server.
   int client_fd = this->getFD();
@@ -71,11 +66,11 @@ SpawnerToDaemon::SpawnerToDaemon(std::string path) : UnixClient(
   Static::posix()->fcntl(drain_fd, F_SETFD, flags);
 
   // Create drain and add it to static context.
-  EventDrainRef drain(new SpawnerToDaemonFdDrain(drain_fd));
+  EventDrainRef drain(new ManagerToSpawnerFdDrain(drain_fd));
   Static::drains()->add(drain);
 }
 
-EventRef SpawnerToDaemon::parse() {
+EventRef ManagerToSpawner::parse() {
   Message message;
   bool valid = MessageIO<Message>::parse(this->getFD(), &message);
   if (!valid) {

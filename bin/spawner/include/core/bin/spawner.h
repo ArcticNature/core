@@ -18,6 +18,7 @@ namespace bin {
   class Spawner : public AsyncPorcess {
    protected:
     void connectDaemon();
+    void managerSocket();
 
    public:
     void initialise();
@@ -34,6 +35,17 @@ namespace bin {
    public:
     explicit SpawnerToDaemon(std::string path);
     sf::core::model::EventRef parse();
+  };
+
+
+  //! Unix event source for the Manager.
+  class SpawnerToManagerSource : public sf::core::event::UnixSource {
+   protected:
+    sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
+    sf::core::model::EventSourceRef clientSource(int fd, std::string id);
+
+   public:
+    explicit SpawnerToManagerSource(std::string path);
   };
 
 }  // namespace bin

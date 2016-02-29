@@ -1,0 +1,15 @@
+package sf.core.protocol.manager_spawner;
+
+message Message {
+  enum Code {
+    Ack = 1;
+  }
+
+  required Code code = 1;
+  extensions 50 to max;
+
+  /*
+   * Used extentions:
+   *  - 50: ?.
+   */
+}

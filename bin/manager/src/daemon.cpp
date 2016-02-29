@@ -38,7 +38,7 @@ using sf::core::utility::string::toString;
 
 class ManagerToDaemonFdDrain : public FdDrain {
  public:
-  ManagerToDaemonFdDrain(int fd) : FdDrain(
+  explicit ManagerToDaemonFdDrain(int fd) : FdDrain(
       fd, "manager-to-daemon" + toString(fd)
   ) {}
 
@@ -52,7 +52,9 @@ class ManagerToDaemonFdDrain : public FdDrain {
 
 EventRef ManagerToDaemon::process(Message message) {
   switch (message.code()) {
-    case Message::Shutdown: throw CleanExit();;
+    case Message::Shutdown:
+      throw CleanExit();
+      break;
   }
   return EventRef();
 }
