@@ -37,6 +37,9 @@ namespace model {
     Event(std::string correlation, std::string drain);
     virtual ~Event();
 
+    //! Returns the event correlation id.
+    std::string correlation() const;
+
     //! Handles the event in the most appropriate way.
     virtual void handle() = 0;
   };

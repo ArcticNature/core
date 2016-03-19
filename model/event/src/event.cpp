@@ -25,6 +25,10 @@ Event::Event(std::string correlation, std::string drain) {
 }
 Event::~Event() {}
 
+std::string Event::correlation() const {
+  return this->correlation_id;
+}
+
 
 EventDrain::EventDrain(std::string drain) : drain_id(drain) {
   this->outstanding = 0;
