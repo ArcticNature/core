@@ -4,12 +4,14 @@
 
   "deps": [
     "core.context.static",
-    "core.model.event"
+    "core.event.source.connected"
   ],
 
   "targets": {
     "debug":   { "type": "lib" },
     "release": { "type": "lib" },
-    "test":    { "type": "lib" }
+    "test":    {
+      "type": "lib"
+    }
   }
 }

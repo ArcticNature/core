@@ -10,16 +10,23 @@
 
 using sf::core::context::Static;
 using sf::core::event::FdSource;
-using sf::core::model::EventSource;
+using sf::core::event::ConnectedSource;
 
 
-FdSource::FdSource(int fd, std::string id) : EventSource("fd-" + id) {
+void FdSource::disconnect() {
+  Static::posix()->shutdown(this->fd, SHUT_RD);
+  Static::posix()->close(this->fd);
+}
+
+FdSource::FdSource(
+    int fd, std::string id, std::string drain
+) : ConnectedSource(id + "-fd", drain) {
   this->fd = fd;
 }
 
 FdSource::~FdSource() {
-  Static::posix()->shutdown(this->fd, SHUT_RD);
-  Static::posix()->close(this->fd);
+  this->safeCleanUp(false);
+  this->fd = -1;
 }
 
 int FdSource::getFD() {

@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "core/model/event.h"
+#include "core/event/source/connected.h"
 
 
 namespace sf {
@@ -15,12 +15,13 @@ namespace event {
   /*!
    * The file descriptor is closed when the source is destroied.
    */
-  class FdSource : public sf::core::model::EventSource {
+  class FdSource : public ConnectedSource {
    protected:
     int fd;
+    void disconnect();
 
    public:
-    FdSource(int fd, std::string id);
+    FdSource(int fd, std::string id, std::string drain);
     ~FdSource();
 
     int getFD();
