@@ -6,7 +6,9 @@
 
 #include "core/compile-time/options.h"
 #include "core/context/static.h"
+
 #include "core/model/logger/console.h"
+#include "core/model/logger/null.h"
 #include "core/utility/string.h"
 
 #define FALLBACK_PREFIX "[Fallback] "
@@ -18,6 +20,7 @@ using sf::core::model::Logger;
 using sf::core::model::LoggerRef;
 using sf::core::model::LogLevel;
 using sf::core::model::LogInfo;
+using sf::core::model::NullLogger;
 
 using sf::core::utility::string::currentTimestamp;
 using sf::core::utility::string::findFirsNotEscaped;
@@ -33,9 +36,13 @@ LoggerRef sf::core::model::Logger::fallback_instance;
 
 LoggerRef Logger::fallback() {
   if (Logger::fallback_instance.get() == nullptr) {
+#ifdef TEST_BUILD
+    Logger::fallback_instance = LoggerRef(new NullLogger());
+#else
     Logger::fallback_instance = LoggerRef(
         new ConsoleLogger(FALLBACK_PREFIX DEFAULT_LOG_FORMAT)
     );
+#endif
   }
   return Logger::fallback_instance;
 }
