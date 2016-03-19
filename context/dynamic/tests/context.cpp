@@ -2,10 +2,12 @@
 #include <gtest/gtest.h>
 
 #include "core/context/context.h"
+#include "core/exceptions/base.h"
 #include "core/model/logger.h"
 
 using sf::core::context::Context;
 using sf::core::context::ContextRef;
+using sf::core::exception::ContextUninitialised;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
@@ -58,7 +60,7 @@ class NoopSourceManager : public EventSourceManager {
 
 TEST_F(ContextTest, Defaults) {
   ASSERT_EQ(Logger::fallback(), Context::logger());
-  ASSERT_EQ(nullptr, Context::sourceManager().get());
+  ASSERT_THROW(Context::sourceManager(), ContextUninitialised);
 }
 
 TEST_F(ContextTest, ReplaceActiveContext) {

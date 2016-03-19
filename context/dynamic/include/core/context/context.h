@@ -41,6 +41,7 @@ namespace context {
 
    public:
     Context();
+    ~Context();
 
     void initialise(sf::core::model::LoggerRef logger);
     void initialise(sf::core::model::EventSourceManagerRef source_manager);
