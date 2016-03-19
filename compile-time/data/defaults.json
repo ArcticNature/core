@@ -1,5 +1,7 @@
 {
   "debug": 0,
+  "test":  0,
+
   "default-log-format": "${<log-group>} ${level} ${<now>} ${file} -> L${line} ==> ${message}",
   "trap-sigint": 0
 }

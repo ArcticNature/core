@@ -35,6 +35,7 @@
 // System options.
 #define DEAFULT_EVENT_SOURCE_MANAGER "epoll"
 #define DEBUG_BUILD {{debug}}
+#define TEST_BUILD  {{test}}
 #define TRAP_SIGINT {{trap-sigint}}
 
 #endif  // CORE_COMPILE_TIME_OPTIONS_H_
