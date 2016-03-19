@@ -13,7 +13,7 @@ using sf::core::event::FdDrain;
 using sf::core::model::EventDrain;
 
 
-FdDrain::FdDrain(int fd, std::string id) : EventDrain("fd-" + id) {
+FdDrain::FdDrain(int fd, std::string id) : EventDrain(id + "-fd") {
   this->fd = fd;
 }
 
