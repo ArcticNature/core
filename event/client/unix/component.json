@@ -1,0 +1,24 @@
+{
+  "name": "core.event.client.unix",
+  "type": "c++",
+
+  "deps": [
+    "core.event.source.fd",
+    "core.context.static",
+    "core.model.event"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": [
+        "core.event.source.unix",
+        "core.event.testing",
+        "core.posix.user",
+        "ext.event.manager.epoll"
+      ],
+      "type": "lib"
+    }
+  }
+}
