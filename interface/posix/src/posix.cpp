@@ -284,6 +284,14 @@ int Posix::listen(int sockfd, int backlog) {
   return 0;
 }
 
+ssize_t Posix::recv(int sockfd, void* buf, size_t len, int flags) {
+  ssize_t size = ::recv(sockfd, buf, len, flags);
+  if (size == -1) {
+    throw ErrNoException("Unable to recv:");
+  }
+  return size;
+}
+
 int Posix::socket(int domain, int type, int protocol) {
   int fd = ::socket(domain, type, protocol);
   if (fd == -1) {

@@ -100,6 +100,7 @@ namespace interface {
         int sockfd, const struct sockaddr* addr, socklen_t addrlen
     );
     virtual int listen(int sockfd, int backlog);
+    virtual ssize_t recv(int sockfd, void* buf, size_t len, int flags);
     virtual int socket(int domain, int type, int protocol);
     virtual int shutdown(int sockfd, int how);
 
