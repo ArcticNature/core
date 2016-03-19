@@ -9,8 +9,8 @@
 #include "core/context/static.h"
 
 #include "core/event/drain/fd.h"
-#include "core/event/source/fd.h"
 #include "core/event/source/unix.h"
+#include "core/event/testing.h"
 
 #include "core/model/event.h"
 #include "core/posix/user.h"
@@ -29,8 +29,10 @@ using sf::core::context::Context;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
-using sf::core::event::FdSource;
 using sf::core::event::UnixSource;
+
+using sf::core::event::TestEvent;
+using sf::core::event::TestFdSource;
 
 using sf::core::model::Event;
 using sf::core::model::EventDrainManager;
@@ -48,32 +50,10 @@ using sf::core::utility::string::toString;
 using sf::ext::event::EpollSourceManager;
 
 
-class TestEvent : public Event {
- public:
-  TestEvent(std::string correlation) : Event(correlation, "NULL") {}
-  void handle() {}
-};
-
-
 class TestFdDrain : public FdDrain {
  public:
   TestFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
   void sendAck() {}
-};
-
-
-class TestFdSource : public FdSource {
- public:
-  TestFdSource(int fd, std::string id) : FdSource(fd, id) {}
-  EventRef parse() {
-    Message message;
-    bool valid = MessageIO<Message>::parse(this->fd, &message);
-
-    if (valid && message.code() == Message::Test) {
-      return EventRef(new TestEvent("abc"));
-    }
-    return EventRef();
-  }
 };
 
 
@@ -83,7 +63,7 @@ class TestUnixSource : public UnixSource {
     return EventDrainRef(new TestFdDrain(fd, id));
   }
 
-  EventSourceRef clientSource(int fd, std::string id) {
+  EventSourceRef clientSource(int fd, std::string id, std::string drain_id) {
     return EventSourceRef(new TestFdSource(fd, id));
   }
 
@@ -101,7 +81,7 @@ class UnixSourceTest : public ::testing::Test {
     return Static::posix()->stat(path.c_str(), &stat_info) == 0;
   }
 
-  void connect(int to) {
+  void connect() {
     this->client_fd = Static::posix()->socket(
         AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0
     );
@@ -163,9 +143,8 @@ TEST_F(UnixSourceTest, ConnectAddsSource) {
   EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
   EventSourceManagerRef sources = Context::sourceManager();
 
-  int source_fd = source->getFD();
   sources->addSource(source);
-  this->connect(source_fd);
+  this->connect();
 
   int remote_fd = this->client_fd + 1;
   std::string client_id = "fd-unix-test-client-" + toString(remote_fd);
@@ -180,12 +159,11 @@ TEST_F(UnixSourceTest, ConnectAddsDrain) {
   EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
   EventSourceManagerRef sources = Context::sourceManager();
 
-  int source_fd = source->getFD();
   sources->addSource(source);
-  this->connect(source_fd);
+  this->connect();
 
   int remote_fd = this->client_fd + 1;
-  std::string client_id = "fd-unix-test-client-" + toString(remote_fd);
+  std::string client_id = "unix-test-client-" + toString(remote_fd) + "-fd";
   EventRef event = sources->wait(1);
   drains->remove(client_id);
 
@@ -197,9 +175,8 @@ TEST_F(UnixSourceTest, ClientToServer) {
   EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
   EventSourceManagerRef sources = Context::sourceManager();
 
-  int source_fd = source->getFD();
   sources->addSource(source);
-  this->connect(source_fd);
+  this->connect();
   sources->wait(1);
 
   // Send message throug the client.
@@ -219,14 +196,13 @@ TEST_F(UnixSourceTest, ServerToClient) {
   EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
   EventSourceManagerRef sources = Context::sourceManager();
 
-  int source_fd = source->getFD();
   sources->addSource(source);
-  this->connect(source_fd);
+  this->connect();
   sources->wait(1);
 
   // Send message down the drain.
   int remote_fd = this->client_fd + 1;
-  std::string client_id = "fd-unix-test-client-" + toString(remote_fd);
+  std::string client_id = "unix-test-client-" + toString(remote_fd) + "-fd";
   EventDrainRef drain = Static::drains()->get(client_id);
 
   Message message;

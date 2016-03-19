@@ -29,7 +29,7 @@ namespace event {
      * of the unix socket source by a subclass.
      *
      * \param fd The client connection fd.
-     * \param id The id of the client drain.
+     * \param id The partial id of the client drain.
      */
     virtual sf::core::model::EventDrainRef clientDrain(
         int fd, std::string id
@@ -44,10 +44,11 @@ namespace event {
      * of the unix socket source by a subclass.
      *
      * \param fd The client connection fd.
-     * \param id The id of the client source.
+     * \param id The partial id of the client source.
+     * \param drain_id The full id of the client drain.
      */
     virtual sf::core::model::EventSourceRef clientSource(
-        int fd, std::string id
+        int fd, std::string id, std::string drain_id
     ) = 0;
 
    public:
@@ -56,22 +57,6 @@ namespace event {
 
     int getFD();
     sf::core::model::EventRef parse();
-  };
-
-
-  //! Unix socket client source..
-  class UnixClient : public sf::core::model::EventSource {
-   protected:
-    int socket_fd;
-    std::string path;
-
-    void openSocket();
-
-   public:
-    UnixClient(std::string socket, std::string id);
-    ~UnixClient();
-
-    int getFD();
   };
 
 }  // namespace event
