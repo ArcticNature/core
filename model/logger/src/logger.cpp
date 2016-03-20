@@ -36,7 +36,7 @@ LoggerRef sf::core::model::Logger::fallback_instance;
 
 LoggerRef Logger::fallback() {
   if (Logger::fallback_instance.get() == nullptr) {
-#ifdef TEST_BUILD
+#if TEST_BUILD
     Logger::fallback_instance = LoggerRef(new NullLogger());
 #else
     Logger::fallback_instance = LoggerRef(

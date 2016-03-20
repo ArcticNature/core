@@ -20,6 +20,14 @@ namespace event {
 
   template<class SourceClass, class DrainClass>
   std::string UnixClient::Connect(std::string socket, std::string id) {
+    // Debug log the path to the socket.
+    sf::core::model::LogInfo info = { {"socket", socket} };
+    DEBUGV(
+        sf::core::context::Context::logger(),
+        "Establishing UNIX socket at ${socket}.",
+        info
+    );
+
     // Connect to the server.
     int source_fd = sf::core::context::Static::posix()->socket(
         AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0
@@ -55,7 +63,7 @@ namespace event {
     sf::core::context::Context::sourceManager()->addSource(source);
 
     // Log connection established.
-    sf::core::model::LogInfo info = {
+    info = {
       {"drain-id",  drain->id()},
       {"socket",    socket},
       {"source-id", source->id()}
