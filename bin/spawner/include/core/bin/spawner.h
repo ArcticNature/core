@@ -5,7 +5,9 @@
 #include <string>
 
 #include "core/bin/async-process.h"
+#include "core/event/client/unix.h"
 #include "core/event/source/unix.h"
+
 #include "core/model/event.h"
 #include "core/protocols/daemon_spanwer/ds_message.pb.h"
 
@@ -33,7 +35,9 @@ namespace bin {
     );
 
    public:
-    explicit SpawnerToDaemon(std::string path);
+    static std::string Connect(std::string path);
+
+    SpawnerToDaemon(int fd, std::string id, std::string drain_id);
     sf::core::model::EventRef parse();
   };
 
@@ -42,7 +46,9 @@ namespace bin {
   class SpawnerToManagerSource : public sf::core::event::UnixSource {
    protected:
     sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
-    sf::core::model::EventSourceRef clientSource(int fd, std::string id);
+    sf::core::model::EventSourceRef clientSource(
+        int fd, std::string id, std::string drain_id
+    );
 
    public:
     explicit SpawnerToManagerSource(std::string path);

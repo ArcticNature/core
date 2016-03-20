@@ -44,7 +44,9 @@ class ManagerFdDrain : public FdDrain {
 
 class ManagerFdSource : public FdSource {
  public:
-  ManagerFdSource(int fd, std::string id) : FdSource(fd, id) {}
+  ManagerFdSource(
+      int fd, std::string id, std::string drain_id
+  ) : FdSource(fd, id, drain_id) {}
 
   EventRef parse() {
     return EventRef();
@@ -69,8 +71,10 @@ EventDrainRef SpawnerToManagerSource::clientDrain(int fd, std::string id) {
   return drain;
 }
 
-EventSourceRef SpawnerToManagerSource::clientSource(int fd, std::string id) {
+EventSourceRef SpawnerToManagerSource::clientSource(
+    int fd, std::string id, std::string drain_id
+) {
   LogInfo info = {{"source-id", id}};
   DEBUGV(Context::logger(), "Creating manager source ${source-id}", info);
-  return EventSourceRef(new ManagerFdSource(fd, id));
+  return EventSourceRef(new ManagerFdSource(fd, id, drain_id));
 }

@@ -36,11 +36,8 @@ using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
 
 
-class SpawnerToDaemonFdDrain : public FdDrain {
- public:
-  explicit SpawnerToDaemonFdDrain(int fd) : FdDrain(
-      fd, "spawner-to-daemon" + toString(fd)
-  ) {}
+class SpawnerToDaemonFdDrain : public FdDrain { public:
+  SpawnerToDaemonFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
 
   void sendAck() {
     Message message;
@@ -59,21 +56,16 @@ EventRef SpawnerToDaemon::process(Message message) {
   return EventRef();
 }
 
-SpawnerToDaemon::SpawnerToDaemon(std::string path) : UnixClient(
-    path, "spawner-to-daemon"
-) {
-  // Connect to server.
-  int client_fd = this->getFD();
 
-  // Create a file descriptor for the drain.
-  int drain_fd = Static::posix()->dup(client_fd);
-  int flags = Static::posix()->fcntl(client_fd, F_GETFD);
-  Static::posix()->fcntl(drain_fd, F_SETFD, flags);
-
-  // Create drain and add it to static context.
-  EventDrainRef drain(new SpawnerToDaemonFdDrain(drain_fd));
-  Static::drains()->add(drain);
+std::string SpawnerToDaemon::Connect(std::string path) {
+  return UnixClient::Connect<SpawnerToDaemon, SpawnerToDaemonFdDrain>(
+      path, "spawner-to-daemon"
+  );
 }
+
+SpawnerToDaemon::SpawnerToDaemon(
+    int fd, std::string id, std::string drain_id
+) : UnixClient(fd, id, drain_id) {}
 
 EventRef SpawnerToDaemon::parse() {
   Message message;

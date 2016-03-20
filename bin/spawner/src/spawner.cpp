@@ -24,10 +24,7 @@ using sf::core::model::EventSourceRef;
 void Spawner::connectDaemon() {
   CLIParser*  parser = Static::parser();
   std::string daemon_path = parser->getString("spawner-socket");
-
-  Context::sourceManager()->addSource(EventSourceRef(
-      new SpawnerToDaemon(daemon_path)
-  ));
+  SpawnerToDaemon::Connect(daemon_path);
 }
 
 void Spawner::managerSocket() {
