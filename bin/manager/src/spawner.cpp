@@ -38,9 +38,7 @@ using sf::core::utility::string::toString;
 
 class ManagerToSpawnerFdDrain : public FdDrain {
  public:
-  explicit ManagerToSpawnerFdDrain(int fd) : FdDrain(
-      fd, "manager-to-spawner" + toString(fd)
-  ) {}
+  ManagerToSpawnerFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
 
   void sendAck() {
     Message message;
@@ -54,21 +52,17 @@ EventRef ManagerToSpawner::process(Message message) {
   return EventRef();
 }
 
-ManagerToSpawner::ManagerToSpawner(std::string path) : UnixClient(
-    path, "manager-to-spawner"
-) {
-  // Connect to server.
-  int client_fd = this->getFD();
 
-  // Create a file descriptor for the drain.
-  int drain_fd = Static::posix()->dup(client_fd);
-  int flags = Static::posix()->fcntl(client_fd, F_GETFD);
-  Static::posix()->fcntl(drain_fd, F_SETFD, flags);
-
-  // Create drain and add it to static context.
-  EventDrainRef drain(new ManagerToSpawnerFdDrain(drain_fd));
-  Static::drains()->add(drain);
+std::string ManagerToSpawner::Connect(std::string path) {
+  return UnixClient::Connect<ManagerToSpawner, ManagerToSpawnerFdDrain>(
+      path, "manager-to-spawner"
+  );
 }
+
+
+ManagerToSpawner::ManagerToSpawner(
+    int fd, std::string id, std::string drain
+) : UnixClient(fd, id, drain) {}
 
 EventRef ManagerToSpawner::parse() {
   Message message;

@@ -14,29 +14,20 @@ using sf::core::bin::Manager;
 using sf::core::bin::ManagerToDaemon;
 using sf::core::bin::ManagerToSpawner;
 
-using sf::core::context::Context;
 using sf::core::context::Static;
-
 using sf::core::model::CLIParser;
-using sf::core::model::EventSourceRef;
 
 
 void Manager::connectDaemon() {
   CLIParser*  parser = Static::parser();
   std::string daemon_path = parser->getString("manager-socket");
-
-  Context::sourceManager()->addSource(EventSourceRef(
-      new ManagerToDaemon(daemon_path)
-  ));
+  ManagerToDaemon::Connect(daemon_path);
 }
 
 void Manager::connectSpawner() {
   CLIParser*  parser = Static::parser();
   std::string spawner_path = parser->getString("spawner-manager-socket");
-
-  Context::sourceManager()->addSource(EventSourceRef(
-      new ManagerToSpawner(spawner_path)
-  ));
+  ManagerToSpawner::Connect(spawner_path);
 }
 
 void Manager::initialise() {

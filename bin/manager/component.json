@@ -8,6 +8,7 @@
     "core.context.dynamic",
     "core.context.static",
 
+    "core.event.client.unix",
     "core.event.drain.fd",
     "core.event.source.unix",
     "core.exceptions",

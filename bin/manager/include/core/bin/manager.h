@@ -5,7 +5,7 @@
 #include <string>
 
 #include "core/bin/async-process.h"
-#include "core/event/source/unix.h"
+#include "core/event/client/unix.h"
 #include "core/model/event.h"
 
 #include "core/protocols/daemon_manager/dm_message.pb.h"
@@ -35,7 +35,9 @@ namespace bin {
     );
 
    public:
-    explicit ManagerToDaemon(std::string path);
+    static std::string Connect(std::string path);
+
+    ManagerToDaemon(int fd, std::string id, std::string drain);
     sf::core::model::EventRef parse();
   };
 
@@ -47,7 +49,9 @@ namespace bin {
     );
 
    public:
-    explicit ManagerToSpawner(std::string path);
+    static std::string Connect(std::string path);
+
+    ManagerToSpawner(int fd, std::string id, std::string drain);
     sf::core::model::EventRef parse();
   };
 

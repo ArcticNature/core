@@ -38,9 +38,7 @@ using sf::core::utility::string::toString;
 
 class ManagerToDaemonFdDrain : public FdDrain {
  public:
-  explicit ManagerToDaemonFdDrain(int fd) : FdDrain(
-      fd, "manager-to-daemon" + toString(fd)
-  ) {}
+  ManagerToDaemonFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
 
   void sendAck() {
     Message message;
@@ -59,21 +57,17 @@ EventRef ManagerToDaemon::process(Message message) {
   return EventRef();
 }
 
-ManagerToDaemon::ManagerToDaemon(std::string path) : UnixClient(
-    path, "manager-to-daemon"
-) {
-  // Connect to server.
-  int client_fd = this->getFD();
 
-  // Create a file descriptor for the drain.
-  int drain_fd = Static::posix()->dup(client_fd);
-  int flags = Static::posix()->fcntl(client_fd, F_GETFD);
-  Static::posix()->fcntl(drain_fd, F_SETFD, flags);
-
-  // Create drain and add it to static context.
-  EventDrainRef drain(new ManagerToDaemonFdDrain(drain_fd));
-  Static::drains()->add(drain);
+std::string ManagerToDaemon::Connect(std::string path) {
+  return UnixClient::Connect<ManagerToDaemon, ManagerToDaemonFdDrain>(
+      path, "manager-to-daemon"
+  );
 }
+
+
+ManagerToDaemon::ManagerToDaemon(
+    int fd, std::string id, std::string drain_id
+) : UnixClient(fd, id, drain_id) {}
 
 EventRef ManagerToDaemon::parse() {
   Message message;
@@ -100,7 +94,8 @@ EventRef ManagerToDaemon::parse() {
   };
   ERRORV(
       Context::logger(),
-      "Source ${source-id} received unkown event ${event-name}.", info
+      "Source ${source-id} received unkown event ${event-name}.",
+      info
   );
   return EventRef();
 }
