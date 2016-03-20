@@ -88,8 +88,10 @@ namespace bin {
   //! Unix event source for the Manager.
   class DaemonToManagerSource : public sf::core::event::UnixSource {
    protected:
-    sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
-    sf::core::model::EventSourceRef clientSource(int fd, std::string id);
+    sf::core::model::EventDrainRef  clientDrain(int fd, std::string id);
+    sf::core::model::EventSourceRef clientSource(
+        int fd, std::string id, std::string drain_id
+    );
 
    public:
     explicit DaemonToManagerSource(std::string path);
@@ -99,8 +101,10 @@ namespace bin {
   //! Unix event source for the Spawner.
   class DaemonToSpawnerSource : public sf::core::event::UnixSource {
    protected:
-    sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
-    sf::core::model::EventSourceRef clientSource(int fd, std::string id);
+    sf::core::model::EventDrainRef  clientDrain(int fd, std::string id);
+    sf::core::model::EventSourceRef clientSource(
+        int fd, std::string id, std::string drain_id
+    );
 
    public:
     explicit DaemonToSpawnerSource(std::string path);
