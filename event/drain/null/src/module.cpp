@@ -4,6 +4,7 @@
 #include "core/context/static.h"
 #include "core/event/drain/null.h"
 #include "core/interface/lifecycle.h"
+#include "core/lifecycle/process.h"
 
 
 using sf::core::context::Static;
@@ -12,8 +13,7 @@ using sf::core::model::EventDrainRef;
 
 using sf::core::interface::BaseLifecycleArg;
 using sf::core::interface::BaseLifecycleHandler;
-using sf::core::interface::Lifecycle;
-using sf::core::interface::LifecycleHandlerRef;
+using sf::core::lifecycle::Process;
 
 
 //! Initialisation handler.
@@ -26,12 +26,5 @@ class NullDrainInitHandler : public BaseLifecycleHandler {
 };
 
 
-//! Module initialiser.
-class NullDrainModuleInit {
- public:
-  NullDrainModuleInit() {
-    LifecycleHandlerRef handler(new NullDrainInitHandler());
-    Lifecycle::on("process::init", handler);
-  }
-};
-NullDrainModuleInit null_drain_module;
+// Register the initialiser.
+LifecycleStaticOn("process::init", NullDrainInitHandler);

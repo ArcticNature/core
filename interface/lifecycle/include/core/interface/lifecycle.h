@@ -29,6 +29,8 @@ namespace interface {
    public:
     virtual ~BaseLifecycleArg();
   };
+  typedef std::shared_ptr<BaseLifecycleArg> LifecycleArgRef;
+
 
   //! Definition of a lifecycle event handler.
   class BaseLifecycleHandler {
@@ -43,6 +45,7 @@ namespace interface {
     virtual void handle(std::string event, BaseLifecycleArg* argument) = 0;
   };
   typedef std::shared_ptr<BaseLifecycleHandler> LifecycleHandlerRef;
+
 
   //! Archive and orchestrator of internal events.
   /*!
@@ -70,6 +73,7 @@ namespace interface {
 #endif  // DEBUG_BUILD
   };
 
+
   //! Singleton proxy for a global LifecycleInstance.
   class Lifecycle {
    protected:
@@ -85,6 +89,18 @@ namespace interface {
     static void reset();
 #endif  // DEBUG_BUILD
   };
+
+
+  //! Register event handlers during static initialisation.
+  template<class Handler>
+  class _LifecycleStaticOn {
+   public:
+    explicit _LifecycleStaticOn(std::string event) {
+      LifecycleHandlerRef handler(new Handler());
+      Lifecycle::on(event, handler);
+    }
+  };
+
 
   //! Lifecycle handler with argument type checking.
   /*!
@@ -112,5 +128,16 @@ namespace interface {
 }  // namespace interface
 }  // namespace core
 }  // namespace sf
+
+
+// Helper macros to make LifecycleStaticOn method-like.
+#define LC_STATIC_ON_UNIQUE_2(handler, line) \
+  __init_##handler##_##line##__
+#define LC_STATIC_ON_UNIQUE(handler, line) \
+  LC_STATIC_ON_UNIQUE_2(handler, line)
+
+#define LifecycleStaticOn(event, Handler) \
+  sf::core::interface::_LifecycleStaticOn<Handler> \
+  LC_STATIC_ON_UNIQUE(Handler, __LINE__) (event);
 
 #endif  // CORE_INTERFACE_LIFECYCLE_H_

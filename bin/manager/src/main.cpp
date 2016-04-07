@@ -5,8 +5,9 @@
 
 #include "core/context/context.h"
 #include "core/context/static.h"
+
 #include "core/exceptions/base.h"
-#include "core/interface/lifecycle.h"
+#include "core/lifecycle/process.h"
 
 #include "core/model/cli-parser.h"
 #include "core/model/logger.h"
@@ -22,7 +23,7 @@ using sf::core::context::Static;
 
 using sf::core::exception::CleanExit;
 using sf::core::exception::SfException;
-using sf::core::interface::Lifecycle;
+using sf::core::lifecycle::Process;
 
 using sf::core::model::CLIParser;
 using sf::core::model::Logger;
@@ -36,7 +37,7 @@ int main(int argc, char** argv) {
   // Initialise static context and trigger process::init lifecycle event.
   Static::initialise(new User());
   Static::options()->setString("log-group", "Manager");
-  Lifecycle::trigger("process::init");
+  Process::Init();
 
   try {
     // Parse CLI.
@@ -66,14 +67,14 @@ int main(int argc, char** argv) {
         "Spawner terminating due to an error: ${error}", vars
     );
 
-    Lifecycle::trigger("process::exit");
+    Process::Exit();
     Context::destroy();
     Logger::destroyFallback();
     Static::destroy();
     return ex.getCode();
   }
 
-  Lifecycle::trigger("process::exit");
+  Process::Exit();
   Context::destroy();
   Logger::destroyFallback();
   Static::destroy();

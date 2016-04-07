@@ -8,7 +8,7 @@
 #include "core/context/static.h"
 
 #include "core/exceptions/base.h"
-#include "core/interface/lifecycle.h"
+#include "core/lifecycle/process.h"
 
 #include "core/model/cli-parser.h"
 #include "core/model/logger.h"
@@ -23,7 +23,7 @@ using sf::core::context::Static;
 
 using sf::core::exception::CleanExit;
 using sf::core::exception::SfException;
-using sf::core::interface::Lifecycle;
+using sf::core::lifecycle::Process;
 
 using sf::core::model::CLIParser;
 using sf::core::model::Logger;
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   // Initialise static context and trigger process::init lifecycle event.
   Static::initialise(new Restricted());
   Static::options()->setString("log-group", "Daemon");
-  Lifecycle::trigger("process::init");
+  Process::Init();
 
   try {
     // Parse CLI.
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
         "Daemon terminating due to an error: ${error}", vars
     );
 
-    Lifecycle::trigger("process::exit");
+    Process::Exit();
     sf::core::context::Daemon::destroy();
     Context::destroy();
     Logger::destroyFallback();
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
   }
 
   int exit_code = sf::core::context::Daemon::instance()->exitCode();
-  Lifecycle::trigger("process::exit");
+  Process::Exit();
   sf::core::context::Daemon::destroy();
   Context::destroy();
   Logger::destroyFallback();

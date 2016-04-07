@@ -16,6 +16,8 @@
 
     "core.exceptions",
     "core.interface.lifecycle",
+    "core.lifecycle.process",
+
     "core.model.cli-parser",
     "core.model.event",
     "core.model.logger",
