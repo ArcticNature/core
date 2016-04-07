@@ -4,7 +4,8 @@
 
   "defaults": "data/defaults.json",
   "templates": {
-    "include/core/compile-time/options.h": "templates/options.h"
+    "include/core/compile-time/options.h": "templates/options.h",
+    "include/core/compile-time/version.h": "templates/version.h"
   },
 
   "targets": {

@@ -30,6 +30,7 @@ namespace model {
    */
   class Event {
    protected:
+    std::string _id;
     std::string correlation_id;
     std::string drain_id;
 
@@ -39,6 +40,12 @@ namespace model {
 
     //! Returns the event correlation id.
     std::string correlation() const;
+
+    //! Initialises the event id, if missing.
+    std::string id(std::string id);
+
+    //! Returns the event id.
+    std::string id() const;
 
     //! Handles the event in the most appropriate way.
     virtual void handle() = 0;

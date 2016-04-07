@@ -20,6 +20,7 @@ using sf::core::model::EventSourceManager;
 
 
 Event::Event(std::string correlation, std::string drain) {
+  this->_id = "";
   this->correlation_id = correlation;
   this->drain_id = drain;
 }
@@ -27,6 +28,20 @@ Event::~Event() {}
 
 std::string Event::correlation() const {
   return this->correlation_id;
+}
+
+std::string Event::id(std::string id) {
+  if (this->_id == "") {
+    this->_id = id;
+  }
+  if (this->correlation_id == "") {
+    this->correlation_id = this->_id;
+  }
+  return this->_id;
+}
+
+std::string Event::id() const {
+  return this->_id;
 }
 
 
