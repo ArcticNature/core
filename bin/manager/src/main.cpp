@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
 
     // Prepare to parse.
     Static::parser(parser);
+    CLIParser::clusterOptions(parser);
     CLIParser::managerOptions(parser);
     CLIParser::miscOptions(parser);
     parser->parse(&argc, &argv);

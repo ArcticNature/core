@@ -95,7 +95,11 @@ void Daemon::forkManager() {
   // Specify the parser to avoid compatibility issues.
   manager->appendArgument("--parser=gflags");
 
-  // Add arguments.
+  // Cluster arguments.
+  manager->appendArgument("--node_name");
+  manager->appendArgument(parser->getString("node-name"));
+
+  // IPC arguments.
   manager->appendArgument("--manager_socket");
   manager->appendArgument(parser->getString("manager-socket"));
   manager->appendArgument("--spawner_manager_socket");

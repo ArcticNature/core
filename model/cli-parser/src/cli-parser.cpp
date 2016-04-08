@@ -22,6 +22,13 @@ using sf::core::model::cli::BoolOption;
 using sf::core::model::cli::StringOption;
 
 
+void CLIParser::clusterOptions(CLIParser* parser) {
+  parser->addString(
+      "node-name", "unique name of the node", "node"
+  );
+}
+
+
 void CLIParser::configOptions(CLIParser* parser) {
   parser->addString(
       "repo-type", "The type of configuration repository", "git"

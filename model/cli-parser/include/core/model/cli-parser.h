@@ -23,6 +23,7 @@ namespace model {
    */
   class CLIParser : public Options {
    public:
+    static void clusterOptions(CLIParser* parser);
     static void configOptions(CLIParser* parser);
     static void miscOptions(CLIParser* parser);
 
