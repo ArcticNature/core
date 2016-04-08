@@ -24,6 +24,8 @@ namespace model {
   class CLIParser : public Options {
    public:
     static void configOptions(CLIParser* parser);
+    static void miscOptions(CLIParser* parser);
+
     static void daemonOptions(CLIParser* parser);
     static void managerOptions(CLIParser* parser);
     static void spawnerOptions(CLIParser* parser);
@@ -53,6 +55,13 @@ namespace model {
         std::string name, std::string description,
         std::string _default
     );
+
+    //! React to the --version flag.
+    /*!
+     * If the --version flag is set, print the version details
+     * and throw CleanExit, otherwise do nothing.
+     */
+    void handleVersionOption(std::string prefix);
 
     //! Parses the command line options.
     /*!

@@ -46,8 +46,10 @@ int main(int argc, char** argv) {
 
     // Prepare to parse.
     Static::parser(parser);
+    CLIParser::miscOptions(parser);
     CLIParser::spawnerOptions(parser);
     parser->parse(&argc, &argv);
+    parser->handleVersionOption("snow-fox-spawner");
 
     // Run spawner.
     Spawner spawner;

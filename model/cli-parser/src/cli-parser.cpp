@@ -1,12 +1,15 @@
 // Copyright 2015 Stefano Pogliani <stefano@spogliani.net>
 #include "core/model/cli-parser.h"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
+#include "core/compile-time/version.h"
 #include "core/exceptions/base.h"
 #include "core/exceptions/options.h"
 
+using sf::core::exception::CleanExit;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::InvalidCommandLine;
 using sf::core::exception::VariableNotFound;
@@ -29,6 +32,11 @@ void CLIParser::configOptions(CLIParser* parser) {
   parser->addString(
       "repo-version", "Version of the configuration to use", "<latest>"
   );
+}
+
+void CLIParser::miscOptions(CLIParser* parser) {
+  parser->addBool("help", "show usage and exit", false);
+  parser->addBool("version", "show version and exit", false);
 }
 
 void CLIParser::daemonOptions(CLIParser* parser) {
@@ -130,12 +138,26 @@ void CLIParser::addString(
   this->addOption(CLIOptionRef(new StringOption(name, description, _default)));
 }
 
+void CLIParser::handleVersionOption(std::string prefix) {
+  if (this->getBoolean("version")) {
+    std::cout << prefix << std::endl;
+    std::cout << "  Version: " << VERSION_NUMBER << std::endl;
+    std::cout << "  Commit:  " << VERSION_SHA << std::endl;
+    throw CleanExit();
+  }
+}
+
 void CLIParser::parse(int* argc, char*** argv) {
   this->parseLogic(argc, argv);
   this->validateOptions();
 }
 
 void CLIParser::validateOptions() {
+  // Pass check if --help or --version are set.
+  if (this->getBoolean("help") || this->getBoolean("version")) {
+    return;
+  }
+
   std::vector<CLIOptionRef>::iterator it;
   for (it = this->options.begin(); it != this->options.end(); it++) {
     std::string name = (*it)->name();

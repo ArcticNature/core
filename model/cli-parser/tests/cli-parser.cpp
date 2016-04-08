@@ -4,6 +4,7 @@
 #include "core/exceptions/base.h"
 #include "core/model/cli-parser.h"
 
+using sf::core::exception::CleanExit;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::InvalidCommandLine;
 
@@ -29,21 +30,24 @@ class ValidParser : public CLIParser {
 
 TEST(CLIParser, checkRequiredOptionsFails) {
   NullParser parser;
-  CLIParser::configOptions(&parser);
   CLIParser::daemonOptions(&parser);
+  CLIParser::configOptions(&parser);
+  CLIParser::miscOptions(&parser);
   ASSERT_THROW(parser.parse(nullptr, nullptr), InvalidCommandLine);
 }
 
 TEST(CLIParser, checkRequiredOptionsPasses) {
   ValidParser parser;
+  CLIParser::miscOptions(&parser);
   parser.parse(nullptr, nullptr);
   ASSERT_EQ("/path/to/repo", parser.getString("repo-path"));
 }
 
 TEST(CLIParser, SetDefaults) {
   NullParser parser;
-  CLIParser::configOptions(&parser);
   CLIParser::daemonOptions(&parser);
+  CLIParser::configOptions(&parser);
+  CLIParser::miscOptions(&parser);
 
   // Daemon options.
   ASSERT_TRUE(parser.getBoolean("daemonise"));
@@ -103,4 +107,16 @@ TEST(CLIOption, ValidateIsCalled) {
   NullParser parser;
   option.setParser(&parser);
   ASSERT_TRUE(option.validate());
+}
+
+TEST(CLIOptionHandleVersion, MovePastWhenNotActive) {
+  NullParser parser;
+  parser.setBoolean("version", false);
+  parser.handleVersionOption("");
+}
+
+TEST(CLIOptionHandleVersion, TerminateProcessWhenActive) {
+  NullParser parser;
+  parser.setBoolean("version", true);
+  ASSERT_THROW(parser.handleVersionOption(""), CleanExit);
 }

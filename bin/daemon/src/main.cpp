@@ -46,9 +46,11 @@ int main(int argc, char** argv) {
 
     // Prepare to parse.
     Static::parser(parser);
-    CLIParser::configOptions(parser);
     CLIParser::daemonOptions(parser);
+    CLIParser::configOptions(parser);
+    CLIParser::miscOptions(parser);
     parser->parse(&argc, &argv);
+    parser->handleVersionOption("snow-fox");
 
     // Run daemon.
     Daemon daemon;
