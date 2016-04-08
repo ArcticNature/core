@@ -3,16 +3,31 @@
 
 #include <string>
 
-#include "core/event/testing.h"
+#include "core/cluster/node.h"
+#include "core/context/static.h"
 #include "core/lifecycle/event.h"
+
+#include "core/event/testing.h"
+#include "core/model/cli-parser.h"
 
 using sf::core::interface::BaseLifecycleArg;
 using sf::core::interface::BaseLifecycleHandler;
 
+using sf::core::cluster::Node;
+using sf::core::context::Static;
 using sf::core::lifecycle::EventLifecycle;
 using sf::core::model::EventRef;
 
 using sf::core::event::TestEvent;
+using sf::core::model::CLIParser;
+
+
+class NullParser : public CLIParser {
+ protected:
+  void parseLogic(int* argc, char*** argv) {
+    return;
+  }
+};
 
 
 class TestEvent2 : public TestEvent {
@@ -33,47 +48,72 @@ uint64_t InitCallHandler::call_count = 0;
 LifecycleStaticOn("event::initialise", InitCallHandler);
 
 
-TEST(EventLifecycleId, AddsId) {
+class EventLifecycleTest : public ::testing::Test {
+ public:
+  EventLifecycleTest() {
+    Static::parser(new NullParser());
+  }
+
+  ~EventLifecycleTest() {
+    Node::reset();
+    EventLifecycle::reset();
+    Static::destroy();
+  }
+};
+
+
+TEST_F(EventLifecycleTest, AddsId) {
   EventRef event(new TestEvent());
   EventLifecycle::Init(event);
   ASSERT_EQ("node!N2sf4core5event9TestEventE#0", event->id());
 }
 
-TEST(EventLifecycleId, IdIsBasedOnClass) {
+TEST_F(EventLifecycleTest, AddsIdSequencially) {
+  EventRef event(new TestEvent());
+  EventLifecycle::Init(event);
+  ASSERT_EQ("node!N2sf4core5event9TestEventE#0", event->id());
+
+  EventRef event2(new TestEvent());
+  EventLifecycle::Init(event2);
+  ASSERT_EQ("node!N2sf4core5event9TestEventE#1", event2->id());
+}
+
+TEST_F(EventLifecycleTest, CorrelationIsIdIfNotSet) {
+  EventRef event(new TestEvent());
+  EventLifecycle::Init(event);
+  ASSERT_EQ("node!N2sf4core5event9TestEventE#0", event->id());
+  ASSERT_EQ("node!N2sf4core5event9TestEventE#0", event->correlation());
+}
+
+TEST_F(EventLifecycleTest, CorrelationIsPreserved) {
+  EventRef event(new TestEvent("set-outside", "NULL"));
+  EventLifecycle::Init(event);
+  ASSERT_EQ("set-outside", event->correlation());
+}
+
+TEST_F(EventLifecycleTest, IdsAreSetOnce) {
+  EventRef event(new TestEvent());
+  EventLifecycle::Init(event);
+  ASSERT_EQ("node!N2sf4core5event9TestEventE#0", event->id());
+  EventLifecycle::Init(event);
+  ASSERT_EQ("node!N2sf4core5event9TestEventE#0", event->id());
+}
+
+TEST_F(EventLifecycleTest, IdIsBasedOnClass) {
   EventRef event(new TestEvent2());
   EventLifecycle::Init(event);
   ASSERT_EQ("node!10TestEvent2#0", event->id());
 }
 
-TEST(EventLifecycleId, AddsIdSequencially) {
+TEST_F(EventLifecycleTest, InitIsCalled) {
   EventRef event(new TestEvent());
   EventLifecycle::Init(event);
-  ASSERT_EQ("node!N2sf4core5event9TestEventE#1", event->id());
+  ASSERT_LT(0, InitCallHandler::call_count);
 }
 
-TEST(EventLifecycleId, IdsAreSetOnce) {
+TEST_F(EventLifecycleTest, NodeNameFromOptions) {
+  Static::parser()->setString("node-name", "test");
   EventRef event(new TestEvent());
   EventLifecycle::Init(event);
-  ASSERT_EQ("node!N2sf4core5event9TestEventE#2", event->id());
-  EventLifecycle::Init(event);
-  ASSERT_EQ("node!N2sf4core5event9TestEventE#2", event->id());
-}
-
-TEST(EventLifecycle, InitIsCalled) {
-  EventRef event(new TestEvent());
-  EventLifecycle::Init(event);
-  ASSERT_EQ(6, InitCallHandler::call_count);
-}
-
-TEST(EventLifecycleCorrelation, IsIdIfNotSet) {
-  EventRef event(new TestEvent());
-  EventLifecycle::Init(event);
-  ASSERT_EQ("node!N2sf4core5event9TestEventE#5", event->id());
-  ASSERT_EQ("node!N2sf4core5event9TestEventE#5", event->correlation());
-}
-
-TEST(EventLifecycleCorrelation, IsPreserved) {
-  EventRef event(new TestEvent("set-outside", "NULL"));
-  EventLifecycle::Init(event);
-  ASSERT_EQ("set-outside", event->correlation());
+  ASSERT_EQ("test!N2sf4core5event9TestEventE#0", event->id());
 }

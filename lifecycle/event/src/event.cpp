@@ -6,7 +6,11 @@
 #include <string>
 #include <typeinfo>
 
+#include "core/cluster/node.h"
+#include "core/compile-time/options.h"
 #include "core/model/event.h"
+
+using sf::core::cluster::Node;
 
 using sf::core::interface::Lifecycle;
 using sf::core::interface::LifecycleArgRef;
@@ -39,8 +43,7 @@ class EventIdentifyHandler : public LifecycleHandler<EventLifecycleArg> {
  public:
   void handle(std::string lc_event, EventLifecycleArg* argument) {
     // Collect needed information.
-    std::string node_name = "node";
-
+    std::string node_name = Node::name();
     Event* event = argument->event.get();
     std::string type_name   = typeid(*event).name();
     uint64_t instance_count = event_id_sequences[type_name]++;
@@ -51,6 +54,13 @@ class EventIdentifyHandler : public LifecycleHandler<EventLifecycleArg> {
     argument->event->id(id.str());
   }
 };
+
+
+#if TEST_BUILD
+void EventLifecycle::reset() {
+  event_id_sequences.clear();
+}
+#endif
 
 
 // Static registration of handlers.

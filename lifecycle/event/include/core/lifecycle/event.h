@@ -2,8 +2,10 @@
 #ifndef CORE_LIFECYCLE_EVENT_H_
 #define CORE_LIFECYCLE_EVENT_H_
 
+#include "core/compile-time/options.h"
 #include "core/interface/lifecycle.h"
 #include "core/model/event.h"
+
 
 namespace sf {
 namespace core {
@@ -14,6 +16,10 @@ namespace lifecycle {
    public:
     //! Initialise an event.
     static void Init(sf::core::model::EventRef event);
+
+#if TEST_BUILD
+    static void reset();
+#endif
   };
 
   //! Lifecycle handler argument that stores an EventRef.

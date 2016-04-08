@@ -3,6 +3,8 @@
   "type": "c++",
 
   "deps": [
+    "core.compile-time",
+    "core.cluster.node",
     "core.interface.lifecycle",
     "core.model.event"
   ],
@@ -11,7 +13,10 @@
     "debug":   { "type": "lib" },
     "release": { "type": "lib" },
     "test":    {
-      "deps": ["core.event.testing"],
+      "deps": [
+        "core.event.testing",
+        "core.model.cli-parser"
+      ],
       "type": "lib"
     }
   }
