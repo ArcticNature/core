@@ -1,0 +1,19 @@
+{
+  "name": "core.cluster.node",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test": {
+      "deps": [
+        "core.model.cli-parser"
+      ],
+      "type": "lib"
+    }
+  }
+}
