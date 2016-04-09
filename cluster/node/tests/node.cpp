@@ -31,10 +31,16 @@ class NodeTest : public ::testing::Test {
 
 
 TEST_F(NodeTest, DefaultName) {
-  ASSERT_EQ("node", Node::name());
+  ASSERT_EQ("node", Node::me()->name());
 }
 
 TEST_F(NodeTest, NameFromCli) {
   Static::parser()->setString("node-name", "test-node");
-  ASSERT_EQ("test-node", Node::name());
+  ASSERT_EQ("test-node", Node::me()->name());
+}
+
+TEST_F(NodeTest, SingletonMe) {
+  Node* node1 = Node::me();
+  Node* node2 = Node::me();
+  ASSERT_EQ(node1, node2);
 }
