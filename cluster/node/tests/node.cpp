@@ -5,6 +5,8 @@
 #include "core/context/static.h"
 
 using sf::core::cluster::Node;
+using sf::core::cluster::NodeStatusCode;
+
 using sf::core::context::Static;
 using sf::core::model::CLIParser;
 
@@ -43,4 +45,12 @@ TEST_F(NodeTest, SingletonMe) {
   Node* node1 = Node::me();
   Node* node2 = Node::me();
   ASSERT_EQ(node1, node2);
+}
+
+
+TEST_F(NodeTest, Status) {
+  ASSERT_EQ(
+      NodeStatusCode::UNKOWN,
+      Node::me()->status().reason().code()
+  );
 }

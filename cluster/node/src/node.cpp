@@ -3,14 +3,47 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "core/compile-time/options.h"
 #include "core/compile-time/version.h"
 #include "core/context/static.h"
 
 using sf::core::cluster::Node;
+using sf::core::cluster::NodeStatus;
+using sf::core::cluster::NodeStatusCode;
+using sf::core::cluster::NodeStatusDetail;
 using sf::core::cluster::NodeVersion;
+
 using sf::core::context::Static;
+using sf::core::utility::StatusDetail;
+
+
+std::vector<std::string> KNOWN_SUBSYSTEMS = {
+  "configuration",
+  "process"
+};
+
+
+NodeStatusDetail::NodeStatusDetail(
+    NodeStatusCode code, std::string message
+) : StatusDetail<
+    NodeStatusCode, NodeStatusCode::OK,
+    NodeStatusCode::WARNING, NodeStatusCode::ERROR,
+    NodeStatusCode::END
+>(code, message) {
+}
+
+
+NodeStatus::NodeStatus() {
+  // Register known subsystems to UNKOWN state.
+  for (std::vector<std::string>::iterator it = KNOWN_SUBSYSTEMS.begin();
+      it != KNOWN_SUBSYSTEMS.end(); it++) {
+    this->set(*it, NodeStatusDetail(
+        NodeStatusCode::UNKOWN, "System initialising"
+    ));
+  }
+}
 
 
 std::shared_ptr<Node> Node::_me;
@@ -52,4 +85,8 @@ Node::Node(std::string name, NodeVersion version) :
 
 std::string Node::name() const {
   return this->_name;
+}
+
+NodeStatus& Node::status() {
+  return this->_status;
 }
