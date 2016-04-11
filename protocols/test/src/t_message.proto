@@ -20,7 +20,8 @@ message Message {
     Test = 1;
   }
 
-  required Code code = 1;
+  required Code   code = 1;
+  optional string correlation_id = 2;
   extensions 50 to max;
 
   /*
