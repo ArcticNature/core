@@ -1,0 +1,29 @@
+import "p_message.proto";
+package sf.core.protocol.public_api;
+
+
+message NodeInfoRequest {
+  optional bool details = 1 [default = false];
+
+  extend Message {
+    optional NodeInfoRequest msg = 51;
+  }
+}
+
+
+message NodeInfoResponse {
+  message SubSystem {
+    required StatusColour colour = 1;
+    required int64  code   = 2;
+    required string reason = 3;
+  }
+
+  required StatusColour colour = 1;
+  required int64  code   = 2;
+  required string reason = 3;
+  repeated SubSystem details = 4;
+
+  extend Message {
+    optional NodeInfoResponse msg = 52;
+  }
+}

@@ -1,0 +1,28 @@
+package sf.core.protocol.public_api;
+
+
+message Message {
+  enum Code {
+    Ack = 1;
+    NodeInfoRequest  = 2;
+    NodeInfoResponse = 3;
+  }
+
+  required Code   code = 1;
+  optional string correlation_id = 2;
+  extensions 50 to max;
+
+  /*
+   * Used extentions:
+   *  - 50: NodeInfoRequest
+   *  - 51: NodeInfoResponse
+   */
+}
+
+
+enum StatusColour {
+  Unkown = -1;
+  Green  = 0;
+  Yellow = 1;
+  Red    = 2;
+}

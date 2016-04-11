@@ -1,0 +1,17 @@
+{
+  "name": "core.protocol.public",
+  "type": "protobuf",
+  "libs": ["protobuf"],
+
+  "generate": {
+    "c++": true,
+    "js":  true
+  },
+
+  "targets": {
+    "debug":   { },
+    "release": { },
+    "test":    { }
+  }
+}
+
