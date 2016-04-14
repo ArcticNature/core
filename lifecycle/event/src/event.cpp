@@ -43,7 +43,7 @@ class EventIdentifyHandler : public LifecycleHandler<EventLifecycleArg> {
  public:
   void handle(std::string lc_event, EventLifecycleArg* argument) {
     // Collect needed information.
-    std::string node_name = Node::name();
+    std::string node_name = Node::me()->name();
     Event* event = argument->event.get();
     std::string type_name   = typeid(*event).name();
     uint64_t instance_count = event_id_sequences[type_name]++;

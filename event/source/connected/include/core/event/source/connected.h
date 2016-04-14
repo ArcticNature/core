@@ -89,6 +89,9 @@ namespace event {
     void removeSource();
 
     //! Cleans up the source, ignoring errors.
+    /*!
+     * \param self Remove yourself from the drain manager.
+     */
     void safeCleanUp(bool self = false);
 
    public:

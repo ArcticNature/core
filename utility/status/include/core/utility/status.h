@@ -70,7 +70,7 @@ namespace utility {
   template<typename DetailClass>
   class Status {
    public:
-    virtual ~Status() {};
+    virtual ~Status() {}
 
     //! Returns the current status colour.
     virtual StatusLight colour() = 0;

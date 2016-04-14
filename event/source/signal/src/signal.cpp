@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "core/compile-time/options.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/exceptions/base.h"

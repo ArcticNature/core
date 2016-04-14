@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     };
     ERRORV(
         Logger::fallback(),
-        "Spawner terminating due to an error: ${error}", vars
+        "Manager terminating due to an error: ${error}", vars
     );
 
     Process::Exit();
