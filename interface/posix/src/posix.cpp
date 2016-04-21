@@ -165,6 +165,12 @@ char* Posix::strncpy(char* dest, const char* src, size_t len) {
 }
 
 
+// Others.
+unsigned int Posix::sleep(unsigned int seconds) {
+  return ::sleep(seconds);
+}
+
+
 // Process.
 void Posix::exit(int status) {
   ::exit(status);

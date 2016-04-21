@@ -65,6 +65,10 @@ ManagerToSpawner::ManagerToSpawner(
 ) : UnixClient(fd, id, drain) {}
 
 EventRef ManagerToSpawner::parse() {
+  if (!this->checkFD()) {
+    return EventRef();
+  }
+
   Message message;
   bool valid = MessageIO<Message>::parse(this->getFD(), &message);
   if (!valid) {

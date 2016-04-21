@@ -3,6 +3,7 @@
   "type": "c++",
 
   "deps": [
+    "core.context.dynamic",
     "core.context.static",
     "core.model.event"
   ],

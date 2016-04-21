@@ -68,6 +68,10 @@ SpawnerToDaemon::SpawnerToDaemon(
 ) : UnixClient(fd, id, drain_id) {}
 
 EventRef SpawnerToDaemon::parse() {
+  if (!this->checkFD()) {
+    return EventRef();
+  }
+
   Message message;
   bool valid = MessageIO<Message>::parse(this->getFD(), &message);
   if (!valid) {

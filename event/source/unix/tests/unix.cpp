@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <gtest/gtest.h>
 
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -60,14 +61,21 @@ class TestFdDrain : public FdDrain {
 class TestUnixSource : public UnixSource {
  protected:
   EventDrainRef clientDrain(int fd, std::string id) {
-    return EventDrainRef(new TestFdDrain(fd, id));
+    EventDrainRef drain(new TestFdDrain(fd, id));
+    this->drains.push_back(drain->id());
+    return drain;
   }
 
   EventSourceRef clientSource(int fd, std::string id, std::string drain_id) {
-    return EventSourceRef(new TestFdSource(fd, id));
+    EventSourceRef source(new TestFdSource(fd, id));
+    this->sources.push_back(source->id());
+    return source;
   }
 
  public:
+  std::vector<std::string> drains;
+  std::vector<std::string> sources;
+
   TestUnixSource(std::string path, std::string id) : UnixSource(path, id) {}
 };
 
@@ -140,33 +148,29 @@ TEST_F(UnixSourceTest, DeletesSockFile) {
 }
 
 TEST_F(UnixSourceTest, ConnectAddsSource) {
-  EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
   EventSourceManagerRef sources = Context::sourceManager();
+  TestUnixSource* source = new TestUnixSource(SOCKET_FILE, "test");
 
-  sources->addSource(source);
+  sources->addSource(EventSourceRef(source));
   this->connect();
-
-  int remote_fd = this->client_fd + 1;
-  std::string client_id = "fd-unix-test-client-" + toString(remote_fd);
   EventRef event = sources->wait(1);
-  sources->removeSource(client_id);
 
+  std::string client_id = source->sources[0];
+  sources->removeSource(client_id);
   ASSERT_EQ(nullptr, event.get());
 }
 
 TEST_F(UnixSourceTest, ConnectAddsDrain) {
   EventDrainManager* drains = Static::drains();
-  EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
   EventSourceManagerRef sources = Context::sourceManager();
+  TestUnixSource* source = new TestUnixSource(SOCKET_FILE, "test");
 
-  sources->addSource(source);
+  sources->addSource(EventSourceRef(source));
   this->connect();
-
-  int remote_fd = this->client_fd + 1;
-  std::string client_id = "unix-test-client-" + toString(remote_fd) + "-fd";
   EventRef event = sources->wait(1);
-  drains->remove(client_id);
 
+  std::string client_id = source->drains[0];
+  drains->remove(client_id);
   ASSERT_EQ(nullptr, event.get());
 }
 

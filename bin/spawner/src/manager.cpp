@@ -49,6 +49,9 @@ class ManagerFdSource : public FdSource {
   ) : FdSource(fd, id, drain_id) {}
 
   EventRef parse() {
+    if (!this->checkFD()) {
+      return EventRef();
+    }
     return EventRef();
   }
 };

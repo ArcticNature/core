@@ -66,6 +66,9 @@ namespace interface {
     virtual void  free(void* ptr);
     virtual char* strncpy(char* dest, const char* src, size_t n);
 
+    // Others.
+    virtual unsigned int sleep(unsigned int seconds);
+
     // Processes.
     virtual void  exit(int status);
     virtual int   execvp(const char* file, char* const argv[]);
