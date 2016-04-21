@@ -125,6 +125,9 @@ void Daemon::forkSpawner() {
 
   spawner->run();
   sf::core::context::Daemon::instance()->setSpawner(spawner);
+
+  // Make sure spawner initialisation is done first.
+  Static::posix()->sleep(1);
 }
 
 
