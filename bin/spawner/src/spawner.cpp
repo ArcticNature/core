@@ -37,6 +37,7 @@ void Spawner::managerSocket() {
 }
 
 void Spawner::initialise() {
+  this->disableSIGINT();
   this->registerDefaultSourceManager();
   this->connectDaemon();
   this->managerSocket();

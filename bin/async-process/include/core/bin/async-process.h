@@ -13,6 +13,9 @@ namespace bin {
   //! Helper base class for event based processes.
   class AsyncPorcess {
    protected:
+    //! Disable handling of SIGINT.
+    void disableSIGINT();
+
     //! Handles an error raised by the event loop.
     void handleLoopError(
         sf::core::model::EventRef event,

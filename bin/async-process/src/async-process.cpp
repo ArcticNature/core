@@ -1,15 +1,18 @@
 // Copyright 2016 Stefano Pogliani
 #include "core/bin/async-process.h"
 
+#include <unistd.h>
 #include <string>
 
 #include "core/compile-time/options.h"
 #include "core/context/context.h"
+#include "core/context/static.h"
 #include "core/registry/event/managers.h"
 
 
 using sf::core::bin::AsyncPorcess;
 using sf::core::context::Context;
+using sf::core::context::Static;
 
 using sf::core::exception::AbortException;
 using sf::core::exception::CleanExit;
@@ -18,12 +21,20 @@ using sf::core::exception::SfException;
 
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceManagerRef;
-
-using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 
 using sf::core::registry::EventSourceManager;
 
+
+void AsyncPorcess::disableSIGINT() {
+  INFO(Context::logger(), "Disabling SIGINT.");
+
+  sigset_t mask;
+  Static::posix()->sigemptyset(&mask);
+  Static::posix()->sigaddset(&mask, SIGINT);
+
+  Static::posix()->sigprocmask(SIG_BLOCK, &mask, nullptr);
+}
 
 void AsyncPorcess::handleLoopError(
     EventRef event, SfException* ex, bool drain
