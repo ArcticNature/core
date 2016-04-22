@@ -1,28 +1,25 @@
 {
-  "name": "core.bin.manager",
+  "name": "core.bin.client",
   "type": "c++",
   "load-all-archives": true,
 
   "deps": [
     "core.bin.async-process",
+    "core.compile-time",
     "core.context.dynamic",
     "core.context.static",
 
     "core.event.client.unix",
     "core.event.drain.fd",
-    "core.event.source.unix",
+    "core.event.source.signal",
+
     "core.exceptions",
-
-    "core.model.event",
+    "core.lifecycle.process",
     "core.model.logger",
-
-    "core.posix.user",
-    "core.protocol.daemon_manager",
-    "core.protocol.manager_spawner",
     "core.protocol.public",
 
-    "core.registry.cli-parser",
-    "core.utility.protobuf"
+    "core.posix.user",
+    "core.registry.cli-parser"
   ],
 
   "targets": {

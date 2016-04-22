@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "core/bin/manager/api/server.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -13,9 +14,12 @@
 using sf::core::bin::Manager;
 using sf::core::bin::ManagerToDaemon;
 using sf::core::bin::ManagerToSpawner;
+using sf::core::bin::UnixServer;
 
+using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::model::CLIParser;
+using sf::core::model::EventSourceRef;
 
 
 void Manager::connectDaemon() {
@@ -31,7 +35,12 @@ void Manager::connectSpawner() {
 }
 
 void Manager::initialise() {
+  this->disableSIGINT();
   this->registerDefaultSourceManager();
   this->connectDaemon();
   this->connectSpawner();
+
+  // TODO(stefano): remove this when config works.
+  EventSourceRef server(new UnixServer("/tmp/snow-fox.socket"));
+  Context::sourceManager()->addSource(server);
 }
