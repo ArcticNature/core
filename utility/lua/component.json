@@ -1,0 +1,15 @@
+{
+  "name": "core.utility.lua",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+    "dependencies.lua"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

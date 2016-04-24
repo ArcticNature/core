@@ -33,6 +33,7 @@ Components
 
   * `core.bin.async-process`:
       Common classes and helpers for event based processes.
+  * `core.bin.client`: Command line interface to the server.
   * `core.bin.daemon`:
       Main SnowFox executable for environment setup and daemon processes
       orchestration.
@@ -110,6 +111,7 @@ Some event components are more then a model and always required:
   * `core.utility.daemoniser`:
     Base class for instances that want to daemonise themselves.
   * `core.utility.forker`: Base class for forking into multiple processes.
+  * `core.utility.lua`: Wrappert classes for LUA.
   * `core.utility.process`: Process related utility functions.
   * `core.utility.string`: String related utilities.
 
