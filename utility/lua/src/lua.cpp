@@ -17,6 +17,7 @@ using sf::core::exception::LuaTypeError;
 using sf::core::utility::Lua;
 using sf::core::utility::LuaRegistry;
 using sf::core::utility::LuaStack;
+using sf::core::utility::LuaTable;
 
 
 Lua* Lua::fetchFrom(lua_State* state) {
@@ -54,12 +55,19 @@ Lua::Lua() : state(luaL_newstate(), lua_close) {
   this->_registry = std::shared_ptr<LuaRegistry>(new LuaRegistry(this));
   this->_stack = std::shared_ptr<LuaStack>(new LuaStack(this));
 
+  // Create LuaTable for globals.
+  this->_registry->dereference(LUA_RIDX_GLOBALS);
+  this->_globals = std::shared_ptr<LuaTable>(new LuaTable(this, -1));
+  this->_stack->remove(-1);
+
   // Store a reference to myself in the registry.
   this->_registry->store(LUA_SELF_REF_KEY, this);
 }
 
 Lua::~Lua() {
-  // NOOP.
+  this->_globals  = std::shared_ptr<LuaTable>();
+  this->_stack    = std::shared_ptr<LuaStack>();
+  this->_registry = std::shared_ptr<LuaRegistry>();
 }
 
 void Lua::doString(std::string code, std::string name) {
@@ -71,6 +79,10 @@ void Lua::doString(std::string code, std::string name) {
 
   result = lua_pcall(state, 0, LUA_MULTRET, 0);
   this->checkError(result, name);
+}
+
+LuaTable* Lua::globals() {
+  return this->_globals.get();
 }
 
 LuaRegistry* Lua::registry() {
@@ -86,14 +98,71 @@ LuaStack::LuaStack(Lua* state) {
   this->state = state;
 }
 
+int LuaStack::absoluteIndex(int index) {
+  int size = this->size();
+  bool valid_abs = index > 0 && index <= size;
+  bool valid_rel = index < 0 && index >= -size;
+  bool valid_pseudo = index <= LUA_REGISTRYINDEX;
+  bool valid = valid_abs || valid_rel || valid_pseudo;
+  if (!valid) {
+    throw LuaInvalidState();
+  }
+
+  if (valid_abs || valid_pseudo) {
+    return index;
+  }
+  return size + index + 1;
+}
+
+void LuaStack::check(int count) {
+  lua_checkstack(this->state->state.get(), count);
+}
+
+void LuaStack::duplicate(int index) {
+  lua_pushvalue(this->state->state.get(), index);
+}
+
+LuaTable LuaStack::newTable(bool pop) {
+  lua_State* state = this->state->state.get();
+  lua_checkstack(state, 1);
+  lua_newtable(state);
+  return LuaTable(this->state, -1, pop);
+}
+
+void LuaStack::push(int value) {
+  lua_State* state = this->state->state.get();
+  lua_checkstack(state, 1);
+  lua_pushinteger(state, value);
+}
+
 void LuaStack::push(std::string value) {
   lua_State* state = this->state->state.get();
   lua_checkstack(state, 1);
   lua_pushstring(state, value.c_str());
 }
 
+void LuaStack::remove(int index) {
+  lua_remove(this->state->state.get(), index);
+}
+
 int LuaStack::size() {
   return lua_gettop(this->state->state.get());
+}
+
+int LuaStack::toInt(int index, bool pop) {
+  lua_State* state = this->state->state.get();
+  if (lua_type(state, index) != LUA_TNUMBER || !lua_isinteger(state, index)) {
+    throw LuaTypeError(
+      "integer",
+      lua_typename(state, lua_type(state, index))
+    );
+  }
+
+  int value = lua_tointeger(state, index);
+  if (pop) {
+    lua_remove(state, index);
+  }
+  return value;
 }
 
 std::string LuaStack::toString(int index, bool pop) {

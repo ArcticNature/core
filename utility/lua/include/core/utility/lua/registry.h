@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "lua.hpp"
 #include "core/utility/lua.h"
 
 namespace sf {
@@ -19,7 +20,16 @@ namespace utility {
     //! Wrap the registry for the given state.
     explicit LuaRegistry(Lua* state);
 
-    //! Store a light user data (a pointer) into the registry.
+    //! Pushes the referenced value onto the stack.
+    void dereference(lua_Integer ref);
+
+    //! Frees a reference allocated with `referenceTop`.
+    void freeReference(lua_Integer ref);
+
+    //! Returns a reference to the top of the stack and pops it.
+    lua_Integer referenceTop();
+
+    //! Store a light userdata (a pointer) into the registry.
     void store(std::string key, void* lightUserData);
   };
 

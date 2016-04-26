@@ -20,3 +20,18 @@ void LuaRegistry::store(std::string key, void* lightUserData) {
   lua_pushlightuserdata(state, lightUserData);
   lua_rawset(state, LUA_REGISTRYINDEX);
 }
+
+void LuaRegistry::dereference(lua_Integer ref) {
+  lua_State* state = this->state->state.get();
+  lua_rawgeti(state, LUA_REGISTRYINDEX, ref);
+}
+
+void LuaRegistry::freeReference(lua_Integer ref) {
+  lua_State* state = this->state->state.get();
+  luaL_unref(state, LUA_REGISTRYINDEX, ref);
+}
+
+lua_Integer LuaRegistry::referenceTop() {
+  lua_State* state = this->state->state.get();
+  return luaL_ref(state, LUA_REGISTRYINDEX);
+}

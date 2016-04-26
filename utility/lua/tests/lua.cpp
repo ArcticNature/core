@@ -48,6 +48,33 @@ TEST(LuaRunString, RuntimeError) {
 }
 
 
+TEST(LuaGlobals, API) {
+  Lua lua;
+  lua.globals()->set("two", 2);
+  ASSERT_EQ(2, lua.globals()->toInt("two"));
+
+  lua.doString("return two + 2");
+  ASSERT_EQ(4, lua.stack()->toInt(-1, true));
+}
+
+
+TEST(LuaStack, AbsoluteIndex) {
+  Lua lua;
+  ASSERT_THROW(lua.stack()->absoluteIndex(0),  LuaInvalidState);
+  ASSERT_THROW(lua.stack()->absoluteIndex(1),  LuaInvalidState);
+  ASSERT_THROW(lua.stack()->absoluteIndex(-1), LuaInvalidState);
+
+  lua.stack()->push("abc");
+  lua.stack()->push("def");
+  lua.stack()->push("ghk");
+  ASSERT_EQ(3, lua.stack()->absoluteIndex(-1));
+  ASSERT_EQ(2, lua.stack()->absoluteIndex(-2));
+  ASSERT_EQ(1, lua.stack()->absoluteIndex(-3));
+  ASSERT_THROW(lua.stack()->absoluteIndex(-4), LuaInvalidState);
+
+  ASSERT_EQ(LUA_REGISTRYINDEX, lua.stack()->absoluteIndex(LUA_REGISTRYINDEX));
+}
+
 TEST(LuaStack, Size) {
   Lua lua;
   ASSERT_EQ(0, lua.stack()->size());
@@ -57,6 +84,27 @@ TEST(LuaStack, Size) {
 
   lua.doString("return 2 + 2");
   ASSERT_EQ(2, lua.stack()->size());
+}
+
+TEST(LuaStack, Int) {
+  Lua lua;
+  lua.doString("return 2");
+
+  // Peek.
+  ASSERT_EQ(2, lua.stack()->toInt());
+  ASSERT_EQ(2, lua.stack()->toInt());
+
+  // Pop.
+  ASSERT_EQ(2, lua.stack()->toInt(-1, true));
+  ASSERT_EQ(0, lua.stack()->size());
+
+  // Push.
+  lua.stack()->push(2);
+  ASSERT_EQ(2, lua.stack()->toInt());
+
+  // Wrong type.
+  lua.doString("return 'abc'");
+  ASSERT_THROW(lua.stack()->toInt(), LuaTypeError);
 }
 
 TEST(LuaStack, String) {
