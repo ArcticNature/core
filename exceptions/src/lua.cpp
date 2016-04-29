@@ -10,7 +10,7 @@ using sf::core::exception::LuaHandlerError;
 using sf::core::exception::LuaInvalidProxyUse;
 using sf::core::exception::LuaInvalidState;
 using sf::core::exception::LuaMemoryError;
-using sf::core::exception::LuaRuntimeError; 
+using sf::core::exception::LuaRuntimeError;
 using sf::core::exception::LuaSyntaxError;
 using sf::core::exception::LuaTypeError;
 using sf::core::exception::LuaTypeExists;

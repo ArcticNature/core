@@ -2,6 +2,7 @@
 #ifndef CORE_UTILITY_LUA_H_
 #define CORE_UTILITY_LUA_H_
 
+#include <string>
 #include <memory>
 
 #include "lua.hpp"
@@ -62,7 +63,7 @@ namespace utility {
     Lua* state;
 
    public:
-    LuaStack(Lua* state);
+    explicit LuaStack(Lua* state);
 
     //! Returns the absolute index for the given index.
     /*!

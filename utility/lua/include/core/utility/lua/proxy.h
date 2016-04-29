@@ -37,7 +37,7 @@ namespace utility {
      *
      * It is needed when methods like `checkArgument` are used.
      */
-    LuaTypeProxy(lua_State* state);
+    explicit LuaTypeProxy(lua_State* state);
 
     //! Checks the first argument on the lua stack and returns it.
     void* check() const;
@@ -63,7 +63,7 @@ namespace utility {
      * See https://www.lua.org/manual/5.3/manual.html#luaL_setfuncs
      */
     virtual const luaL_Reg* library() const = 0;
-   
+
    public:
     //! Type definition constructor.
     /*!
@@ -75,7 +75,7 @@ namespace utility {
     LuaTypeProxy();
     virtual ~LuaTypeProxy();
 
-    //! Registers the metatable in Lua and created the 
+    //! Registers the type metatable in Lua.
     void initType(Lua lua);
 
     //! Creates a LUA userdata with this type.

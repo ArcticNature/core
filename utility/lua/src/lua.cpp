@@ -1,6 +1,8 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/utility/lua.h"
 
+#include <string>
+
 #include "core/exceptions/lua.h"
 #include "core/utility/lua/registry.h"
 
@@ -36,7 +38,7 @@ Lua* Lua::fetchFrom(lua_State* state) {
 
 
 void Lua::checkError(int code, std::string source_name) {
-  switch(code) {
+  switch (code) {
     case LUA_OK:        return;
     case LUA_ERRERR:    throw LuaHandlerError();
     case LUA_ERRGCMM:   throw LuaGCError();

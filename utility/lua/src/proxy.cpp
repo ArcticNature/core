@@ -1,6 +1,8 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/utility/lua/proxy.h"
 
+#include <string>
+
 #include "core/exceptions/lua.h"
 #include "core/utility/lua.h"
 
@@ -23,7 +25,7 @@ int LuaTypeProxy::lua_proxy_gc(lua_State* state) {
   // Access the instance.
   void** pointer = reinterpret_cast<void**>(block);
   lua_proxy_delete fn = reinterpret_cast<lua_proxy_delete>(deleter);
-  
+
   // Free it and reset pointer.
   fn(*pointer);
   *pointer = nullptr;

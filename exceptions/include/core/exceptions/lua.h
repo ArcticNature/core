@@ -30,7 +30,7 @@ namespace exception {
 
   class LuaException : public SfException {
    public:
-    LuaException(std::string msg);
+    explicit LuaException(std::string msg);
   };
 
   class LuaTypeError : public LuaException {
@@ -70,5 +70,5 @@ namespace exception {
 }  // namespace core
 }  // namespace sf
 
-#endif  // CORE_EXCEPTIONS_OPTIONS_H_
+#endif  // CORE_EXCEPTIONS_LUA_H_
 
