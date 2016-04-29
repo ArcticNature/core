@@ -16,7 +16,9 @@
     "core.exceptions",
     "core.lifecycle.process",
     "core.model.logger",
+
     "core.protocol.public",
+    "core.utility.protobuf",
 
     "core.posix.user",
     "core.registry.cli-parser"
