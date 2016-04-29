@@ -141,6 +141,12 @@ void LuaStack::push(std::string value) {
   lua_pushstring(state, value.c_str());
 }
 
+void LuaStack::push(lua_CFunction value, int close_with) {
+  lua_State* state = this->state->state.get();
+  lua_checkstack(state, 1);
+  lua_pushcclosure(state, value, close_with);
+}
+
 void LuaStack::remove(int index) {
   lua_remove(this->state->state.get(), index);
 }

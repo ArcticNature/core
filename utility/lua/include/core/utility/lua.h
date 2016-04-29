@@ -15,6 +15,7 @@ namespace utility {
   // Forward declare classes needed by the lua wrapper.
   class LuaRegistry;
   class LuaStack;
+  class LuaTypeProxy;
 
 
   //! Wrapper for a LUA state.
@@ -23,6 +24,7 @@ namespace utility {
     friend LuaRegistry;
     friend LuaStack;
     friend LuaTable;
+    friend LuaTypeProxy;
 
     std::shared_ptr<lua_State> state;
     std::shared_ptr<LuaRegistry> _registry;
@@ -85,6 +87,25 @@ namespace utility {
 
     //! Pushes a string onto the stack.
     void push(std::string value);
+
+    //! Pushes a string onto the stack.
+    void push(lua_CFunction value, int close_with);
+
+    //! Pushes a light userdata onto the stack.
+    /*!
+     * This method does not overload the `push` method because
+     * it would make that method always valid, even when it is
+     * not doing what you would expect.
+     *
+     * If you want to push a void* on the stack, you
+     * need to confirm it by using a different name.
+     */
+    template<typename type>
+    void pushLight(type* value) {
+      lua_State* state = this->state->state.get();
+      lua_checkstack(state, 1);
+      lua_pushlightuserdata(state, reinterpret_cast<void*>(value));
+    }
 
     //! Removes an item from the stack.
     void remove(int index);

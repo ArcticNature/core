@@ -48,6 +48,9 @@ namespace exception {
   NO_ARG_EXCEPTION(LuaException, LuaGCError);
   NO_ARG_EXCEPTION(LuaException, LuaHandlerError);
 
+  //! Thrown when a LuaTypeProxy is used incorrectly.
+  MSG_EXCEPTION(LuaException, LuaInvalidProxyUse);
+
   //! Thrown when an invalid LUA state is used.
   NO_ARG_EXCEPTION(LuaException, LuaInvalidState);
 
@@ -59,6 +62,9 @@ namespace exception {
 
   //! Thrown when LUA raises a syntax error.
   MSG_EXCEPTION(LuaException, LuaSyntaxError);
+
+  //! Thrown when a LuaTypeProxy is defined twice.
+  MSG_EXCEPTION(LuaException, LuaTypeExists);
 
 }  // namespace exception
 }  // namespace core
