@@ -22,5 +22,5 @@ EventSourceNotFound::EventSourceNotFound(std::string source) : SfException(
 ) {}
 
 int EventSourceNotFound::getCode() const {
-  return -29;
+  return -30;
 }

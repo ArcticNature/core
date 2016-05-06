@@ -80,6 +80,10 @@ int Posix::fcntl(int fd, int cmd, int option) {
   return res;
 }
 
+int Posix::fileno(FILE* stream) {
+  return ::fileno(stream);
+}
+
 FILE* Posix::freopen(const char* path, const char* mode, FILE* stream) {
   return ::freopen(path, mode, stream);
 }
@@ -168,6 +172,12 @@ char* Posix::strncpy(char* dest, const char* src, size_t len) {
 // Others.
 unsigned int Posix::sleep(unsigned int seconds) {
   return ::sleep(seconds);
+}
+
+
+// Poll.
+int Posix::poll(struct pollfd* fds, nfds_t nfds, int timeout) {
+  return ::poll(fds, nfds, timeout);
 }
 
 

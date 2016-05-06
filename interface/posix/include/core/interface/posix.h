@@ -3,6 +3,7 @@
 #define CORE_INTERFACE_POSIX_H_
 
 #include <grp.h>
+#include <poll.h>
 #include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -45,6 +46,7 @@ namespace interface {
     virtual int   close(int fd, bool silent = false);
     virtual int   dup(int fd);
     virtual int   fcntl(int fd, int cmd, int option = -1);
+    virtual int   fileno(FILE* stream);
     virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
     virtual int   open(const char* path, int flags, mode_t mode);
     virtual int   pipe(int fildes[2], int flags = 0);
@@ -68,6 +70,9 @@ namespace interface {
 
     // Others.
     virtual unsigned int sleep(unsigned int seconds);
+
+    // Poll.
+    virtual int poll(struct pollfd* fds, nfds_t nfds, int timeout);
 
     // Processes.
     virtual void  exit(int status);

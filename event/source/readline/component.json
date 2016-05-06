@@ -1,0 +1,22 @@
+{
+  "name": "core.event.source.readline",
+  "type": "c++",
+
+  "deps": [
+    "dependencies.readline",
+    "core.context.static",
+    "core.model.event",
+    "core.posix.user"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test":    {
+      "deps": [
+        "ext.event.manager.epoll"
+      ],
+      "type": "lib"
+    }
+  }
+}

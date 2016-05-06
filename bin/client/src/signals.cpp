@@ -7,6 +7,7 @@
 
 #include "core/compile-time/options.h"
 #include "core/context/context.h"
+#include "core/context/static.h"
 #include "core/event/source/signal.h"
 
 #include "core/exceptions/base.h"
@@ -16,6 +17,7 @@
 
 using sf::core::bin::Client;
 using sf::core::context::Context;
+using sf::core::context::Static;
 using sf::core::event::SignalSource;
 
 using sf::core::exception::CleanExit;
@@ -30,12 +32,12 @@ class ClientSignalSource : public SignalSource {
 
   sigset_t getSignalsMask() {
     sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGTERM);
+    Static::posix()->sigemptyset(&mask);
+    Static::posix()->sigaddset(&mask, SIGTERM);
 
 #if TRAP_SIGINT
     DEBUG(Context::logger(), "Trapping SIGINT too.");
-    sigaddset(&mask, SIGINT);
+    Static::posix()->sigaddset(&mask, SIGINT);
 #endif
 
     return mask;

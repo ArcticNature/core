@@ -18,6 +18,7 @@ using sf::core::exception::CleanExit;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::CorruptedData;
 using sf::core::exception::DuplicateInjection;
+using sf::core::exception::EndOfStream;
 using sf::core::exception::ErrNoException;
 using sf::core::exception::FactoryNotFound;
 using sf::core::exception::FileError;
@@ -152,6 +153,9 @@ NO_ARG_DEFINITION(
 );
 NO_ARG_DEFINITION(
     SfException, CleanExit, 0, "Process terminating successfully."
+);
+NO_ARG_DEFINITION(
+    SfException, EndOfStream, 30, "Reading from empty stream."
 );
 NO_ARG_DEFINITION(
     SfException, ForkFailed, -2, "Unable to fork a new process."

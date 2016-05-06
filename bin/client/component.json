@@ -11,6 +11,7 @@
 
     "core.event.client.unix",
     "core.event.drain.fd",
+    "core.event.source.readline",
     "core.event.source.signal",
 
     "core.exceptions",
