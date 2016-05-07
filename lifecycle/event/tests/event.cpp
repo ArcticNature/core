@@ -3,7 +3,6 @@
 
 #include <string>
 
-#include "core/cluster/node.h"
 #include "core/context/static.h"
 #include "core/lifecycle/event.h"
 
@@ -13,7 +12,6 @@
 using sf::core::interface::BaseLifecycleArg;
 using sf::core::interface::BaseLifecycleHandler;
 
-using sf::core::cluster::Node;
 using sf::core::context::Static;
 using sf::core::lifecycle::EventLifecycle;
 using sf::core::model::EventRef;
@@ -51,11 +49,11 @@ LifecycleStaticOn("event::initialise", InitCallHandler);
 class EventLifecycleTest : public ::testing::Test {
  public:
   EventLifecycleTest() {
+    Static::options()->setString("process-name", "node");
     Static::parser(new NullParser());
   }
 
   ~EventLifecycleTest() {
-    Node::reset();
     EventLifecycle::reset();
     Static::destroy();
   }
@@ -109,11 +107,4 @@ TEST_F(EventLifecycleTest, InitIsCalled) {
   EventRef event(new TestEvent());
   EventLifecycle::Init(event);
   ASSERT_LT(0, InitCallHandler::call_count);
-}
-
-TEST_F(EventLifecycleTest, NodeNameFromOptions) {
-  Static::parser()->setString("node-name", "test");
-  EventRef event(new TestEvent());
-  EventLifecycle::Init(event);
-  ASSERT_EQ("test!N2sf4core5event9TestEventE#0", event->id());
 }

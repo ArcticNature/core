@@ -6,11 +6,11 @@
 #include <string>
 #include <typeinfo>
 
-#include "core/cluster/node.h"
 #include "core/compile-time/options.h"
+#include "core/context/static.h"
 #include "core/model/event.h"
 
-using sf::core::cluster::Node;
+using sf::core::context::Static;
 
 using sf::core::interface::Lifecycle;
 using sf::core::interface::LifecycleArgRef;
@@ -43,14 +43,14 @@ class EventIdentifyHandler : public LifecycleHandler<EventLifecycleArg> {
  public:
   void handle(std::string lc_event, EventLifecycleArg* argument) {
     // Collect needed information.
-    std::string node_name = Node::me()->name();
+    std::string proc_name = Static::options()->getString("process-name");
     Event* event = argument->event.get();
     std::string type_name   = typeid(*event).name();
     uint64_t instance_count = event_id_sequences[type_name]++;
 
     // Build and set the id.
     std::stringstream id;
-    id << node_name << "!" << type_name << "#" << instance_count;
+    id << proc_name << "!" << type_name << "#" << instance_count;
     argument->event->id(id.str());
   }
 };

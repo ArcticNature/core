@@ -5,6 +5,7 @@
 
   "deps": [
     "core.bin.async-process",
+    "core.cluster.node",
     "core.context.dynamic",
     "core.context.static",
 

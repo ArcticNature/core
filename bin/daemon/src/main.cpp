@@ -3,6 +3,7 @@
 
 #include "core/bin/daemon.h"
 
+#include "core/cluster/node.h"
 #include "core/context/daemon.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
@@ -18,6 +19,7 @@
 
 using sf::core::bin::Daemon;
 
+using sf::core::cluster::Node;
 using sf::core::context::Context;
 using sf::core::context::Static;
 
@@ -52,6 +54,7 @@ int main(int argc, char** argv) {
     CLIParser::miscOptions(parser);
     parser->parse(&argc, &argv);
     parser->handleVersionOption("snow-fox");
+    Static::options()->setString("process-name", Node::me()->name());
 
     // Run daemon.
     Daemon daemon;

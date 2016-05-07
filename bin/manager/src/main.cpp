@@ -3,6 +3,7 @@
 
 #include "core/bin/manager.h"
 
+#include "core/cluster/node.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -18,6 +19,7 @@
 
 using sf::core::bin::Manager;
 
+using sf::core::cluster::Node;
 using sf::core::context::Context;
 using sf::core::context::Static;
 
@@ -51,6 +53,7 @@ int main(int argc, char** argv) {
     CLIParser::miscOptions(parser);
     parser->parse(&argc, &argv);
     parser->handleVersionOption("snow-fox-manager");
+    Static::options()->setString("process-name", Node::me()->name());
 
     // Run manager.
     Manager manager;

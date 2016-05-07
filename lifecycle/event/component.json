@@ -4,7 +4,7 @@
 
   "deps": [
     "core.compile-time",
-    "core.cluster.node",
+    "core.context.static",
     "core.interface.lifecycle",
     "core.model.event"
   ],

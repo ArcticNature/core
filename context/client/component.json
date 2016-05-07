@@ -1,0 +1,14 @@
+{
+  "name": "core.context.client",
+  "type": "c++",
+
+  "deps": [
+    "core.utility.lua"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
