@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/eventfd.h>
 #include <sys/signalfd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -70,6 +71,10 @@ int Posix::dup(int fd) {
     throw ErrNoException("Unable to dup fd:");
   }
   return res;
+}
+
+int Posix::eventfd(unsigned int initval, int flags) {
+  return ::eventfd(initval, flags);
 }
 
 int Posix::fcntl(int fd, int cmd, int option) {
@@ -321,6 +326,19 @@ int Posix::shutdown(int sockfd, int how) {
 }
 
 
+// TimerFD.
+int Posix::timerfd_create(int clockid, int flags) {
+  return ::timerfd_create(clockid, flags);
+}
+
+int Posix::timerfd_settime(
+    int fd, int flags, const struct itimerspec* new_value,
+    struct itimerspec* old_value
+) {
+  return ::timerfd_settime(fd, flags, new_value, old_value);
+}
+
+
 // Users.
 struct group Posix::getgrnam(const char* name, char** buf) {
   size_t bufsize = sysconf(_SC_GETGR_R_SIZE_MAX);
@@ -360,6 +378,31 @@ struct passwd Posix::getpwnam(const char* name, char** buf) {
   }
 
   return uinfo;
+}
+
+struct passwd Posix::getpwuid(uid_t uid, char** buf) {
+  size_t bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
+  if (bufsize == -1) {  /* Value was indeterminate */
+    bufsize = 16384;    /* Should be more than enough */
+  }
+
+  char* buffer = new char[bufsize];
+  *buf = buffer;
+
+  struct passwd  uinfo;
+  struct passwd* result;
+  getpwuid_r(uid, &uinfo, buffer, bufsize, &result);
+
+  if (result == nullptr) {
+    delete [] buffer;
+    throw UserNotFound("Unable to find user by id.");
+  }
+
+  return uinfo;
+}
+
+uid_t Posix::getuid() {
+  return ::getuid();
 }
 
 int Posix::setgroups(int size, gid_t list[]) {

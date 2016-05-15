@@ -102,6 +102,15 @@ void LuaTable::set(std::string key, std::string value) {
   this->state->stack()->remove(-1);
 }
 
+void LuaTable::set(std::string key, lua_CFunction value) {
+  this->state->stack()->check(3);
+  this->state->registry()->dereference(this->table_ref);
+  this->state->stack()->push(key);
+  this->state->stack()->push(value, 0);
+  lua_settable(this->state->state.get(), -3);
+  this->state->stack()->remove(-1);
+}
+
 int LuaTable::toInt(int key) {
   this->state->stack()->check(2);
   this->state->registry()->dereference(this->table_ref);

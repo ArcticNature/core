@@ -4,6 +4,7 @@
 
   "deps": [
     "dependencies.readline",
+    "core.compile-time",
     "core.context.static",
     "core.model.event",
     "core.posix.user"

@@ -4,9 +4,11 @@
 #include "core/bin/client.h"
 
 #include "core/cluster/node.h"
+#include "core/context/client.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
+#include "core/event/source/readline.h"
 #include "core/exceptions/base.h"
 #include "core/lifecycle/process.h"
 
@@ -23,6 +25,7 @@ using sf::core::cluster::Node;
 using sf::core::context::Context;
 using sf::core::context::Static;
 
+using sf::core::event::ReadlineEventSource;
 using sf::core::exception::CleanExit;
 using sf::core::exception::SfException;
 using sf::core::lifecycle::Process;
@@ -74,6 +77,8 @@ int main(int argc, char** argv) {
     );
 
     Process::Exit();
+    sf::core::context::Client::destroy();
+    ReadlineEventSource::destroy();
     Context::destroy();
     Logger::destroyFallback();
     Static::destroy();
@@ -81,6 +86,8 @@ int main(int argc, char** argv) {
   }
 
   Process::Exit();
+  sf::core::context::Client::destroy();
+  ReadlineEventSource::destroy();
   Context::destroy();
   Logger::destroyFallback();
   Static::destroy();

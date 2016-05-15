@@ -6,6 +6,7 @@
 using sf::core::exception::SfException;
 using sf::core::exception::EventDrainNotFound;
 using sf::core::exception::EventSourceNotFound;
+using sf::core::exception::IncorrectSourceType;
 
 
 EventDrainNotFound::EventDrainNotFound(std::string drain) : SfException(
@@ -22,5 +23,14 @@ EventSourceNotFound::EventSourceNotFound(std::string source) : SfException(
 ) {}
 
 int EventSourceNotFound::getCode() const {
-  return -30;
+  return -31;
+}
+
+
+IncorrectSourceType::IncorrectSourceType(std::string source) : SfException(
+    "Event source '" + source + "' has incompatible type."
+) {}
+
+int IncorrectSourceType::getCode() const {
+  return -32;
 }

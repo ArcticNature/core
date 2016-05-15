@@ -178,6 +178,7 @@ namespace exception {
   //! Thrown when an operation that is not permitted is attempted.
   NO_ARG_EXCEPTION(SfException, OperationNotPermitted);
 
+  //! ?
   MSG_EXCEPTION(SfException, ProcessNotFound);
 
   //! Thrown when a requested service was not found.

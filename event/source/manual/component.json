@@ -1,0 +1,23 @@
+{
+  "name": "core.event.source.manual",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static",
+    "core.model.event"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": [
+        "core.context.dynamic",
+        "core.event.testing",
+        "core.posix.user",
+        "ext.event.manager.epoll"
+      ],
+      "type": "lib"
+    }
+  }
+}

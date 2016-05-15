@@ -5,12 +5,16 @@
 #include <grp.h>
 #include <poll.h>
 #include <pwd.h>
+
 #include <signal.h>
 #include <stdio.h>
+
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/timerfd.h>
 #include <sys/types.h>
+
 #include <unistd.h>
 
 
@@ -45,6 +49,7 @@ namespace interface {
     // File descriptors.
     virtual int   close(int fd, bool silent = false);
     virtual int   dup(int fd);
+    virtual int   eventfd(unsigned int initval, int flags);
     virtual int   fcntl(int fd, int cmd, int option = -1);
     virtual int   fileno(FILE* stream);
     virtual FILE* freopen(const char* path, const char* mode, FILE* stream);
@@ -112,9 +117,19 @@ namespace interface {
     virtual int socket(int domain, int type, int protocol);
     virtual int shutdown(int sockfd, int how);
 
+    // TimerFD.
+    virtual int timerfd_create(int clockid, int flags);
+    virtual int timerfd_settime(
+        int fd, int flags, const struct itimerspec* new_value,
+        struct itimerspec* old_value
+    );
+
     // Users.
     virtual group  getgrnam(const char* name, char** buf);
     virtual passwd getpwnam(const char* name, char** buf);
+    virtual passwd getpwuid(uid_t uid, char** buf);
+
+    virtual uid_t getuid();
 
     virtual int setgroups(int size, gid_t list[]);
 

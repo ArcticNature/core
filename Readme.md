@@ -60,8 +60,13 @@ Some event components are more then a model and always required:
 
   * `core.event.client.unix`: EventSource that connects to a UNIX socket.
   * `core.event.drain.fd`: EventDrain that writes to a file descriptor.
+  * `core.event.drain.null`: EventDrain that writed to `/dev/null`.
   * `core.event.source.connected`: Socket connection-aware EventSource.
   * `core.event.source.fd`: EventSource that reads from a file descriptor.
+  * `core.event.source.readline`:
+      EventSource that reads stdin through GNU readline.
+  * `core.event.source.scheduled`:
+      EventSource that emits events sheduled by other components.
   * `core.event.source.signal`: EventSource triggered by process signals.
   * `core.event.source.unix`:
       EventSource that waits for connections over a UNIX socket.
@@ -113,6 +118,7 @@ Some event components are more then a model and always required:
   * `core.utility.forker`: Base class for forking into multiple processes.
   * `core.utility.lua`: Wrappert classes for LUA.
   * `core.utility.process`: Process related utility functions.
+  * `core.utility.scored-list`: Linked lists of elements sorted by score.
   * `core.utility.string`: String related utilities.
 
 

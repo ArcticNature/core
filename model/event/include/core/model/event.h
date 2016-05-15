@@ -7,6 +7,7 @@
 #include <string>
 
 #include "core/exceptions/base.h"
+#include "core/exceptions/event.h"
 
 
 namespace sf {
@@ -174,6 +175,20 @@ namespace model {
 
    public:
     virtual ~EventSourceManager();
+
+    //! Returns a pointer to the requested event source.
+    template<typename EventSrc>
+    EventSrc* get(std::string id) {
+      if (this->sources.find(id) == this->sources.end()) {
+        throw sf::core::exception::EventSourceNotFound(id);
+      }
+      EventSourceRef ref = this->sources.at(id);
+      EventSrc* source = dynamic_cast<EventSrc*>(ref.get());
+      if (source == nullptr) {
+        throw sf::core::exception::IncorrectSourceType(id);
+      }
+      return source;
+    }
 
     //! Adds an event source to the manager.
     virtual void addSource(EventSourceRef source) = 0;

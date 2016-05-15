@@ -77,6 +77,9 @@ namespace utility {
     //! Checks the stack can hold count more items.
     void check(int count);
 
+    //! Removes all values from the stack.
+    void clear();
+
     //! Duplicates an item by pushing it to the top.
     void duplicate(int index);
 
@@ -89,7 +92,7 @@ namespace utility {
     //! Pushes a string onto the stack.
     void push(std::string value);
 
-    //! Pushes a string onto the stack.
+    //! Pushes a closure onto the stack.
     void push(lua_CFunction value, int close_with);
 
     //! Pushes a light userdata onto the stack.
@@ -110,6 +113,9 @@ namespace utility {
 
     //! Removes an item from the stack.
     void remove(int index);
+
+    //! Returns the string repesentation of a value.
+    std::string represent(int index);
 
     //! Returns the current size of the stack.
     int size();

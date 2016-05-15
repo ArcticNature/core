@@ -37,6 +37,7 @@ namespace utility {
     void set(int key, std::string value);
     void set(std::string key, int value);
     void set(std::string key, std::string value);
+    void set(std::string key, lua_CFunction value);
 
     //! Gets an int from a table.
     int toInt(int key);

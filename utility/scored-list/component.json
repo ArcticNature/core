@@ -1,0 +1,10 @@
+{
+  "name": "core.utility.scored-list",
+  "type": "c++",
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

@@ -120,6 +120,10 @@ void LuaStack::check(int count) {
   lua_checkstack(this->state->state.get(), count);
 }
 
+void LuaStack::clear() {
+  lua_settop(this->state->state.get(), 0);
+}
+
 void LuaStack::duplicate(int index) {
   lua_pushvalue(this->state->state.get(), index);
 }
@@ -151,6 +155,13 @@ void LuaStack::push(lua_CFunction value, int close_with) {
 
 void LuaStack::remove(int index) {
   lua_remove(this->state->state.get(), index);
+}
+
+std::string LuaStack::represent(int index) {
+  lua_State*  state = this->state->state.get();
+  const char* value = luaL_tolstring(state, index, nullptr);
+  lua_remove(state, -1);
+  return std::string(value);
 }
 
 int LuaStack::size() {

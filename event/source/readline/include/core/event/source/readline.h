@@ -39,11 +39,19 @@ namespace event {
    protected:
     static sf::core::model::EventSourceRef _instance;
     static ReadlineEventSource* _self;
+    static std::string history_file;
+
     static void handleLine(char* line);
+    static void readHistroyFile();
 
    public:
     static void destroy();
     static sf::core::model::EventSourceRef instance(LineParser parser);
+
+    static void addHistory(std::string line);
+    static void clearLine();
+    static void clearScreen();
+    static void showPrompt();
   };
 
 }  // namespace event

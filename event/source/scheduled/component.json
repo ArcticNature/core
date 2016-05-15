@@ -1,0 +1,24 @@
+{
+  "name": "core.event.source.scheduled",
+  "type": "c++",
+
+  "deps": [
+    "core.context.dynamic",
+    "core.context.static",
+    "core.event.source.manual",
+    "core.interface.posix",
+    "core.utility.scored-list"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": [
+        "core.posix.user",
+        "ext.event.manager.epoll"
+      ],
+      "type": "lib"
+    }
+  }
+}

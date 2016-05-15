@@ -14,6 +14,9 @@ namespace exception {
   //! Thrown when a non-existent source is looked up.
   MSG_EXCEPTION(SfException, EventSourceNotFound);
 
+  //! Thrown when a source is found but it's type is not the specified one.
+  MSG_EXCEPTION(SfException, IncorrectSourceType);
+
 }  // namespace exception
 }  // namespace core
 }  // namespace sf

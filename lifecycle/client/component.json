@@ -1,0 +1,14 @@
+{
+  "name": "core.lifecycle.client",
+  "type": "c++",
+
+  "deps": [
+    "core.interface.lifecycle"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

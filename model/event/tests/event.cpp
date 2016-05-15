@@ -5,13 +5,19 @@
 #include "core/model/event.h"
 
 using sf::core::exception::EventDrainNotFound;
+using sf::core::exception::EventSourceNotFound;
+using sf::core::exception::IncorrectSourceType;
 
 using sf::core::model::Event;
+using sf::core::model::EventRef;
+
 using sf::core::model::EventDrain;
 using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainRef;
-using sf::core::model::EventRef;
+
 using sf::core::model::EventSource;
+using sf::core::model::EventSourceManager;
+using sf::core::model::EventSourceRef;
 
 
 class TestEvent : public Event {
@@ -42,6 +48,34 @@ class TestSource : public EventSource {
   }
   EventRef parse() {
     return EventRef(nullptr);
+  }
+};
+
+
+class TestSource2 : public EventSource {
+ public:
+  TestSource2(std::string id) : EventSource(id) {}
+  int getFD() {
+    return 1;
+  }
+  EventRef parse() {
+    return EventRef(nullptr);
+  }
+};
+
+
+class TestEventSourceManager : public EventSourceManager {
+ public:
+  void addSource(EventSourceRef source) {
+    this->sources[source->id()] = source;
+  }
+  
+  void removeSource(std::string id) {
+    this->sources.erase(id);
+  }
+
+  EventRef wait(int timeout) {
+    return EventRef();
   }
 };
 
@@ -91,4 +125,22 @@ TEST(EventDrainManager, remove) {
 TEST(EventSource, id) {
   TestSource drain("id");
   ASSERT_EQ("id", drain.id());
+}
+
+TEST(EventSourceManager, Get) {
+  TestEventSourceManager manager;
+  manager.addSource(EventSourceRef(new TestSource("id")));
+  TestSource* source = manager.get<TestSource>("id");
+  ASSERT_NE(nullptr, source);
+}
+
+TEST(EventSourceManager, NotFound) {
+  TestEventSourceManager manager;
+  ASSERT_THROW(manager.get<TestSource>("id"), EventSourceNotFound);
+}
+
+TEST(EventSourceManager, WrongType) {
+  TestEventSourceManager manager;
+  manager.addSource(EventSourceRef(new TestSource("id")));
+  ASSERT_THROW(manager.get<TestSource2>("id"), IncorrectSourceType);
 }
