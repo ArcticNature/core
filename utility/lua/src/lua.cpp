@@ -199,3 +199,7 @@ std::string LuaStack::toString(int index, bool pop) {
   }
   return value;
 }
+
+int LuaStack::type(int index) {
+  return lua_type(this->state->state.get(), index);
+}

@@ -24,6 +24,7 @@ using sf::core::context::Client;
 using sf::core::context::Context;
 
 using sf::core::event::ReadlineEventSource;
+using sf::core::exception::CleanExit;
 using sf::core::exception::LuaSyntaxError;
 using sf::core::exception::SfException;
 
@@ -94,6 +95,9 @@ void ExecuteString::handle() {
   } catch (LuaSyntaxError& ex) {
     this->printStack();
     ReadlineEventSource::showPrompt();
+
+  } catch (CleanExit& ex) {
+    throw;
 
   } catch (SfException& ex) {
     std::cerr << ex.what() << std::endl;

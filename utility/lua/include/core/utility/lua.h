@@ -125,6 +125,9 @@ namespace utility {
 
     //! Returns (and optionally pops) a string.
     std::string toString(int index = -1, bool pop = false);
+
+    //! Returns the type of the value on the stack.
+    int type(int index = -1);
   };
 
 }  // namespace utility

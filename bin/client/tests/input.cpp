@@ -44,7 +44,7 @@ TEST_F(ExecuteStringTest, ResultIsPrinted) {
 
 TEST_F(ExecuteStringTest, ResultsArePrinted) {
   this->execute("function test() return 2, 4 end");
-  ASSERT_EQ("\n", this->output.str());
+  ASSERT_EQ("", this->output.str());
   this->output.str("");
 
   this->execute("return test()");

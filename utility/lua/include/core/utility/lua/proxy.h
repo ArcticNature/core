@@ -85,6 +85,8 @@ namespace utility {
      *
      * Specifically, memory de-allocation is performed by the
      * LuaTypeProxy deleter invoked by the LUA garbage collector.
+     *
+     * The new userdata is left on the stack.
      */
     void bind(Lua lua, void* instance);
 
