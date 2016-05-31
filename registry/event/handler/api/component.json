@@ -1,11 +1,11 @@
 {
-  "name": "core.context.client",
+  "name": "core.registry.event.handler.api",
   "type": "c++",
 
   "deps": [
-    "core.context.static",
     "core.model.event",
-    "core.utility.lua"
+    "core.protocol.public",
+    "core.registry.base"
   ],
 
   "targets": {

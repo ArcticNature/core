@@ -1,0 +1,19 @@
+{
+  "name": "core.context.event",
+  "type": "c++",
+
+  "deps": [
+    "core.interface.lifecycle"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "type": "lib",
+      "deps": [
+        "core.lifecycle.process"
+      ]
+    }
+  }
+}

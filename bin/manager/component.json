@@ -13,6 +13,7 @@
     "core.event.drain.fd",
     "core.event.source.unix",
     "core.exceptions",
+    "core.lifecycle.event",
 
     "core.model.event",
     "core.model.logger",
@@ -23,6 +24,7 @@
     "core.protocol.public",
 
     "core.registry.cli-parser",
+    "core.registry.event.handler.api",
     "core.utility.protobuf"
   ],
 

@@ -3,27 +3,30 @@
 
 #include <string>
 
-#include "core/bin/client/input.h"
+#include "core/context/client.h"
 #include "core/context/context.h"
 
 #include "core/event/client/unix.h"
 #include "core/event/drain/fd.h"
 #include "core/event/source/manual.h"
+#include "core/exceptions/base.h"
 
 #include "core/lifecycle/client.h"
 #include "core/lifecycle/event.h"
 #include "core/model/event.h"
+#include "core/model/logger.h"
 
 #include "core/protocols/public/p_message.pb.h"
+#include "core/registry/event/handler/api.h"
 #include "core/utility/protobuf.h"
 
 using sf::core::bin::Client;
-using sf::core::bin::EnableReadline;
 using sf::core::context::Context;
 
 using sf::core::event::FdDrain;
 using sf::core::event::ManualSource;
 using sf::core::event::UnixClient;
+using sf::core::exception::CorruptedData;
 
 using sf::core::lifecycle::ClientLifecycle;
 using sf::core::lifecycle::EventLifecycle;
@@ -31,6 +34,8 @@ using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 
 using sf::core::protocol::public_api::Message;
+using sf::core::registry::ApiEventFactory;
+using sf::core::registry::ApiHandlerRegistry;
 using sf::core::utility::MessageIO;
 
 
@@ -53,22 +58,46 @@ class ApiClient : public UnixClient {
   }
 
   ApiClient(int fd, std::string id, std::string drain_id)
-    : UnixClient(fd, id, drain_id) {}
+    : UnixClient(fd, id, drain_id) {
+    // NOOP.
+  }
 
   EventRef parse() {
     if (!this->checkFD()) {
       return EventRef();
     }
 
-    // TODO(stefano): parse event from the channel.
-    return EventRef();
+    // Parse event.
+    int fd = this->getFD();
+    Message message;
+    bool parsed = MessageIO<Message>::parse(fd, &message);
+    if (!parsed) {
+      throw CorruptedData("Unable to parse protocol buffer");
+    }
+
+    // Create event.
+    std::string event_name = "Res::" + Message_Code_Name(message.code());
+    ApiEventFactory factory = ApiHandlerRegistry::Get(event_name);
+    EventRef event = factory(message, this->drain_id);
+
+    // Initialise event and return.
+    EventLifecycle::Init(event);
+    return event;
   }
 };
 
 
 void Client::connectToServer() {
   std::string path = "/tmp/snow-fox.socket";
-  ApiClient::Connect(path);
+  std::string drain_id = ApiClient::Connect(path);
+  sf::core::context::Client::server(drain_id);
+}
+
+void Client::introduceToServer() {
+  int server = sf::core::context::Client::server()->getFD();
+  Message introduce;
+  introduce.set_code(Message::Introduce);
+  MessageIO<Message>::send(server, introduce);
 }
 
 
@@ -83,10 +112,5 @@ void Client::initialise() {
   this->maskSignals();
   this->connectToServer();
   ClientLifecycle::Lua::Init();
-
-  // Enqueue async readline enable.
-  ManualSource* manual = Context::sourceManager()->get<ManualSource>("manual");
-  EventRef async(new EnableReadline());
-  EventLifecycle::Init(async);
-  manual->enqueueEvent(async);
+  this->introduceToServer();
 }

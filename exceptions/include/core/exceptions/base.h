@@ -145,6 +145,9 @@ namespace exception {
   //! Thrown by the injection system when an injection has occurred already.
   MSG_EXCEPTION(SfException, DuplicateInjection);
 
+  //! Thrown when an item already exists in a collection.
+  MSG_EXCEPTION(SfException, DuplicateItem);
+
   //! Thrown when data is read from a stream with no more data.
   NO_ARG_EXCEPTION(SfException, EndOfStream);
 

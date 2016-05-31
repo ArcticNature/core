@@ -42,6 +42,9 @@ namespace model {
     //! Returns the event correlation id.
     std::string correlation() const;
 
+    //! Returns the id of the drain for this event.
+    std::string drain() const;
+
     //! Initialises the event id, if missing.
     std::string id(std::string id);
 
@@ -50,6 +53,9 @@ namespace model {
 
     //! Handles the event in the most appropriate way.
     virtual void handle() = 0;
+
+    //! Attempt to rescure form an handling error.
+    virtual void rescue(sf::core::exception::SfException* ex);
   };
   typedef std::shared_ptr<Event> EventRef;
 

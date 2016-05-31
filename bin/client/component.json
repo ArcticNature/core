@@ -24,6 +24,7 @@
     "core.model.logger",
 
     "core.protocol.public",
+    "core.registry.event.handler.api",
     "core.utility.protobuf",
 
     "core.posix.user",

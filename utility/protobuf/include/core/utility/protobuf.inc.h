@@ -13,7 +13,11 @@ namespace utility {
   template<typename Message>
   bool MessageIO<Message>::send(int fd, Message message) {
     LengthIO::write(fd, message.ByteSize());
-    return message.SerializeToFileDescriptor(fd);
+    if (!message.SerializeToFileDescriptor(fd)) {
+      // TODO(stefano): throw an exception.
+      return false;
+    }
+    return true;
   }
 
   template<typename Message>

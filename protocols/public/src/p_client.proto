@@ -1,0 +1,12 @@
+import "p_message.proto";
+package sf.core.protocol.public_api;
+
+
+message ClientIntroduce {
+  required string client_id = 1;
+  required string node_name = 2;
+
+  extend Message {
+    optional ClientIntroduce msg = 52;
+  }
+}

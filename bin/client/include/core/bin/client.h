@@ -15,6 +15,7 @@ namespace bin {
   class Client : public AsyncPorcess {
    protected:
     void connectToServer();
+    void introduceToServer();
     void maskSignals();
 
    public:

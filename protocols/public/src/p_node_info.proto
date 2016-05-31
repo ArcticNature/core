@@ -6,7 +6,7 @@ message NodeInfoRequest {
   optional bool details = 1 [default = false];
 
   extend Message {
-    optional NodeInfoRequest msg = 51;
+    optional NodeInfoRequest msg = 50;
   }
 }
 
@@ -24,6 +24,6 @@ message NodeInfoResponse {
   repeated SubSystem details = 4;
 
   extend Message {
-    optional NodeInfoResponse msg = 52;
+    optional NodeInfoResponse msg = 51;
   }
 }

@@ -69,7 +69,16 @@ void AsyncPorcess::loop() {
     try {
       event = source->wait();
       if (!event) { continue; }
-      event->handle();
+
+      // Attempt to handle or rescue.
+      try {
+        event->handle();
+      } catch(CleanExit&) {
+        throw;
+      } catch(SfException& ex) {
+        event->rescue(&ex);
+      }
+
     } catch (CleanExit&) {
       break;
 

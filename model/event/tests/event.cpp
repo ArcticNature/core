@@ -4,6 +4,7 @@
 #include "core/exceptions/event.h"
 #include "core/model/event.h"
 
+using sf::core::exception::SfException;
 using sf::core::exception::EventDrainNotFound;
 using sf::core::exception::EventSourceNotFound;
 using sf::core::exception::IncorrectSourceType;
@@ -18,6 +19,15 @@ using sf::core::model::EventDrainRef;
 using sf::core::model::EventSource;
 using sf::core::model::EventSourceManager;
 using sf::core::model::EventSourceRef;
+
+
+class FailEvent : public Event {
+ public:
+  FailEvent() : Event("abc", "NULL") {}
+  void handle() {
+    throw IncorrectSourceType("");
+  }
+};
 
 
 class TestEvent : public Event {
@@ -80,12 +90,22 @@ class TestEventSourceManager : public EventSourceManager {
 };
 
 
-TEST(EventDrain, id) {
+TEST(Event, Rescue) {
+  FailEvent event;
+  try {
+    event.handle();
+  } catch (SfException& ex) {
+    ASSERT_THROW(event.rescue(&ex), IncorrectSourceType);
+  }
+}
+
+
+TEST(EventDrain, Id) {
   TestDrain drain("id");
   ASSERT_EQ("id", drain.id());
 }
 
-TEST(EventDrainManager, add) {
+TEST(EventDrainManager, Add) {
   EventDrainManager manager;
   EventDrainRef drain(new TestDrain("drain"));
 

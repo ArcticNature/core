@@ -30,6 +30,10 @@ std::string Event::correlation() const {
   return this->correlation_id;
 }
 
+std::string Event::drain() const {
+  return this->drain_id;
+}
+
 std::string Event::id(std::string id) {
   if (this->_id == "") {
     this->_id = id;
@@ -42,6 +46,10 @@ std::string Event::id(std::string id) {
 
 std::string Event::id() const {
   return this->_id;
+}
+
+void Event::rescue(SfException* ex) {
+  throw;
 }
 
 

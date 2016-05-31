@@ -2,7 +2,9 @@
 #ifndef CORE_REGISTRY_BASE_INC_H_
 #define CORE_REGISTRY_BASE_INC_H_
 
+#include <memory>
 #include <string>
+
 #include "core/exceptions/base.h"
 
 
@@ -11,11 +13,15 @@ namespace core {
 namespace registry {
 
   template<typename factory>
-  Registry<factory> Registry<factory>::singleton_instance;
+  std::shared_ptr<Registry<factory>> Registry<factory>::singleton_instance;
 
   template<typename factory>
   Registry<factory>* Registry<factory>::instance() {
-    return &Registry<factory>::singleton_instance;
+    if (!Registry<factory>::singleton_instance) {
+      std::shared_ptr<Registry<factory>> instance(new Registry<factory>);
+      Registry<factory>::singleton_instance = instance;
+    }
+    return Registry<factory>::singleton_instance.get();
   }
 
   template<typename factory>
@@ -24,7 +30,7 @@ namespace registry {
   }
 
   template<typename factory>
-  void Registry<factory>::RegisterFactory(std::string name, factory callback) {
+  bool Registry<factory>::RegisterFactory(std::string name, factory callback) {
     return Registry<factory>::instance()->registerFactory(name, callback);
   }
 
@@ -43,7 +49,7 @@ namespace registry {
   }
 
   template<typename factory>
-  void Registry<factory>::registerFactory(std::string name, factory callback) {
+  bool Registry<factory>::registerFactory(std::string name, factory callback) {
     if (this->factories.find(name) != this->factories.end()) {
       throw sf::core::exception::DuplicateInjection(
           "The registry already contains a '" + name + "'."

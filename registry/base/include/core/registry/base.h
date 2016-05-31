@@ -3,6 +3,7 @@
 #define CORE_REGISTRY_BASE_H_
 
 #include <map>
+#include <memory>
 #include <string>
 
 
@@ -14,7 +15,7 @@ namespace registry {
   template<typename factory>
   class Registry {
    protected:
-    static Registry<factory> singleton_instance;
+    static std::shared_ptr<Registry<factory>> singleton_instance;
 
    public:
     static Registry<factory>* instance();
@@ -22,8 +23,8 @@ namespace registry {
     //! Proxay get method to the singleton instace.
     static factory Get(std::string name);
 
-    //! Proxay registerFactory method to the singleton instace.
-    static void RegisterFactory(std::string name, factory callback);
+    //! Proxy registerFactory method to the singleton instace.
+    static bool RegisterFactory(std::string name, factory callback);
 
    protected:
     std::map<std::string, factory> factories;
@@ -35,7 +36,7 @@ namespace registry {
     factory get(std::string name);
 
     //! Add a new factory to the registry.
-    void registerFactory(std::string name, factory callback);
+    bool registerFactory(std::string name, factory callback);
   };
 
 }  // namespace registry
@@ -44,5 +45,14 @@ namespace registry {
 
 
 #include "core/registry/base.inc.h"
+
+
+// Helper macros to make RegisterFactory method-like.
+#define RF_UNIQUE_2(handler, line) __init_##handler##_##line##__
+#define RF_UNIQUE(handler, line)   RF_UNIQUE_2(handler, line)
+
+#define StaticFactory(Registry, name, Handler) \
+  static bool RF_UNIQUE(Handler, __LINE__) = \
+    Registry::RegisterFactory(name, Handler);
 
 #endif  // CORE_REGISTRY_BASE_H_

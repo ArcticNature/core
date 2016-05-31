@@ -6,6 +6,7 @@ message Message {
     Ack = 1;
     NodeInfoRequest  = 2;
     NodeInfoResponse = 3;
+    Introduce = 4;
   }
 
   required Code   code = 1;
@@ -16,6 +17,7 @@ message Message {
    * Used extentions:
    *  - 50: NodeInfoRequest
    *  - 51: NodeInfoResponse
+   *  - 52: ClientIntroduce
    */
 }
 
