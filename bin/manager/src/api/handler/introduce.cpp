@@ -11,7 +11,9 @@
 #include "core/protocols/public/p_client.pb.h"
 #include "core/protocols/public/p_message.pb.h"
 #include "core/registry/event/handler/api.h"
+
 #include "core/utility/protobuf.h"
+#include "core/utility/string.h"
 
 using sf::core::cluster::Node;
 using sf::core::context::Context;
@@ -24,11 +26,16 @@ using sf::core::model::LogInfo;
 using sf::core::protocol::public_api::ClientIntroduce;
 using sf::core::protocol::public_api::Message;
 using sf::core::registry::ApiHandlerRegistry;
+
 using sf::core::utility::MessageIO;
+using sf::core::utility::string::toString;
 
 
 //! Event to handle clients introduction requests.
 class ClientIntroduceEvent : public Event {
+ protected:
+  static uint64_t clients_count;
+
  public:
   ClientIntroduceEvent(
       std::string correlation, std::string drain
@@ -39,7 +46,9 @@ class ClientIntroduceEvent : public Event {
   void handle() {
     // Generate unique id for the client.
     std::string node_name = Node::me()->name();
-    std::string client_id = "CLI_NUM@" + node_name + "!PID";
+    std::string num = toString(ClientIntroduceEvent::clients_count++);
+    std::string pid = toString(Static::posix()->getpid());
+    std::string client_id = num + "@" + node_name + "!" + pid;
     LogInfo info = {{"client_id", client_id}};
     DEBUGV(Context::logger(), "Welcoming new client: '${client_id}'", info);
 
@@ -55,6 +64,7 @@ class ClientIntroduceEvent : public Event {
     MessageIO<Message>::send(drain, response);
   }
 };
+uint64_t ClientIntroduceEvent::clients_count = 0;
 
 
 //! Event factory for Introduce requests.

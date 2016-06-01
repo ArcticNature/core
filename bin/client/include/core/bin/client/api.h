@@ -25,6 +25,7 @@ namespace bin {
 
     static void deleteInstance(void* instance);
     static int  exit(lua_State* state);
+    static int  id(lua_State* state);
     static int  version(lua_State* state);
 
    protected:

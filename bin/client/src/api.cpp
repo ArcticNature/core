@@ -5,6 +5,7 @@
 
 #include "core/exceptions/base.h"
 #include "core/compile-time/version.h"
+#include "core/context/static.h"
 
 #include "core/utility/lua.h"
 #include "core/utility/lua/table.h"
@@ -12,6 +13,7 @@
 
 using sf::core::bin::ClientLuaBinding;
 using sf::core::bin::ClientLuaType;
+using sf::core::context::Static;
 using sf::core::exception::CleanExit;
 
 using sf::core::utility::Lua;
@@ -27,6 +29,7 @@ void ClientLuaBinding::exit() {
 
 const struct luaL_Reg ClientLuaType::lib[] = {
   {"exit",    ClientLuaType::exit},
+  {"id",      ClientLuaType::id},
   {"version", ClientLuaType::version},
   {nullptr, nullptr}
 };
@@ -41,6 +44,12 @@ int ClientLuaType::exit(lua_State* state) {
   ClientLuaBinding* client = type.check<ClientLuaBinding>();
   client->exit();
   return 0;
+}
+
+int ClientLuaType::id(lua_State* state) {
+  Lua* lua = Lua::fetchFrom(state);
+  lua->stack()->push(Static::options()->getString("client-id"));
+  return 1;
 }
 
 int ClientLuaType::version(lua_State* state) {

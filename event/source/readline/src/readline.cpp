@@ -37,7 +37,8 @@ ReadlineEventSource::ReadlineEventSource(LineParser parser) : EventSource(
 
   // Initialise readline and history.
   using_history();
-  rl_callback_handler_install("snow-fox> ", &ReadlineEventSource::handleLine);
+  std::string tag = Static::options()->getString("client-id") + "> ";
+  rl_callback_handler_install(tag.c_str(), &ReadlineEventSource::handleLine);
   ReadlineEventSource::readHistroyFile();
 }
 
