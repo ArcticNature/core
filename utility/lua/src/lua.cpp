@@ -15,8 +15,10 @@ using sf::core::exception::LuaMemoryError;
 using sf::core::exception::LuaRuntimeError;
 using sf::core::exception::LuaSyntaxError;
 using sf::core::exception::LuaTypeError;
+using sf::core::exception::SfException;
 
 using sf::core::utility::Lua;
+using sf::core::utility::LuaArguments;
 using sf::core::utility::LuaRegistry;
 using sf::core::utility::LuaStack;
 using sf::core::utility::LuaTable;
@@ -72,15 +74,28 @@ Lua::~Lua() {
   this->_registry = std::shared_ptr<LuaRegistry>();
 }
 
+void Lua::call(int nargs, int nresults, int msgh, bool clear) {
+  lua_State* state = this->state.get();
+  // Clear the stack in case of errors.
+  try {
+    int result = lua_pcall(state, nargs, nresults, msgh);
+    this->checkError(result, this->last_name);
+  } catch(SfException& ex) {
+    if (clear) {
+      this->stack()->clear();
+    }
+    throw;
+  }
+}
+
 void Lua::doString(std::string code, std::string name) {
   int result = 0;
   lua_State* state = this->state.get();
+  this->last_name  = name;
 
   result = luaL_loadbuffer(state, code.c_str(), code.length(), name.c_str());
   this->checkError(result, name);
-
-  result = lua_pcall(state, 0, LUA_MULTRET, 0);
-  this->checkError(result, name);
+  this->call(0, LUA_MULTRET, 0, true);
 }
 
 LuaTable* Lua::globals() {
@@ -96,8 +111,23 @@ LuaStack* Lua::stack() {
 }
 
 
+LuaArguments::LuaArguments(Lua* state) {
+  this->state = state;
+}
+
+void LuaArguments::any(int number) {
+  luaL_checkany(this->state->state.get(), number);
+}
+
+lua_Integer LuaArguments::reference(int number) {
+  this->state->stack()->duplicate(number);
+  return this->state->registry()->referenceTop();
+}
+
+
 LuaStack::LuaStack(Lua* state) {
   this->state = state;
+  this->_arguments = std::shared_ptr<LuaArguments>(new LuaArguments(state));
 }
 
 int LuaStack::absoluteIndex(int index) {
@@ -114,6 +144,10 @@ int LuaStack::absoluteIndex(int index) {
     return index;
   }
   return size + index + 1;
+}
+
+LuaArguments* LuaStack::arguments() {
+  return this->_arguments.get();
 }
 
 void LuaStack::check(int count) {
@@ -133,6 +167,24 @@ LuaTable LuaStack::newTable(bool pop) {
   lua_checkstack(state, 1);
   lua_newtable(state);
   return LuaTable(this->state, -1, pop);
+}
+
+void LuaStack::print(std::ostream* out_stream) {
+  int top = this->size();
+  if (top == 0) {
+    return;  // Nothing to print.
+  }
+
+  std::ostream& out = *out_stream;
+  for (int idx=1; idx <= top; idx++) {
+    out << this->represent(idx);
+    if (idx != top) {
+      out << '\t';
+    }
+  }
+
+  out << std::endl;
+  this->clear();
 }
 
 void LuaStack::push(int value) {

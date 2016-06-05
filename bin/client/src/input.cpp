@@ -53,24 +53,7 @@ void ExecuteString::_handle() {
 
 void ExecuteString::printStack() {
   Lua lua = Client::lua();
-  int top = lua.stack()->size();
-
-  // Nothing to print.
-  if (top == 0) {
-    return;
-  }
-
-  std::ostream& out = *this->out;
-
-  for (int idx=1; idx <= top; idx++) {
-    out << lua.stack()->represent(idx);
-    if (idx != top) {
-      out << '\t';
-    }
-  }
-
-  out << std::endl;
-  lua.stack()->clear();
+  lua.stack()->print(this->out);
 }
 
 

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <memory>
+#include <ostream>
 
 #include "lua.hpp"
 
@@ -14,6 +15,7 @@ namespace core {
 namespace utility {
 
   // Forward declare classes needed by the lua wrapper.
+  class LuaArguments;
   class LuaRegistry;
   class LuaStack;
   class LuaTypeProxy;
@@ -22,6 +24,7 @@ namespace utility {
   //! Wrapper for a LUA state.
   class Lua {
    protected:
+    friend LuaArguments;
     friend LuaRegistry;
     friend LuaStack;
     friend LuaTable;
@@ -32,12 +35,29 @@ namespace utility {
     std::shared_ptr<LuaStack> _stack;
     std::shared_ptr<LuaTable> _globals;
 
+    //! Store the last given chunk name for error messages.
+    std::string last_name;
+
     //! Checks if the previous operation failed.
     void checkError(int code, std::string name = "<block>");
 
    public:
     Lua();
     virtual ~Lua();
+
+    //! Calls the LUA function on top of the stack.
+    /*!
+     * See lua_pcall documentation.
+     * \param nargs Number of arguments on the stack for the call.
+     * \param nresults Number of results to expect.
+     * \param msgh Index on the stack of the optional message handler.
+     * \param clear Indicates that the stack schould be cleared
+     *              if and exception is thrown.
+     */
+    void call(
+        int nargs, int nresults = LUA_MULTRET,
+        int msgh = 0, bool clear = true
+    );
 
     //! Runs the given code.
     void doString(std::string code, std::string name = "<block>");
@@ -57,10 +77,27 @@ namespace utility {
   };
 
 
+  //! Helper class to manipulate Lua call arguments.
+  class LuaArguments {
+   protected:
+    Lua* state;
+
+   public:
+    explicit LuaArguments(Lua* state);
+
+    //! Checks that an argument of any type is passed.
+    void any(int number);
+
+    //! Returns a reference to the given argument.
+    lua_Integer reference(int number);
+  };
+
+
   //! Helper class to manipulate a Lua stack.
   class LuaStack {
    protected:
     Lua* state;
+    std::shared_ptr<LuaArguments> _arguments;
 
    public:
     explicit LuaStack(Lua* state);
@@ -74,6 +111,9 @@ namespace utility {
      */
     int absoluteIndex(int index);
 
+    //! Returns an object able to manipulate arguments.
+    LuaArguments* arguments();
+
     //! Checks the stack can hold count more items.
     void check(int count);
 
@@ -85,6 +125,9 @@ namespace utility {
 
     //! Pushes a new table on top of the stack and returns a wrapper to it.
     LuaTable newTable(bool pop = false);
+
+    // Prints the values on the stack to a stream.
+    void print(std::ostream* out_stream);
 
     //! Pushes an integer onto the stack.
     void push(int value);

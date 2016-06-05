@@ -1,7 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
-#include "core/bin/client/api.h"
-
 #include <string>
+
+#include "core/bin/client/api.h"
 
 #include "core/exceptions/base.h"
 #include "core/compile-time/version.h"

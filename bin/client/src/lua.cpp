@@ -1,4 +1,5 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
+#include <iostream>
 #include <string>
 
 #include "core/bin/client/api.h"
@@ -11,6 +12,8 @@
 
 using sf::core::bin::ClientLuaBinding;
 using sf::core::bin::ClientLuaType;
+using sf::core::bin::NodeLuaBinding;
+using sf::core::bin::NodeLuaType;
 
 using sf::core::context::Client;
 using sf::core::event::ReadlineEventSource;
@@ -27,6 +30,12 @@ int lua_clear_screen(lua_State* state) {
   return 0;
 }
 
+int lua_print(lua_State* state) {
+  Lua* lua = Lua::fetchFrom(state);
+  lua->stack()->print(&std::cout);
+  return 0;
+}
+
 
 //! Handler for client::lua::init that sets global variables.
 class ClientLuaInitHandler : public BaseLifecycleHandler {
@@ -36,13 +45,21 @@ class ClientLuaInitHandler : public BaseLifecycleHandler {
 
     // Register global functions.
     lua.globals()->set("clear", lua_clear_screen);
+    lua.globals()->set("print", lua_print);
 
     // Register global `client` object.
     ClientLuaBinding* client = new ClientLuaBinding();
-    ClientLuaType type;
-    type.initType(lua);
-    type.bind(lua, client);
+    ClientLuaType client_type;
+    client_type.initType(lua);
+    client_type.bind(lua, client);
     lua.globals()->fromStack("client");
+
+    // Register global `node` object.
+    NodeLuaBinding* node = new NodeLuaBinding();
+    NodeLuaType node_type;
+    node_type.initType(lua);
+    node_type.bind(lua, node);
+    lua.globals()->fromStack("node");
   }
 };
 

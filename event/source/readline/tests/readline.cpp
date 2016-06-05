@@ -69,6 +69,7 @@ class ReadlineSourceTest : public ::testing::Test {
     dup2(this->stdin_read, fileno(::stdin));
 
     // Create an instance for the tests.
+    Static::options()->setString("client-id", "TEST");
     Context::sourceManager()->addSource(
         ReadlineEventSource::instance(test_readline_parser)
     );
