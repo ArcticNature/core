@@ -7,12 +7,15 @@
     "core.bin.async-process",
     "core.cluster.node",
     "core.compile-time",
+
     "core.context.client",
     "core.context.dynamic",
+    "core.context.event",
     "core.context.static",
 
     "core.event.client.unix",
     "core.event.drain.fd",
+    "core.event.drain.null",
     "core.event.source.manual",
     "core.event.source.readline",
     "core.event.source.signal",

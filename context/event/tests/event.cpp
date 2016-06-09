@@ -16,7 +16,7 @@ typedef EventContext<int> TestEventContext;
 class EventContextTest : public ::testing::Test {
  protected:
   ~EventContextTest() {
-    TestEventContext::destory();
+    TestEventContext::destroy();
   }
 };
 

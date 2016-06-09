@@ -88,6 +88,9 @@ namespace utility {
     //! Checks that an argument of any type is passed.
     void any(int number);
 
+    //! Checks that the argument is a boolean and returns it.
+    bool boolean(int number);
+
     //! Returns a reference to the given argument.
     lua_Integer reference(int number);
   };

@@ -54,9 +54,12 @@ void Event::rescue(SfException* ex) {
 
 
 EventDrain::EventDrain(std::string drain) : drain_id(drain) {
-  this->outstanding = 0;
+  // NOOP.
 }
-EventDrain::~EventDrain() {}
+
+EventDrain::~EventDrain() {
+  // NOOP.
+}
 
 std::string EventDrain::id() const {
   return this->drain_id;

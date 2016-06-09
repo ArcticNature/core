@@ -42,7 +42,7 @@ namespace bin {
   //! Node API for LUA environment.
   class NodeLuaBinding {
    public:
-    void status(sf::core::utility::Lua* lua, int callback_ref);
+    void status(sf::core::utility::Lua* lua, int callback_ref, bool details);
   };
 
   //! Lua type of the client object.

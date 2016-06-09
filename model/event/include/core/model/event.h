@@ -73,7 +73,6 @@ namespace model {
   class EventDrain {
    protected:
     const std::string drain_id;
-    unsigned int outstanding;
 
    public:
     explicit EventDrain(std::string id);

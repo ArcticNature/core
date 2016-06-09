@@ -119,6 +119,11 @@ void LuaArguments::any(int number) {
   luaL_checkany(this->state->state.get(), number);
 }
 
+bool LuaArguments::boolean(int number) {
+  luaL_checktype(this->state->state.get(), number, LUA_TBOOLEAN);
+  return lua_toboolean(this->state->state.get(), number);
+}
+
 lua_Integer LuaArguments::reference(int number) {
   this->state->stack()->duplicate(number);
   return this->state->registry()->referenceTop();

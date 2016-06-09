@@ -25,7 +25,7 @@ namespace context {
 
   // *** Public static methods. ***
   template<typename Context>
-  void EventContext<Context>::destory() {
+  void EventContext<Context>::destroy() {
     if (EventContext<Context>::_instance == nullptr) {
       return;
     }
@@ -68,7 +68,7 @@ namespace context {
   template<typename Context>
   EventContext<Context>::EventContext() {
     this->handler = sf::core::interface::LifecycleHandlerRef(
-        new EventContextCleanupHandler(&EventContext<Context>::destory)
+        new EventContextCleanupHandler(&EventContext<Context>::destroy)
     );
     sf::core::interface::Lifecycle::on("process::exit", this->handler);
   }

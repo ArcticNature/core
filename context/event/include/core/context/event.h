@@ -27,7 +27,7 @@ namespace context {
 
    public:
     //! Clean up all the stored contexts.
-    static void destory();
+    static void destroy();
 
     //! Retrive a context for a correlation.
     static Context pop(std::string correlation);

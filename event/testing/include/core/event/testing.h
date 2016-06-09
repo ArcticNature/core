@@ -12,6 +12,20 @@ namespace sf {
 namespace core {
 namespace event {
 
+  class MockDrain : public sf::core::model::EventDrain {
+   protected:
+    int read_fd;
+    int write_fd;
+
+   public:
+    MockDrain(std::string id);
+    ~MockDrain();
+    int  getFD();
+    void sendAck();
+    int readFD();
+  };
+
+
   class TestEvent : public sf::core::model::Event {
    public:
     TestEvent();

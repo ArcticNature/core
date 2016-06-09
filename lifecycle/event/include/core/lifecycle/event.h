@@ -17,6 +17,14 @@ namespace lifecycle {
     //! Initialise an event.
     static void Init(sf::core::model::EventRef event);
 
+    //! Creates an EventRef from an Event subclass and init it.
+    template <class EventClass, typename... Args>
+    static sf::core::model::EventRef make(Args... args) {
+      sf::core::model::EventRef event(new EventClass(args...));
+      EventLifecycle::Init(event);
+      return event;
+    }
+
 #if TEST_BUILD
     static void reset();
 #endif

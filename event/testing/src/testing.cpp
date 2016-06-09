@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/event/testing.h"
 
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <string>
@@ -16,16 +17,51 @@
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
+using sf::core::event::MockDrain;
 using sf::core::event::TestEvent;
 using sf::core::event::TestFdDrain;
 using sf::core::event::TestFdSource;
 using sf::core::event::TestUnixClient;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrain;
 using sf::core::model::EventRef;
 
 using sf::core::protocol::test::Message;
 using sf::core::utility::MessageIO;
+
+
+MockDrain::MockDrain(std::string id) : EventDrain(id) {
+  this->read_fd  = 0;
+  this->write_fd = 0;
+}
+
+MockDrain::~MockDrain() {
+  if (this->read_fd != 0) {
+    Static::posix()->close(this->read_fd);
+  }
+  if (this->write_fd != 0) {
+    Static::posix()->close(this->write_fd);
+  }
+}
+
+int MockDrain::getFD() {
+  if (this->write_fd == 0) {
+    int pipe[2];
+    Static::posix()->pipe(pipe, O_NONBLOCK);
+    this->read_fd  = pipe[0];
+    this->write_fd = pipe[1];
+  }
+  return this->write_fd;
+}
+
+void MockDrain::sendAck() {
+  // NOOP.
+}
+
+int MockDrain::readFD() {
+  return this->read_fd;
+}
 
 
 TestEvent::TestEvent() : Event("", "NULL") {}
