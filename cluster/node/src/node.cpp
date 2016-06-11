@@ -90,3 +90,7 @@ std::string Node::name() const {
 NodeStatus& Node::status() {
   return this->_status;
 }
+
+NodeVersion Node::version() const {
+  return this->_version;
+}

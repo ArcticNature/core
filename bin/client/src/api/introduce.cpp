@@ -64,22 +64,18 @@ class ClientIntroduceResponse : public Event {
     ManualSource* manual = Context::sourceManager()->get<
       ManualSource
     >("manual");
-    EventRef async(new EnableReadline());
-    EventLifecycle::Init(async);
+    EventRef async = EventLifecycle::make<EnableReadline>();
     manual->enqueueEvent(async);
   }
 };
 
-
 //! Event factory for Introduce responses.
 EventRef client_introduce(Message message, std::string drain) {
   ClientIntroduce intro = message.GetExtension(ClientIntroduce::msg);
-  return EventRef(new ClientIntroduceResponse(
+  return EventLifecycle::make<ClientIntroduceResponse>(
       message.correlation_id(), drain,
       intro.client_id(), intro.node_name()
-  ));
+  );
 }
 
-
-// Register event factory.
 StaticFactory(ApiHandlerRegistry, "Res::Introduce", client_introduce);

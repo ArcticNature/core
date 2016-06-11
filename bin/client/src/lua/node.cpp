@@ -37,15 +37,6 @@ void NodeLuaBinding::status(Lua* lua, int callback_ref, bool details) {
   // Enqueue it for handling.
   ManualSource* manual = Context::sourceManager()->get<ManualSource>("manual");
   manual->enqueueEvent(request);
-
-  // TODO(stefano): implement process as below.
-  // On repsonse convert it to LUA table.
-  // Call the callback with the response.
-
-  // TODO(stefano): Testing code to remove.
-  lua->registry()->dereference(callback_ref);
-  lua->stack()->push("TODO!!!");
-  lua->call(1);
 }
 
 

@@ -16,6 +16,7 @@
 using sf::core::bin::NodeStatusRequest;
 using sf::core::bin::NodeStatusContext;
 using sf::core::bin::NSClientContext;
+using sf::core::bin::NSClientContextRef;
 
 using sf::core::context::Client;
 using sf::core::context::Static;
@@ -49,13 +50,15 @@ NodeStatusRequest::NodeStatusRequest(
 
 void NodeStatusRequest::handle() {
   // Store callback reference in NodeStatusContext.
-  NSClientContext context;
-  context.callback_ref = this->callback_ref;
+  NSClientContextRef context(new NSClientContext());
+  context->callback_ref = this->callback_ref;
   NodeStatusContext::store(this->correlation(), context);
 
   // Build status request.
   Message message;
   message.set_code(Message::NodeInfoRequest);
+  message.set_correlation_id(this->correlation());
+
   NodeInfoRequest* info = message.MutableExtension(NodeInfoRequest::msg);
   info->set_details(this->details);
 

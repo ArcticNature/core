@@ -129,7 +129,10 @@ namespace utility {
     //! Pushes a new table on top of the stack and returns a wrapper to it.
     LuaTable newTable(bool pop = false);
 
-    // Prints the values on the stack to a stream.
+    //! Pritty prints a value on the stack to a stream.
+    void pprint(std::ostream* out_stream, int index = -1, int nesting = 0);
+
+    //! Prints the values on the stack to a stream.
     void print(std::ostream* out_stream);
 
     //! Pushes an integer onto the stack.
@@ -140,6 +143,9 @@ namespace utility {
 
     //! Pushes a closure onto the stack.
     void push(lua_CFunction value, int close_with);
+
+    //! Pushes nil onto the stack.
+    void pushNil();
 
     //! Pushes a light userdata onto the stack.
     /*!

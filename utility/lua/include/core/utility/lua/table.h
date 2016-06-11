@@ -32,12 +32,18 @@ namespace utility {
     void toStack(std::string key);
     void toStack(int key);
 
+    //! Pushes itself on the stack.
+    void pushMe();
+
     //! Stores a value in the table.
     void set(int key, int value);
     void set(int key, std::string value);
     void set(std::string key, int value);
     void set(std::string key, std::string value);
     void set(std::string key, lua_CFunction value);
+
+    //! Sets the metatable for itself from the stack.
+    void setMetatable(int index = -1);
 
     //! Gets an int from a table.
     int toInt(int key);

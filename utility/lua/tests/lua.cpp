@@ -1,5 +1,6 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <memory>
+#include <sstream>
 #include <gtest/gtest.h>
 
 #include "core/exceptions/lua.h"
@@ -126,4 +127,19 @@ TEST(LuaStack, String) {
   // Wrong type.
   lua.doString("return 2");
   ASSERT_THROW(lua.stack()->toString(), LuaTypeError);
+}
+
+TEST(LuaStack, PrettyPrintTable) {
+  Lua lua;
+  lua.doString("return {a = 'b', [1] = {[2] = false}}");
+  std::stringstream out;
+  lua.stack()->pprint(&out);
+  ASSERT_EQ(1, lua.stack()->size());
+  // Table traversal is non-deterministic ...
+  bool letter_first = "a: b\n1: \n  2: false\n" == out.str();
+  bool number_first = "1: \n  2: false\na: b\b" == out.str();
+  if (!(letter_first || number_first)) {
+    EXPECT_EQ("a: b\n1: \n  2: false\n", out.str());
+    EXPECT_EQ("1: \n  2: false\na: b\b", out.str());
+  }
 }

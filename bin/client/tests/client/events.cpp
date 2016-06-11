@@ -21,7 +21,7 @@
 
 using sf::core::bin::NodeStatusRequest;
 using sf::core::bin::NodeStatusContext;
-using sf::core::bin::NSClientContext;
+using sf::core::bin::NSClientContextRef;
 
 using sf::core::context::Client;
 using sf::core::context::Static;
@@ -75,8 +75,8 @@ class NodeStatusRequestTest : public ::testing::Test {
 TEST_F(NodeStatusRequestTest, EventContextIsCreated) {
   EventRef event = this->make("NULL");
   event->handle();
-  NSClientContext context = NodeStatusContext::pop(event->correlation());
-  ASSERT_EQ(this->test_reference, context.callback_ref);
+  NSClientContextRef context = NodeStatusContext::pop(event->correlation());
+  ASSERT_EQ(this->test_reference, context->callback_ref);
 }
 
 TEST_F(NodeStatusRequestTest, SendsRequest) {

@@ -77,6 +77,9 @@ namespace cluster {
 
     //! Returns the node status traker.
     NodeStatus& status();
+
+    //! returns the node version information.
+    NodeVersion version() const;
   };
 
 }  // namespace cluster

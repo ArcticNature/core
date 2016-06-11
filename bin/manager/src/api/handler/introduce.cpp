@@ -74,6 +74,5 @@ EventRef client_introduce(Message message, std::string drain) {
   );
 }
 
-
 // Register event factory.
 StaticFactory(ApiHandlerRegistry, "Req::Introduce", client_introduce);

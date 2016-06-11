@@ -2,6 +2,7 @@
 #ifndef CORE_BIN_CLIENT_EVENTS_H_
 #define CORE_BIN_CLIENT_EVENTS_H_
 
+#include <memory>
 #include <string>
 
 #include "core/context/event.h"
@@ -19,9 +20,10 @@ namespace bin {
     NSClientContext();
     ~NSClientContext();
   };
+  typedef std::shared_ptr<NSClientContext> NSClientContextRef;
 
   //! Node status event context.
-  typedef sf::core::context::EventContext<NSClientContext> 
+  typedef sf::core::context::EventContext<NSClientContextRef> 
     NodeStatusContext;
 
   //! Request the state of a node.

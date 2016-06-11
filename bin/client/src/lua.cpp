@@ -36,6 +36,12 @@ int lua_print(lua_State* state) {
   return 0;
 }
 
+int lua_pprint(lua_State* state) {
+  Lua* lua = Lua::fetchFrom(state);
+  lua->stack()->pprint(&std::cout);
+  return 0;
+}
+
 
 //! Handler for client::lua::init that sets global variables.
 class ClientLuaInitHandler : public BaseLifecycleHandler {
@@ -46,6 +52,7 @@ class ClientLuaInitHandler : public BaseLifecycleHandler {
     // Register global functions.
     lua.globals()->set("clear", lua_clear_screen);
     lua.globals()->set("print", lua_print);
+    lua.globals()->set("pprint", lua_pprint);
 
     // Register global `client` object.
     ClientLuaBinding* client = new ClientLuaBinding();

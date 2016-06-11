@@ -12,16 +12,26 @@ message NodeInfoRequest {
 
 
 message NodeInfoResponse {
+  message NodeVersion {
+    required string commit  = 1;
+    optional string taint   = 2;
+    optional string version = 3;
+  }
+
+  message NodeInfo {
+    required string name = 1;
+    required NodeVersion version = 2;
+  }
+
   message SubSystem {
     required StatusColour colour = 1;
     required int64  code   = 2;
     required string reason = 3;
   }
 
-  required StatusColour colour = 1;
-  required int64  code   = 2;
-  required string reason = 3;
-  repeated SubSystem details = 4;
+  optional NodeInfo  node = 1;
+  optional SubSystem overall = 2;
+  repeated SubSystem details = 3;
 
   extend Message {
     optional NodeInfoResponse msg = 51;

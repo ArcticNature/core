@@ -66,6 +66,11 @@ void LuaTable::toStack(int key) {
   this->state->stack()->remove(-2);
 }
 
+void LuaTable::pushMe() {
+  this->state->stack()->check(1);
+  this->state->registry()->dereference(this->table_ref);
+}
+
 void LuaTable::set(int key, int value) {
   this->state->stack()->check(3);
   this->state->registry()->dereference(this->table_ref);
@@ -108,6 +113,16 @@ void LuaTable::set(std::string key, lua_CFunction value) {
   this->state->stack()->push(key);
   this->state->stack()->push(value, 0);
   lua_settable(this->state->state.get(), -3);
+  this->state->stack()->remove(-1);
+}
+
+void LuaTable::setMetatable(int index) {
+  int abs_idx = this->state->stack()->absoluteIndex(index);
+  this->state->stack()->check(2);
+  this->state->registry()->dereference(this->table_ref);
+  this->state->stack()->duplicate(abs_idx);
+  this->state->stack()->remove(abs_idx);
+  lua_setmetatable(this->state->state.get(), -2);
   this->state->stack()->remove(-1);
 }
 

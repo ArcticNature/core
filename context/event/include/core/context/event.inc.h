@@ -44,8 +44,9 @@ namespace context {
     }
     typename std::map<std::string, Context>::iterator it;
     it = instance->contexts.find(correlation);
+    Context context = it->second;
     instance->contexts.erase(it);
-    return it->second;
+    return context;
   }
 
   template<typename Context>

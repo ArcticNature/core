@@ -192,6 +192,40 @@ void LuaStack::print(std::ostream* out_stream) {
   this->clear();
 }
 
+void LuaStack::pprint(std::ostream* out_stream, int index, int nesting) {
+  int absIdx = this->absoluteIndex(index);
+  int type = this->type(absIdx);
+  std::ostream& out = *out_stream;
+
+  // Anything other then tables are just printed.
+  if (type != LUA_TTABLE) {
+    out << this->represent(absIdx) << std::endl;
+    return;
+  }
+
+  // For tables iterate through keys and call recursively.
+  // Skip the new line before the Key: Value pair on the top level table.
+  lua_State* state = this->state->state.get();
+  lua_pushnil(state);
+
+  while (lua_next(state, absIdx) != 0) {
+    // Print leading spaces.
+    for (int col=0; col < nesting * 2; col++) {
+      out << ' ';
+    }
+
+    // Print key and value.
+    out << this->represent(-2) << ": ";
+    if (this->type(-1) == LUA_TTABLE) {
+      out << std::endl;
+    }
+    this->pprint(out_stream, -1, nesting + 1);
+
+    // Prepare for the next line.
+    lua_pop(state, 1);
+  }
+}
+
 void LuaStack::push(int value) {
   lua_State* state = this->state->state.get();
   lua_checkstack(state, 1);
@@ -208,6 +242,12 @@ void LuaStack::push(lua_CFunction value, int close_with) {
   lua_State* state = this->state->state.get();
   lua_checkstack(state, 1);
   lua_pushcclosure(state, value, close_with);
+}
+
+void LuaStack::pushNil() {
+  lua_State* state = this->state->state.get();
+  lua_checkstack(state, 1);
+  lua_pushnil(state);
 }
 
 void LuaStack::remove(int index) {
