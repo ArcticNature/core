@@ -12,9 +12,9 @@ namespace utility {
   //! Status colours.
   enum StatusLight {
     UNKOWN = -1,
-    GREEN,
-    YELLOW,
-    RED
+    GREEN  = 0,
+    YELLOW = 1,
+    RED    = 2
   };
 
   //! Details of a status.
@@ -84,6 +84,11 @@ namespace utility {
   //! Status class that aggregates multiple sub-systems.
   template<typename DetailClass, typename SCode>
   class SubsystemStatus : public Status<DetailClass> {
+   public:
+    typedef
+      typename std::map<std::string, DetailClass>::iterator
+      iterator;
+
    protected:
     std::map<std::string, DetailClass> subsystems;
 
@@ -93,6 +98,10 @@ namespace utility {
 
     //! Sets the state of a subsystem.
     void set(std::string subsys, DetailClass status);
+
+    //! Iterate over subsystems.
+    SubsystemStatus::iterator begin();
+    SubsystemStatus::iterator end();
   };
 
 }  // namespace utility

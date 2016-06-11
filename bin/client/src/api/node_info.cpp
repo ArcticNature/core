@@ -25,6 +25,7 @@ using sf::core::model::EventRef;
 
 using sf::core::protocol::public_api::Message;
 using sf::core::protocol::public_api::NodeInfoResponse;
+using sf::core::protocol::public_api::StatusColour_Name;
 using sf::core::registry::ApiHandlerRegistry;
 
 using sf::core::utility::Lua;
@@ -34,6 +35,15 @@ using sf::core::utility::LuaTable;
 class NodeInfo : public Event {
  protected:
   Message message;
+
+  void statusToTable(
+      LuaTable* table,
+      const NodeInfoResponse::SystemStatus& status
+  ) {
+    table->set("colour", StatusColour_Name(status.colour()));
+    table->set("code", status.code());
+    table->set("reason", status.reason());
+  }
 
  public:
   NodeInfo(
@@ -54,14 +64,33 @@ class NodeInfo : public Event {
     if (info.has_node()) {
       const NodeInfoResponse::NodeVersion& node_ver = info.node().version();
       LuaTable version = lua.stack()->newTable();
-      response.set("name", info.node().name());
       response.fromStack("version");
+      response.set("name", info.node().name());
       version.set("commit", node_ver.commit());
       if (node_ver.has_taint()) {
         version.set("taint", node_ver.taint());
       }
       if (node_ver.has_version()) {
         version.set("version", node_ver.version());
+      }
+    }
+
+    if (info.has_overall()) {
+      LuaTable overall = lua.stack()->newTable();
+      response.fromStack("overall");
+      this->statusToTable(&overall, info.overall());
+    }
+
+    if (!info.details().empty()) {
+      LuaTable details = lua.stack()->newTable();
+      response.fromStack("details");
+      int sub_sys = info.details_size();
+
+      for (int idx = 0; idx < sub_sys; idx++) {
+        const NodeInfoResponse::SubSystem& sub = info.details(idx);
+        LuaTable sub_table = lua.stack()->newTable();
+        details.fromStack(sub.name());
+        this->statusToTable(&sub_table, sub.status());
       }
     }
 

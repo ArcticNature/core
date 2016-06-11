@@ -51,6 +51,6 @@ TEST_F(NodeTest, SingletonMe) {
 TEST_F(NodeTest, Status) {
   ASSERT_EQ(
       NodeStatusCode::UNKOWN,
-      Node::me()->status().reason().code()
+      Node::me()->status()->reason().code()
   );
 }

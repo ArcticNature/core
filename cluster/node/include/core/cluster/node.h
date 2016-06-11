@@ -76,7 +76,7 @@ namespace cluster {
     std::string name() const;
 
     //! Returns the node status traker.
-    NodeStatus& status();
+    NodeStatus* status();
 
     //! returns the node version information.
     NodeVersion version() const;

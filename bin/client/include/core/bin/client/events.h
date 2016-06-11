@@ -23,7 +23,7 @@ namespace bin {
   typedef std::shared_ptr<NSClientContext> NSClientContextRef;
 
   //! Node status event context.
-  typedef sf::core::context::EventContext<NSClientContextRef> 
+  typedef sf::core::context::EventContext<NSClientContextRef>
     NodeStatusContext;
 
   //! Request the state of a node.

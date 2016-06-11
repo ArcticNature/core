@@ -87,8 +87,8 @@ std::string Node::name() const {
   return this->_name;
 }
 
-NodeStatus& Node::status() {
-  return this->_status;
+NodeStatus* Node::status() {
+  return &this->_status;
 }
 
 NodeVersion Node::version() const {

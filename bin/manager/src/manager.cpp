@@ -4,6 +4,8 @@
 #include <string>
 
 #include "core/bin/manager/api/server.h"
+#include "core/cluster/node.h"
+
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -15,6 +17,10 @@ using sf::core::bin::Manager;
 using sf::core::bin::ManagerToDaemon;
 using sf::core::bin::ManagerToSpawner;
 using sf::core::bin::UnixServer;
+
+using sf::core::cluster::Node;
+using sf::core::cluster::NodeStatusCode;
+using sf::core::cluster::NodeStatusDetail;
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -43,4 +49,10 @@ void Manager::initialise() {
   // TODO(stefano): remove this when config works.
   EventSourceRef server(new UnixServer("/tmp/snow-fox.socket"));
   Context::sourceManager()->addSource(server);
+
+  // Manager subsystem ready.
+  Node::me()->status()->set("process", NodeStatusDetail(
+      NodeStatusCode::PROCESS_READY,
+      "Manager process successfully initialised"
+  ));
 }
