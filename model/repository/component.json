@@ -1,0 +1,15 @@
+{
+  "name": "core.model.repository",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+    "core.utility.string"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test":    {"type": "lib"}
+  }
+}
