@@ -7,7 +7,8 @@
     "core.exceptions",
     "core.interface.posix",
     "core.model.cli-parser",
-    "core.model.event"
+    "core.model.event",
+    "core.model.repository"
   ],
 
   "targets": {

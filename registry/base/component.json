@@ -2,7 +2,10 @@
   "name": "core.registry.base",
   "type": "c++",
 
-  "deps": ["core.exceptions"],
+  "deps": [
+    "core.compile-time",
+    "core.exceptions"
+  ],
 
   "targets": {
     "debug":   { "type": "lib" },

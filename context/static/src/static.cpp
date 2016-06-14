@@ -14,6 +14,7 @@ using sf::core::model::CLIParser;
 using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainManagerRef;
 using sf::core::model::Options;
+using sf::core::model::RepositoryRef;
 
 
 // Static variables to store injected instances.
@@ -21,6 +22,7 @@ static EventDrainManagerRef drains_ref;
 static std::shared_ptr<Options> options_ref;
 static std::shared_ptr<CLIParser> parser_ref;
 static std::shared_ptr<Posix> posix_ref;
+static RepositoryRef repo_ref;
 
 
 // Static class.
@@ -38,13 +40,6 @@ Options* Static::options() {
   return options_ref.get();
 }
 
-CLIParser* Static::parser() {
-  if (parser_ref.get() == nullptr) {
-    throw ContextUninitialised("Static cli-parser not initialised.");
-  }
-  return parser_ref.get();
-}
-
 Posix* Static::posix() {
   if (posix_ref.get() == nullptr) {
     throw ContextUninitialised("Static posix not initialised.");
@@ -59,6 +54,13 @@ void Static::initialise(Posix* posix) {
   posix_ref = std::shared_ptr<Posix>(posix);
 }
 
+CLIParser* Static::parser() {
+  if (parser_ref.get() == nullptr) {
+    throw ContextUninitialised("Static cli-parser not initialised.");
+  }
+  return parser_ref.get();
+}
+
 void Static::parser(CLIParser* parser) {
   if (parser_ref.get() != nullptr) {
     throw DuplicateInjection(
@@ -68,10 +70,27 @@ void Static::parser(CLIParser* parser) {
   parser_ref = std::shared_ptr<CLIParser>(parser);
 }
 
+void Static::repository(RepositoryRef repo) {
+  if (repo_ref.get() != nullptr) {
+    throw DuplicateInjection(
+        "Attempted to initialise static repository twice."
+    );
+  }
+  repo_ref = repo;
+}
+
+RepositoryRef Static::repository() {
+  if (repo_ref.get() == nullptr) {
+    throw ContextUninitialised("Static repository not initialised.");
+  }
+  return repo_ref;
+}
+
 
 void Static::destroy() {
   drains_ref  = EventDrainManagerRef();
   options_ref = std::shared_ptr<Options>();
   parser_ref  = std::shared_ptr<CLIParser>();
   posix_ref   = std::shared_ptr<Posix>();
+  repo_ref    = RepositoryRef();
 }

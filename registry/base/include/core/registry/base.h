@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+#include "core/compile-time/options.h"
+
 
 namespace sf {
 namespace core {
@@ -25,6 +27,10 @@ namespace registry {
 
     //! Proxy registerFactory method to the singleton instace.
     static bool RegisterFactory(std::string name, factory callback);
+
+#if TEST_BUILD
+    static void destroy();
+#endif
 
    protected:
     std::map<std::string, factory> factories;

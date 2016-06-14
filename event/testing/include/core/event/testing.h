@@ -18,7 +18,7 @@ namespace event {
     int write_fd;
 
    public:
-    MockDrain(std::string id);
+    explicit MockDrain(std::string id);
     ~MockDrain();
     int  getFD();
     void sendAck();

@@ -62,6 +62,7 @@ namespace model {
      */
     virtual void verifyVersion(const std::string version) = 0;
   };
+  typedef std::shared_ptr<Repository> RepositoryRef;
 
   //! Operates on a specific version of the repositry.
   class RepositoryVersion {

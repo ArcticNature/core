@@ -34,6 +34,14 @@ namespace registry {
     return Registry<factory>::instance()->registerFactory(name, callback);
   }
 
+#if TEST_BUILD
+  template<typename factory>
+  void Registry<factory>::destroy() {
+    Registry<factory>::singleton_instance = \
+        std::shared_ptr<Registry<factory>>();
+  }
+#endif
+
 
   template<typename factory>
   Registry<factory>::~Registry() {}

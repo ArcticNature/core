@@ -8,9 +8,9 @@
 
 #include "core/context/context.h"
 #include "core/context/static.h"
-
 #include "core/model/cli-parser.h"
 #include "core/model/event.h"
+#include "core/registry/repositories.h"
 
 
 using sf::core::bin::Manager;
@@ -26,6 +26,7 @@ using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::model::CLIParser;
 using sf::core::model::EventSourceRef;
+using sf::core::registry::ReposRegistry;
 
 
 void Manager::connectDaemon() {
@@ -45,12 +46,13 @@ void Manager::initialise() {
   this->registerDefaultSourceManager();
   this->connectDaemon();
   this->connectSpawner();
+  ReposRegistry::initStaticContext();
 
   // TODO(stefano): remove this when config works.
   EventSourceRef server(new UnixServer("/tmp/snow-fox.socket"));
   Context::sourceManager()->addSource(server);
 
-  // Manager subsystem ready.
+  // Manager process subsystem ready.
   Node::me()->status()->set("process", NodeStatusDetail(
       NodeStatusCode::PROCESS_READY,
       "Manager process successfully initialised"

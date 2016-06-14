@@ -62,8 +62,8 @@ void Daemon::dropUser() {
   INFO(Logger::fallback(), "Dropping privileges.");
 
   CLIParser*  parser = Static::parser();
-  std::string group = parser->getString("group");
-  std::string user = parser->getString("user");
+  std::string group  = parser->getString("group");
+  std::string user   = parser->getString("user");
 
   LogInfo info = { {"group", group}, {"user", user} };
   DEBUGV(
@@ -98,6 +98,14 @@ void Daemon::forkManager() {
   // Cluster arguments.
   manager->appendArgument("--node_name");
   manager->appendArgument(parser->getString("node-name"));
+
+  // Config arguments.
+  manager->appendArgument("--repo_type");
+  manager->appendArgument(parser->getString("repo-type"));
+  manager->appendArgument("--repo_path");
+  manager->appendArgument(parser->getString("repo-path"));
+  manager->appendArgument("--repo_ver");
+  manager->appendArgument(parser->getString("repo-version"));
 
   // IPC arguments.
   manager->appendArgument("--manager_socket");
