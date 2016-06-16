@@ -3,12 +3,14 @@
 
 #include "core/cluster/node.h"
 #include "core/context/static.h"
+#include "core/model/repository.h"
 
 using sf::core::cluster::Node;
 using sf::core::cluster::NodeStatusCode;
-
 using sf::core::context::Static;
+
 using sf::core::model::CLIParser;
+using sf::core::model::RepositoryVersionId;
 
 
 class NullParser : public CLIParser {
@@ -47,10 +49,23 @@ TEST_F(NodeTest, SingletonMe) {
   ASSERT_EQ(node1, node2);
 }
 
-
 TEST_F(NodeTest, Status) {
   ASSERT_EQ(
       NodeStatusCode::UNKOWN,
       Node::me()->status()->reason().code()
   );
+}
+
+TEST_F(NodeTest, DefaultConfigVersion) {
+  RepositoryVersionId version = Node::me()->configVersion();
+  ASSERT_EQ("<system-starting>", version.symbolic());
+  ASSERT_EQ("", version.effective());
+}
+
+TEST_F(NodeTest, UpdateConfigVersion) {
+  RepositoryVersionId version("a", "b");
+  Node::me()->configVersion(version);
+  version = Node::me()->configVersion();
+  ASSERT_EQ("b", version.symbolic());
+  ASSERT_EQ("a", version.effective());
 }

@@ -16,6 +16,7 @@ using sf::core::cluster::NodeStatusDetail;
 using sf::core::cluster::NodeVersion;
 
 using sf::core::context::Static;
+using sf::core::model::RepositoryVersionId;
 using sf::core::utility::StatusDetail;
 
 
@@ -79,8 +80,16 @@ void Node::reset() {
 
 
 Node::Node(std::string name, NodeVersion version) :
-    _name(name), _version(version) {
+    _name(name), _version(version), config_version("", "<system-starting>") {
   //
+}
+
+RepositoryVersionId Node::configVersion() const {
+  return this->config_version;
+}
+
+void Node::configVersion(RepositoryVersionId ver) {
+  this->config_version = ver;
 }
 
 std::string Node::name() const {

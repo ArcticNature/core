@@ -18,6 +18,19 @@ namespace model {
   //! Reference counting on std::istream pointers.
   typedef std::shared_ptr<std::istream> IStreamRef;
 
+  //! Store a symbolic version and the ID it resolves to.
+  class RepositoryVersionId {
+   protected:
+    std::string _effective;
+    std::string _symbolic;
+
+   public:
+    RepositoryVersionId(std::string effective, std::string symbolic);
+
+    std::string effective() const;
+    std::string symbolic() const;
+  };
+
   //! Base definition of a repository.
   /*!
    * In order to be repository system agnostic all repositories are

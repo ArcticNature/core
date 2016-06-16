@@ -6,6 +6,7 @@
 
 #include "core/lifecycle/event.h"
 #include "core/model/event.h"
+#include "core/model/repository.h"
 
 #include "core/protocols/public/p_message.pb.h"
 #include "core/protocols/public/p_node_info.pb.h"
@@ -21,6 +22,7 @@ using sf::core::context::Static;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
+using sf::core::model::RepositoryVersionId;
 using sf::core::lifecycle::EventLifecycle;
 
 using sf::core::protocol::public_api::Message;
@@ -64,6 +66,7 @@ class NodeInfoEvent : public Event {
     Node* me = Node::me();
     NodeStatus* node_status  = me->status();
     NodeVersion node_version = me->version();
+    RepositoryVersionId config_version = me->configVersion();
 
     // Wrapper message.
     Message message;
@@ -74,10 +77,13 @@ class NodeInfoEvent : public Event {
     // Basic node info.
     NodeInfoResponse::NodeInfo* info = res->mutable_node();
     NodeInfoResponse::NodeVersion* ver = info->mutable_version();
+    NodeInfoResponse::ConfigVersion* config = info->mutable_config();
     info->set_name(me->name());
     ver->set_commit(node_version.commit);
     ver->set_taint(node_version.taint);
     ver->set_version(node_version.version);
+    config->set_effective(config_version.effective());
+    config->set_symbolic(config_version.symbolic());
 
     // Node status info.
     this->statusToMessage(

@@ -23,7 +23,6 @@ namespace context {
     static sf::core::model::LoggerRef logger();
     static sf::core::model::EventSourceManagerRef sourceManager();
 
-
     // Context managment function.
     static void initialise(ContextRef context);
     static ContextRef instance();

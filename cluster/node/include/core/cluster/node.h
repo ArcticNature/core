@@ -6,6 +6,7 @@
 #include <string>
 
 #include "core/compile-time/options.h"
+#include "core/model/repository.h"
 #include "core/utility/status.h"
 
 namespace sf {
@@ -68,9 +69,14 @@ namespace cluster {
     const NodeVersion _version;
 
     NodeStatus _status;
+    sf::core::model::RepositoryVersionId config_version;
 
    public:
     Node(std::string name, NodeVersion version);
+
+    //! Returns or sets the current configuration version.
+    sf::core::model::RepositoryVersionId configVersion() const;
+    void configVersion(sf::core::model::RepositoryVersionId ver);
 
     //! Returns the name of the node.
     std::string name() const;
@@ -78,7 +84,7 @@ namespace cluster {
     //! Returns the node status traker.
     NodeStatus* status();
 
-    //! returns the node version information.
+    //! Returns the node version information.
     NodeVersion version() const;
   };
 

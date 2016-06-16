@@ -137,9 +137,9 @@ TEST(LuaStack, PrettyPrintTable) {
   ASSERT_EQ(1, lua.stack()->size());
   // Table traversal is non-deterministic ...
   bool letter_first = "a: b\n1: \n  2: false\n" == out.str();
-  bool number_first = "1: \n  2: false\na: b\b" == out.str();
+  bool number_first = "1: \n  2: false\na: b\n" == out.str();
   if (!(letter_first || number_first)) {
     EXPECT_EQ("a: b\n1: \n  2: false\n", out.str());
-    EXPECT_EQ("1: \n  2: false\na: b\b", out.str());
+    EXPECT_EQ("1: \n  2: false\na: b\n", out.str());
   }
 }

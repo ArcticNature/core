@@ -73,6 +73,15 @@ class NodeInfo : public Event {
       if (node_ver.has_version()) {
         version.set("version", node_ver.version());
       }
+
+      if (info.node().has_config()) {
+        const NodeInfoResponse::ConfigVersion& config_ver =
+          info.node().config();
+        LuaTable config = lua.stack()->newTable();
+        response.fromStack("config");
+        config.set("effective", config_ver.effective());
+        config.set("symbolic", config_ver.symbolic());
+      }
     }
 
     if (info.has_overall()) {

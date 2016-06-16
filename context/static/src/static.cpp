@@ -89,8 +89,8 @@ RepositoryRef Static::repository() {
 
 void Static::destroy() {
   drains_ref  = EventDrainManagerRef();
+  repo_ref    = RepositoryRef();
   options_ref = std::shared_ptr<Options>();
   parser_ref  = std::shared_ptr<CLIParser>();
   posix_ref   = std::shared_ptr<Posix>();
-  repo_ref    = RepositoryRef();
 }
