@@ -17,8 +17,10 @@ namespace cluster {
   enum NodeStatusCode {
     UNKOWN = -1,
     OK,
+    CONFIG_OK,
     PROCESS_READY,
     WARNING,
+    CONFIG_LOAD,
     PROCESS_STARTING,
     ERROR,
     END

@@ -1,0 +1,21 @@
+{
+  "name": "core.interface.config.node",
+  "type": "c++",
+
+  "deps": [
+    "core.context.dynamic",
+    "core.cluster.node",
+    "core.interface.lifecycle",
+    "core.model.repository",
+    "core.utility.lua"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test":    {
+      "deps": ["ext.repository.git"],
+      "type": "lib"
+    }
+  }
+}

@@ -21,6 +21,7 @@ namespace bin {
    protected:
     void connectDaemon();
     void connectSpawner();
+    void defaultSources();
 
    public:
     void initialise();

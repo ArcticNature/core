@@ -2,9 +2,10 @@
 #ifndef CORE_UTILITY_LUA_H_
 #define CORE_UTILITY_LUA_H_
 
-#include <string>
+#include <istream>
 #include <memory>
 #include <ostream>
+#include <string>
 
 #include "lua.hpp"
 
@@ -59,7 +60,10 @@ namespace utility {
         int msgh = 0, bool clear = true
     );
 
-    //! Runs the given code.
+    //! Runs code from the given input stream.
+    void doStream(std::shared_ptr<std::istream> stream, std::string name);
+
+    //! Runs the given code code.
     void doString(std::string code, std::string name = "<block>");
 
     //! Returns a wrapper to the globals table.

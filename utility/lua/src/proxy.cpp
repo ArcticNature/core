@@ -32,6 +32,10 @@ int LuaTypeProxy::lua_proxy_gc(lua_State* state) {
 }
 
 
+LuaTypeProxy::LuaTypeProxy(Lua lua) {
+  this->_state = lua.state.get();
+}
+
 LuaTypeProxy::LuaTypeProxy(lua_State* state) {
   this->_state = state;
 }

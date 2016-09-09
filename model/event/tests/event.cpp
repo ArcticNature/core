@@ -76,11 +76,11 @@ class TestSource2 : public EventSource {
 
 class TestEventSourceManager : public EventSourceManager {
  public:
-  void addSource(EventSourceRef source) {
+  void add(EventSourceRef source) {
     this->sources[source->id()] = source;
   }
   
-  void removeSource(std::string id) {
+  void remove(std::string id) {
     this->sources.erase(id);
   }
 

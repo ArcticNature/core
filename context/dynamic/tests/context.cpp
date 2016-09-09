@@ -52,8 +52,8 @@ class NoopLogger : public Logger {
 
 class NoopSourceManager : public EventSourceManager {
   public:
-   void addSource(EventSourceRef source) {}
-   void removeSource(std::string id) {}
+   void add(EventSourceRef source) {}
+   void remove(std::string id) {}
    EventRef wait(int timeout = -1) {}
 };
 

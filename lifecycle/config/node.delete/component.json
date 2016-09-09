@@ -1,0 +1,15 @@
+{
+  "name": "core.lifecycle.config.node",
+  "type": "c++",
+
+  "deps": [
+    "core.interface.lifecycle",
+    "core.utility.lua"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test":    {"type": "lib"}
+  }
+}

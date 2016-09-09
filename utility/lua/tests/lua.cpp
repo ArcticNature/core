@@ -1,7 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
+#include <gtest/gtest.h>
 #include <memory>
 #include <sstream>
-#include <gtest/gtest.h>
 
 #include "core/exceptions/lua.h"
 #include "core/utility/lua.h"
@@ -33,9 +33,30 @@ TEST(LuaFetchFromState, Success) {
 }
 
 
+TEST(LuaRunStream, Pass) {
+  std::shared_ptr<std::istream> stream(new std::stringstream("return 2 + 2"));
+  Lua lua;
+  lua.doStream(stream, "<test>");
+  ASSERT_EQ(4, lua.stack()->toInt());
+}
+
+TEST(LuaRunStream, SyntaxError) {
+  std::shared_ptr<std::istream> stream(new std::stringstream("2a _ test"));
+  Lua lua;
+  ASSERT_THROW(lua.doStream(stream, "<test>"), LuaSyntaxError);
+}
+
+TEST(LuaRunStream, RuntimeError) {
+  std::shared_ptr<std::istream> stream(new std::stringstream("return f()"));
+  Lua lua;
+  ASSERT_THROW(lua.doStream(stream, "<test>"), LuaRuntimeError);
+}
+
+
 TEST(LuaRunString, Pass) {
   Lua lua;
   lua.doString("return 2 + 2");
+  ASSERT_EQ(4, lua.stack()->toInt());
 }
 
 TEST(LuaRunString, SyntaxError) {

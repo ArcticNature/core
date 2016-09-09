@@ -196,10 +196,12 @@ namespace model {
     }
 
     //! Adds an event source to the manager.
-    virtual void addSource(EventSourceRef source) = 0;
+    virtual void add(EventSourceRef source) = 0;
+    void addSource(EventSourceRef source);
 
     //! Removes an event source from the manager.
-    virtual void removeSource(std::string id) = 0;
+    virtual void remove(std::string id) = 0;
+    void removeSource(std::string id);
 
     //! Waits for one or more file descriptors to be ready.
     /**

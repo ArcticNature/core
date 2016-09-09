@@ -103,3 +103,11 @@ std::string EventSource::id() const {
 
 
 EventSourceManager::~EventSourceManager() {}
+
+void EventSourceManager::addSource(EventSourceRef source) {
+  this->add(source);
+}
+
+void EventSourceManager::removeSource(std::string id) {
+  this->remove(id);
+}

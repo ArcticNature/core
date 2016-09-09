@@ -11,8 +11,11 @@
 
     "core.event.client.unix",
     "core.event.drain.fd",
+    "core.event.source.manual",
     "core.event.source.unix",
     "core.exceptions",
+
+    "core.interface.config.node",
     "core.lifecycle.event",
 
     "core.model.event",

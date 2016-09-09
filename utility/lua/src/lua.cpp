@@ -5,6 +5,7 @@
 
 #include "core/exceptions/lua.h"
 #include "core/utility/lua/registry.h"
+#include "core/utility/lua/stream.h"
 
 #define LUA_SELF_REF_KEY "_sf_lua_self_ref"
 
@@ -21,6 +22,7 @@ using sf::core::utility::Lua;
 using sf::core::utility::LuaArguments;
 using sf::core::utility::LuaRegistry;
 using sf::core::utility::LuaStack;
+using sf::core::utility::LuaStreamReader;
 using sf::core::utility::LuaTable;
 
 
@@ -86,6 +88,19 @@ void Lua::call(int nargs, int nresults, int msgh, bool clear) {
     }
     throw;
   }
+}
+
+void Lua::doStream(std::shared_ptr<std::istream> stream, std::string name) {
+  int result = 0;
+  lua_State* state = this->state.get();
+  this->last_name  = name;
+
+  LuaStreamReader reader(stream);
+  result = lua_load(
+      state, LuaStreamReader::read, &reader, name.c_str(), nullptr
+  );
+  this->checkError(result, name);
+  this->call(0, LUA_MULTRET, 0, true);
 }
 
 void Lua::doString(std::string code, std::string name) {

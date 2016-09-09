@@ -51,11 +51,7 @@ void AsyncPorcess::handleLoopError(
     {"error", ex->what()}, {"trace", ex->getTrace()},
     {"drain_error", drain ? "yes" : "no" }
   };
-
-  ERRORV(
-      Context::logger(),
-      "Error (ignored) during run loop. ${error}", vars
-  );
+  ERRORV(Context::logger(), "Error during run loop. ${error}", vars);
 }
 
 void AsyncPorcess::loop() {

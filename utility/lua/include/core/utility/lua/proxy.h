@@ -37,6 +37,7 @@ namespace utility {
      *
      * It is needed when methods like `checkArgument` are used.
      */
+    explicit LuaTypeProxy(Lua lua);
     explicit LuaTypeProxy(lua_State* state);
 
     //! Checks the first argument on the lua stack and returns it.
