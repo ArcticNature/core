@@ -59,12 +59,31 @@ Logger::Logger(std::string format) {
 Logger::~Logger() {}
 
 
+LogInfo Logger::extendRecord(LogInfo record, const LogLevel level) {
+  if (record.find("<now>") == record.end()) {
+    record["<now>"] = currentTimestamp();
+  }
+
+  if (record.find("<log-group>") == record.end()) {
+    record["<log-group>"] = "Global";
+    if (Static::options()->hasString("log-group")) {
+      record["<log-group>"] = Static::options()->getString("log-group");
+    }
+  }
+
+  record["level"] = LEVEL_NAMES[level];
+  return record;
+}
+
 std::string Logger::formatMessage(
     const LogLevel level, const std::string message, LogInfo vars
 ) {
+  // Extend variables with default stuff.
+  vars = this->extendRecord(vars, level);
+
+  // Generate the format string.
   std::stringstream buffer;
   std::string::size_type pos = findFirsNotEscaped("${message}", this->format);
-
   if (pos == -1) {
     buffer << this->format;
   } else {
@@ -74,20 +93,8 @@ std::string Logger::formatMessage(
 
   std::string format = buffer.str();
   pos = findFirsNotEscaped("${", format);
-
   if (pos == -1) {
     return format;
-  }
-
-  // Extend variables with default stuff.
-  vars["level"] = LEVEL_NAMES[level];
-  if (vars.find("<now>") == vars.end()) {
-    vars["<now>"] = currentTimestamp();
-  }
-
-  vars["<log-group>"] = "Global";
-  if (Static::options()->hasString("log-group")) {
-    vars["<log-group>"] = Static::options()->getString("log-group");
   }
 
   // Replace variables.

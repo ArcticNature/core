@@ -58,10 +58,23 @@ namespace model {
      */
     std::string format;
 
+    //! Extends a log record with metadata.
+    /*!
+     * Helper method that updates the metadata of a record and
+     * extends the record with extra information if it is missing.
+     *
+     * The added attributes are:
+     *
+     *   * `<now>`: the current timestamp.
+     *   * `<log-group>`: an identifier for the logging process.
+     *   * `level`: string version of the log level.
+     */
+    LogInfo extendRecord(LogInfo record, const LogLevel level);
+
     //! Format a log messages.
     /*!
-     * Helper method to format a log message based on the value of format and
-     * the variables passed to the logging method.
+     * Helper method to format a log message based on the value of
+     * format and the variables passed to the logging method.
      */
     std::string formatMessage(
         const LogLevel level, const std::string message,
