@@ -156,7 +156,7 @@ void NodeConfigLoader::verify() {
   }
 
   // Check that required options are provided.
-  this->requireProvider("events::manager");
+  this->requireProvider("event.manager");
 }
 
 

@@ -239,6 +239,9 @@ NodeConfigLoaderTest::NodeConfigLoaderTest() {
   this->loader = std::shared_ptr<TestLoader>(
       new TestLoader("refs/heads/test-fixture")
   );
+  this->loader->addIntent(
+      NodeConfigIntentRef(new EventManagerIntent())
+  );
 }
 
 NodeConfigLoaderTest::~NodeConfigLoaderTest() {

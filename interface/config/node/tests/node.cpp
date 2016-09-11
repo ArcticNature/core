@@ -58,7 +58,8 @@ TEST_F(NodeConfigLoaderTest, ProcessesFiles) {
 TEST_F(NodeConfigLoaderTest, IntentsAreCollected) {
   this->loader->load();
   Lua* lua = this->loader->getLua();
-  ASSERT_EQ(1, this->loader->getIntents().size());
+  // Null + EventManager
+  ASSERT_EQ(2, this->loader->getIntents().size());
 }
 
 TEST_F(NodeConfigLoaderTest, CheckNewContext) {
@@ -79,6 +80,7 @@ TEST_F(NodeConfigLoaderTest, CheckNewVersion) {
 TEST_F(NodeConfigIntentsOrderTest, NullIntent) {
   this->loader->loadToSort();
   ASSERT_ORDER({
+      "event.manager",
       "null"
   });
 }
@@ -114,6 +116,17 @@ TEST_F(NodeConfigIntentsOrderTest, TcpUnixDepends) {
       "event.manager",
       "event.tcp",
       "event.unix",
+      "null"
+  });
+}
+
+// event.tcp -> event.manager
+TEST_F(NodeConfigIntentsOrderTest, MissingDepends) {
+  this->useIntent("event_tcp");
+  this->loader->loadToSort();
+  ASSERT_ORDER({
+      "event.manager",
+      "event.tcp",
       "null"
   });
 }
