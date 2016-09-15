@@ -56,6 +56,10 @@ void Context::initialise(EventSourceManagerRef manager) {
   this->source_manager = manager;
 }
 
+EventSourceManagerRef Context::instanceSourceManager() {
+  return this->source_manager;
+}
+
 
 void Context::destroy() {
   Context::_instance = ContextRef();

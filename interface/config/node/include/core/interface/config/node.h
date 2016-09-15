@@ -177,6 +177,11 @@ namespace lifecycle {
     sf::core::utility::Lua* lua() const;
   };
 
+  //! Base NodeConfigLifecycleHandler class.
+  typedef
+    sf::core::interface::LifecycleHandler<NodeConfigLifecycleArg>
+    NodeConfigLifecycleHandler;
+
 }  // namespace lifecycle
 }  // namespace core
 }  // namespace sf

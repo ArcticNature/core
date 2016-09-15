@@ -5,6 +5,7 @@
   "deps": [
     "core.context.dynamic",
     "core.cluster.node",
+    "core.event.source.manual",
     "core.interface.lifecycle",
     "core.model.repository",
     "core.utility.lua"
@@ -14,7 +15,10 @@
     "debug":   {"type": "lib"},
     "release": {"type": "lib"},
     "test":    {
-      "deps": ["ext.repository.git"],
+      "deps": [
+        "ext.event.manager.epoll",
+        "ext.repository.git"
+      ],
       "type": "lib"
     }
   }

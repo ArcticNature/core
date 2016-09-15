@@ -44,6 +44,10 @@ namespace context {
 
     void initialise(sf::core::model::LoggerRef logger);
     void initialise(sf::core::model::EventSourceManagerRef source_manager);
+
+    // Instance version of fetch methods.
+    // Needed by node configuration to manipulate new context.
+    sf::core::model::EventSourceManagerRef instanceSourceManager();
   };
 
 }  // namespace context

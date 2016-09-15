@@ -199,6 +199,9 @@ namespace model {
     virtual void add(EventSourceRef source) = 0;
     void addSource(EventSourceRef source);
 
+    //! Returns en event source reference for the requested source.
+    EventSourceRef fetch(std::string id) const;
+
     //! Removes an event source from the manager.
     virtual void remove(std::string id) = 0;
     void removeSource(std::string id);

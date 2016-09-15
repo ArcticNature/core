@@ -10,6 +10,7 @@
 
 using sf::core::exception::SfException;
 using sf::core::exception::EventDrainNotFound;
+using sf::core::exception::EventSourceNotFound;
 
 using sf::core::model::Event;
 using sf::core::model::EventDrain;
@@ -17,6 +18,7 @@ using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventSource;
 using sf::core::model::EventSourceManager;
+using sf::core::model::EventSourceRef;
 
 
 Event::Event(std::string correlation, std::string drain) {
@@ -106,6 +108,13 @@ EventSourceManager::~EventSourceManager() {}
 
 void EventSourceManager::addSource(EventSourceRef source) {
   this->add(source);
+}
+
+EventSourceRef EventSourceManager::fetch(std::string id) const {
+  if (this->sources.find(id) == this->sources.end()) {
+    throw EventSourceNotFound(id);
+  }
+  return this->sources.at(id);
 }
 
 void EventSourceManager::removeSource(std::string id) {

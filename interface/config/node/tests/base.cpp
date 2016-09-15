@@ -7,20 +7,26 @@
 
 #include "core/context/context.h"
 #include "core/context/static.h"
+#include "core/event/source/manual.h"
 
 #include "core/interface/config/node.h"
 #include "core/model/cli-parser.h"
+#include "core/model/event.h"
 #include "core/model/repository.h"
 
+#include "core/posix/user.h"
 #include "core/utility/lua.h"
 #include "core/utility/lua/table.h"
 
+#include "ext/event/manager/epoll.h"
 #include "ext/repository/git.h"
 #include "./base.h"
 
 
+using sf::core::context::Context;
 using sf::core::context::ContextRef;
 using sf::core::context::Static;
+using sf::core::event::ManualSource;
 
 using sf::core::interface::NodeConfigIntent;
 using sf::core::interface::NodeConfigIntentRef;
@@ -28,15 +34,21 @@ using sf::core::interface::NodeConfigIntentLuaProxy;
 using sf::core::interface::NodeConfigLoader;
 
 using sf::core::model::CLIParser;
+using sf::core::model::EventSourceManagerRef;
+using sf::core::model::EventSourceRef;
 using sf::core::model::RepositoryRef;
 
+using sf::core::posix::User;
 using sf::core::utility::Lua;
 using sf::core::utility::LuaTable;
 
+using sf::core::test::NodeConfigIntentTest;
 using sf::core::test::NodeConfigLoaderTest;
 using sf::core::test::NodeConfigIntentsOrderTest;
+using sf::core::test::TestIntentLoader;
 using sf::core::test::TestLoader;
 
+using sf::ext::event::EpollSourceManager;
 using sf::ext::repository::GitRepo;
 
 
@@ -102,9 +114,23 @@ class Cycle2Intent : public MockIntent {
 };
 
 class EventManagerIntent : public MockIntent {
+ protected:
+  bool noop;
+
  public:
-  EventManagerIntent() : MockIntent("event.manager", "event.manager") {
-    // Noop.
+  EventManagerIntent(bool noop = true) : MockIntent(
+      "event.manager", "event.manager"
+  ) {
+    this->noop = noop;
+  }
+
+  void apply(ContextRef context) {
+    if (this->noop) {
+      return;
+    }
+    context->initialise(
+        EventSourceManagerRef(new EpollSourceManager())
+    );
   }
 };
 
@@ -232,6 +258,24 @@ void TestLoader::loadToSort() {
 }
 
 
+TestIntentLoader::TestIntentLoader() : NodeConfigLoader(
+    "refs/heads/master"
+) {
+  // NOOP.
+}
+
+void TestIntentLoader::addIntent(NodeConfigIntentRef intent) {
+  this->mocks.push_back(intent);
+}
+
+void TestIntentLoader::collectIntents() {
+  std::vector<NodeConfigIntentRef>::iterator it;
+  for (it = this->mocks.begin(); it != this->mocks.end(); it++) {
+    NodeConfigLoader::addIntent(*it);
+  }
+}
+
+
 NodeConfigLoaderTest::NodeConfigLoaderTest() {
   git_libgit2_init();
   Static::parser(new TestParser());
@@ -248,6 +292,38 @@ NodeConfigLoaderTest::~NodeConfigLoaderTest() {
   this->loader = std::shared_ptr<TestLoader>();
   Static::destroy();
   git_libgit2_shutdown();
+}
+
+
+NodeConfigIntentTest::NodeConfigIntentTest() {
+  git_libgit2_init();
+  Static::initialise(new User());
+  Static::parser(new TestParser());
+  Static::repository(RepositoryRef(new GitRepo("config-example/")));
+
+  EventSourceManagerRef manager(new EpollSourceManager());
+  Context::instance()->initialise(manager);
+  manager->add(EventSourceRef(new ManualSource()));
+
+  this->loader = std::shared_ptr<TestIntentLoader>(
+      new TestIntentLoader()
+  );
+}
+
+NodeConfigIntentTest::~NodeConfigIntentTest() {
+  this->loader.reset();
+  Context::destroy();
+  Static::destroy();
+  git_libgit2_shutdown();
+}
+
+void NodeConfigIntentTest::addIntent(NodeConfigIntentRef intent) {
+  this->loader->addIntent(intent);
+}
+
+void NodeConfigIntentTest::load() {
+  this->loader->addIntent(NodeConfigIntentRef(new EventManagerIntent(false)));
+  this->loader->load();
 }
 
 

@@ -122,6 +122,7 @@ void NodeConfigLoader::sort() {
         }
         if (visited.find(*it) == visited.end()) {
           pushed = true;
+          this->requireProvider(*it);
           intents.push_front(this->providers.at(*it));
         }
       }
@@ -222,7 +223,6 @@ void NodeConfigLoader::load() {
     return;
   }
 
-  this->loaded = true;
   this->initialise();
   this->run();
   this->collectIntents();
@@ -230,6 +230,7 @@ void NodeConfigLoader::load() {
   this->verify();
   this->apply();
   this->updateSystem();
+  this->loaded = true;
 }
 
 void NodeConfigLoader::requireProvider(std::string id) {

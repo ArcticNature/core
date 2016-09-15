@@ -39,6 +39,17 @@ namespace test {
   };
 
 
+  class TestIntentLoader : public sf::core::interface::NodeConfigLoader {
+   protected:
+    std::vector<sf::core::interface::NodeConfigIntentRef> mocks;
+
+   public:
+    TestIntentLoader();
+    void addIntent(sf::core::interface::NodeConfigIntentRef intent);
+    void collectIntents();
+  };
+
+
   //! Test case for node configuration loader tests.
   class NodeConfigLoaderTest : public ::testing::Test {
    protected:
@@ -46,6 +57,18 @@ namespace test {
 
     NodeConfigLoaderTest();
     ~NodeConfigLoaderTest();
+  };
+
+  //! Test case for node configuration intent tests.
+  class NodeConfigIntentTest : public ::testing::Test {
+   protected:
+    std::shared_ptr<TestIntentLoader> loader;
+
+    NodeConfigIntentTest();
+    ~NodeConfigIntentTest();
+
+    void addIntent(sf::core::interface::NodeConfigIntentRef intent);
+    void load();
   };
 
   class NodeConfigIntentsOrderTest : public NodeConfigLoaderTest {
