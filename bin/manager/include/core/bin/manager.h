@@ -3,6 +3,7 @@
 #define CORE_BIN_MANAGER_H_
 
 #include <string>
+#include <utility>
 
 #include "core/bin/async-process.h"
 #include "core/event/client/unix.h"
@@ -36,7 +37,7 @@ namespace bin {
     );
 
    public:
-    static std::string Connect(std::string path);
+    static std::pair<std::string, std::string> Connect(std::string path);
 
     ManagerToDaemon(int fd, std::string id, std::string drain);
     sf::core::model::EventRef parse();
@@ -50,7 +51,7 @@ namespace bin {
     );
 
    public:
-    static std::string Connect(std::string path);
+    static std::pair<std::string, std::string> Connect(std::string path);
 
     ManagerToSpawner(int fd, std::string id, std::string drain);
     sf::core::model::EventRef parse();

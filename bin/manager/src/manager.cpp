@@ -36,13 +36,17 @@ using sf::core::registry::ReposRegistry;
 void Manager::connectDaemon() {
   CLIParser*  parser = Static::parser();
   std::string daemon_path = parser->getString("manager-socket");
-  ManagerToDaemon::Connect(daemon_path);
+  std::pair<std::string, std::string> daemon =
+    ManagerToDaemon::Connect(daemon_path);
+  Static::options()->setString("daemon-source-id", daemon.first);
 }
 
 void Manager::connectSpawner() {
   CLIParser*  parser = Static::parser();
   std::string spawner_path = parser->getString("spawner-manager-socket");
-  ManagerToSpawner::Connect(spawner_path);
+  std::pair<std::string, std::string> spawner =
+    ManagerToSpawner::Connect(spawner_path);
+  Static::options()->setString("spawner-source-id", spawner.first);
 }
 
 void Manager::defaultSources() {

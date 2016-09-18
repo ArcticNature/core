@@ -48,7 +48,7 @@ void LoadConfiguration::handle() {
   };
   INFOV(
       Context::logger(),
-      "Loading configuration ${requested} (from ${current}).",
+      "Loading configuration '${requested}' (currently at '${current}').",
       info
   );
   Node::me()->status()->set("configuration", NodeStatusDetail(
@@ -63,7 +63,7 @@ void LoadConfiguration::handle() {
   // Update status again.
   info = {{"requested", Node::me()->configVersion().effective()}};
   INFOV(
-      Context::logger(), "Configuration ${requested} loaded).",
+      Context::logger(), "Configuration '${requested}' loaded).",
       info
   );
   Node::me()->status()->set("configuration", NodeStatusDetail(

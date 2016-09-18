@@ -32,5 +32,5 @@ std::string CopyManualSourceIntent::provides() const {
 }
 
 void CopyManualSourceIntent::verify(ContextRef context) {
-  // NOOP.
+  Context::sourceManager()->fetch("manual");
 }

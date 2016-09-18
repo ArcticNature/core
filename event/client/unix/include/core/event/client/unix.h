@@ -3,6 +3,7 @@
 #define CORE_EVENT_CLIENT_UNIX_H_
 
 #include <string>
+#include <utility>
 
 #include "core/event/source/fd.h"
 #include "core/model/event.h"
@@ -30,10 +31,12 @@ namespace event {
      * \param socket The path to the unix socket.
      * \param id     The id of the source/drain pair.
      *
-     * \returns The id of the resulting drain.
+     * \returns The id of the resulting source and drain.
      */
     template<class SourceClass, class DrainClass>
-    static std::string Connect(std::string socket, std::string id);
+    static std::pair<std::string, std::string> Connect(
+        std::string socket, std::string id
+    );
   };
 
 }  // namespace event

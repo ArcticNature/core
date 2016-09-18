@@ -7,6 +7,7 @@
 #include <sys/un.h>
 
 #include <string>
+#include <utility>
 
 #include "core/context/context.h"
 #include "core/context/static.h"
@@ -19,7 +20,9 @@ namespace core {
 namespace event {
 
   template<class SourceClass, class DrainClass>
-  std::string UnixClient::Connect(std::string socket, std::string id) {
+  std::pair<std::string, std::string> UnixClient::Connect(
+      std::string socket, std::string id
+  ) {
     // Debug log the path to the socket.
     sf::core::model::LogInfo info = { {"socket", socket} };
     DEBUGV(
@@ -73,7 +76,7 @@ namespace event {
         "Connected to UNIX socket at ${socket}.",
         info
     );
-    return drain->id();
+    return std::make_pair(source->id(), drain->id());
   }
 
 }  // namespace event

@@ -91,10 +91,13 @@ void NodeConfigLoader::run() {
 }
 
 void NodeConfigLoader::sort() {
+  DEBUG(Context::logger(), "Sorting node configuration intents ...");
+
   // Visit all intents and sort them by dependency.
   std::deque<NodeConfigIntentRef> intents = this->intents;
   std::deque<NodeConfigIntentRef> sorted;
   std::set<std::string> pending;
+  std::set<std::string> provided;
   std::set<std::string> visited;
 
   while (!intents.empty()) {
@@ -115,15 +118,17 @@ void NodeConfigLoader::sort() {
       std::vector<std::string>::iterator it;
 
       for (it = depends.begin(); it != depends.end(); it++) {
-        if (pending.find(*it) != pending.end()) {
+        this->requireProvider(*it);
+        NodeConfigIntentRef provided_by = this->providers.at(*it);
+
+        if (pending.find(provided_by->id()) != pending.end()) {
           throw InvalidConfiguration(
             "Circular dependency in feature configuration."
           );
         }
-        if (visited.find(*it) == visited.end()) {
+        if (visited.find(provided_by->id()) == visited.end()) {
           pushed = true;
-          this->requireProvider(*it);
-          intents.push_front(this->providers.at(*it));
+          intents.push_front(provided_by);
         }
       }
 
@@ -141,6 +146,7 @@ void NodeConfigLoader::sort() {
   }
 
   this->intents = sorted;
+  DEBUG(Context::logger(), "Node configuration intents sorted!");
 }
 
 void NodeConfigLoader::updateSystem() {
@@ -211,7 +217,7 @@ NodeConfigLoader::NodeConfigLoader(std::string symbolic) {
 }
 
 void NodeConfigLoader::addIntent(NodeConfigIntentRef intent) {
-  std::string provides = intent->id();
+  std::string provides = intent->provides();
   if (provides != "") {
     this->providers[provides] = intent;
   }

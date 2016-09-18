@@ -58,7 +58,9 @@ EventRef ManagerToDaemon::process(Message message) {
 }
 
 
-std::string ManagerToDaemon::Connect(std::string path) {
+std::pair<std::string, std::string> ManagerToDaemon::Connect(
+    std::string path
+  ) {
   return UnixClient::Connect<ManagerToDaemon, ManagerToDaemonFdDrain>(
       path, "manager-to-daemon"
   );

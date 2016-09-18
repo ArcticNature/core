@@ -53,7 +53,9 @@ EventRef ManagerToSpawner::process(Message message) {
 }
 
 
-std::string ManagerToSpawner::Connect(std::string path) {
+std::pair<std::string, std::string> ManagerToSpawner::Connect(
+    std::string path
+) {
   return UnixClient::Connect<ManagerToSpawner, ManagerToSpawnerFdDrain>(
       path, "manager-to-spawner"
   );

@@ -4,6 +4,8 @@
 
 #include "core/context/context.h"
 #include "core/interface/config/node.h"
+
+#include "core/interface/config/node/intents/manager-sources.h"
 #include "core/interface/config/node/intents/manual-source.h"
 
 #include "core/interface/lifecycle.h"
@@ -11,10 +13,12 @@
 #include "core/utility/lua.h"
 
 using sf::core::context::Context;
-using sf::core::interface::CopyManualSourceIntent;
 using sf::core::interface::NodeConfigIntentLuaProxy;
 using sf::core::interface::NodeConfigIntentRef;
 using sf::core::interface::NodeConfigLoader;
+
+using sf::core::interface::CopyManagerSourcesIntent;
+using sf::core::interface::CopyManualSourceIntent;
 
 using sf::core::lifecycle::NodeConfigLifecycleArg;
 using sf::core::lifecycle::NodeConfigLifecycleHandler;
@@ -68,10 +72,15 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
   }
 
   void collectDefaults(NodeConfigLoader* loader) {
-    // Move ManualSource and add ScheduledSource if missing.
+    // Move ManualSource and daemon needed sources.
     loader->addIntent(
         NodeConfigIntentRef(new CopyManualSourceIntent())
     );
+    loader->addIntent(
+        NodeConfigIntentRef(new CopyManagerSourcesIntent())
+    );
+
+    // TODO(stefano): Add or import ScheduledSource.
   }
 
  public:
