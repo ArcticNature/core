@@ -14,8 +14,7 @@
       "deps": [
         "core.context.dynamic",
         "core.event.testing",
-        "core.posix.user",
-        "ext.event.manager.epoll"
+        "core.posix.user"
       ],
       "type": "lib"
     }

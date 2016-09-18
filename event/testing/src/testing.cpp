@@ -6,29 +6,44 @@
 #include <sys/un.h>
 #include <string>
 
+#include "core/context/context.h"
 #include "core/context/static.h"
+
 #include "core/event/drain/fd.h"
+#include "core/exceptions/base.h"
+#include "core/exceptions/event.h"
+
 #include "core/model/event.h"
+#include "core/model/logger.h"
 
 #include "core/protocols/test/t_message.pb.h"
 #include "core/utility/protobuf.h"
+#include "core/utility/string.h"
 
 
+using sf::core::context::Context;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
 using sf::core::event::MockDrain;
 using sf::core::event::TestEvent;
+using sf::core::event::TestEpollManager;
 using sf::core::event::TestFdDrain;
 using sf::core::event::TestFdSource;
 using sf::core::event::TestUnixClient;
 
+using sf::core::exception::ErrNoException;
+using sf::core::exception::EventSourceNotFound;
+
 using sf::core::model::Event;
 using sf::core::model::EventDrain;
 using sf::core::model::EventRef;
+using sf::core::model::EventSourceRef;
+using sf::core::model::LogInfo;
 
 using sf::core::protocol::test::Message;
 using sf::core::utility::MessageIO;
+using sf::core::utility::string::toString;
 
 
 MockDrain::MockDrain(std::string id) : EventDrain(id) {
@@ -71,6 +86,68 @@ TestEvent::TestEvent(std::string correlation, std::string drain) : Event(
 }
 
 void TestEvent::handle() {
+}
+
+
+TestEpollManager::TestEpollManager() {
+  this->epoll_fd = Static::posix()->epoll_create();
+}
+
+TestEpollManager::~TestEpollManager() {
+  Static::posix()->close(this->epoll_fd, true);
+}
+
+
+void TestEpollManager::add(EventSourceRef source) {
+  struct epoll_event event;
+  int fd = source->getFD();
+  event.data.fd = fd;
+  event.events  = EPOLLIN | EPOLLRDHUP | EPOLLPRI | EPOLLERR | EPOLLHUP;
+
+  Static::posix()->epoll_control(this->epoll_fd, EPOLL_CTL_ADD, fd, &event);
+
+  this->sources[source->id()] = source;
+  this->index[fd] = source;
+}
+
+void TestEpollManager::remove(std::string id) {
+  if (this->sources.find(id) == this->sources.end()) {
+    throw EventSourceNotFound(id);
+  }
+
+  EventSourceRef source = this->sources.at(id);
+  int fd = source->getFD();
+
+  try {
+    Static::posix()->epoll_control(this->epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
+  } catch (ErrNoException& ex) {
+    if (ex.getCode() != EBADF) {
+      throw;
+    }
+    // Ignore bad file descriptors only.
+  }
+
+  this->index.erase(fd);
+  this->sources.erase(id);
+}
+
+EventRef TestEpollManager::wait(int timeout) {
+  struct epoll_event event = {0};
+  int code = Static::posix()->epoll_wait(this->epoll_fd, &event, 1, timeout);
+
+  int fd = event.data.fd;
+  if (code == 0) {
+    DEBUG(Context::logger(), "Epoll wait timeout");
+    return EventRef();
+  }
+
+  if (this->index.find(fd) == this->index.end()) {
+    LogInfo vars = {{"source", toString(fd)}};
+    ERRORV(Context::logger(), "Unable to find source for FD ${source}.", vars);
+    return EventRef();
+  }
+
+  return this->index[fd]->parse();
 }
 
 

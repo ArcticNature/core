@@ -17,8 +17,7 @@
         "core.event.testing",
         "core.posix.user",
         "core.protocol.test",
-        "core.utility.protobuf",
-        "ext.event.manager.epoll"
+        "core.utility.protobuf"
       ],
       "type": "lib"
     }

@@ -2,6 +2,7 @@
 #ifndef CORE_EVENT_TESTING_H_
 #define CORE_EVENT_TESTING_H_
 
+#include <map>
 #include <string>
 
 #include "core/event/drain/fd.h"
@@ -32,6 +33,21 @@ namespace event {
     TestEvent(std::string correlation, std::string drain);
 
     virtual void handle();
+  };
+
+
+  class TestEpollManager : public sf::core::model::EventSourceManager {
+   protected:
+    int epoll_fd;
+    std::map<int, sf::core::model::EventSourceRef> index;
+
+   public:
+    TestEpollManager();
+    virtual ~TestEpollManager();
+
+    void add(sf::core::model::EventSourceRef source);
+    void remove(std::string id);
+    sf::core::model::EventRef wait(int timeout = -1);
   };
 
 

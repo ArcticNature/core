@@ -10,11 +10,12 @@
 #include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/event/source/readline.h"
-#include "core/exceptions/base.h"
 
+#include "core/exceptions/base.h"
 #include "core/model/event.h"
+
+#include "core/event/testing.h"
 #include "core/posix/user.h"
-#include "ext/event/manager/epoll.h"
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -25,8 +26,8 @@ using sf::core::model::EventRef;
 using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
 
+using sf::core::event::TestEpollManager;
 using sf::core::posix::User;
-using sf::ext::event::EpollSourceManager;
 
 
 class LineEvent : public Event {
@@ -57,7 +58,7 @@ class ReadlineSourceTest : public ::testing::Test {
   ReadlineSourceTest() {
     Static::initialise(new User());
     Context::instance()->initialise(EventSourceManagerRef(
-        new EpollSourceManager()
+        new TestEpollManager()
     ));
 
     // Redirect stdin from a pipe.

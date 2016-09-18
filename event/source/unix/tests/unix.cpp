@@ -20,7 +20,7 @@
 #include "core/utility/string.h"
 #include "core/utility/protobuf.h"
 
-#include "ext/event/manager/epoll.h"
+#include "core/event/testing.h"
 
 
 #define SOCKET_FILE "out/build/test/unix.socket"
@@ -48,7 +48,7 @@ using sf::core::protocol::test::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
 
-using sf::ext::event::EpollSourceManager;
+using sf::core::event::TestEpollManager;
 
 
 class TestFdDrain : public FdDrain {
@@ -112,7 +112,7 @@ class UnixSourceTest : public ::testing::Test {
 
     Static::initialise(new User());
     Context::instance()->initialise(EventSourceManagerRef(
-        new EpollSourceManager()
+        new TestEpollManager()
     ));
 
     // Ensure that the socket file does not exist.

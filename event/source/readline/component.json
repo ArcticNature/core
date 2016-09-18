@@ -15,7 +15,7 @@
     "release": {"type": "lib"},
     "test":    {
       "deps": [
-        "ext.event.manager.epoll"
+        "core.event.testing"
       ],
       "type": "lib"
     }

@@ -15,8 +15,7 @@
       "deps": [
         "core.event.source.unix",
         "core.event.testing",
-        "core.posix.user",
-        "ext.event.manager.epoll"
+        "core.posix.user"
       ],
       "type": "lib"
     }

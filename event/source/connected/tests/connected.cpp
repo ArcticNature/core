@@ -13,7 +13,6 @@
 
 #include "core/event/testing.h"
 #include "core/posix/user.h"
-#include "ext/event/manager/epoll.h"
 
 #define SOCKET_PATH "./connected.source.test"
 
@@ -33,12 +32,12 @@ using sf::core::model::EventRef;
 using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
 
+using sf::core::event::TestEpollManager;
 using sf::core::event::TestEvent;
 using sf::core::event::TestFdDrain;
 using sf::core::event::TestUnixClient;
 
 using sf::core::posix::User;
-using sf::ext::event::EpollSourceManager;
 
 
 class TestSource : public ConnectedSource {
@@ -122,7 +121,7 @@ class ConnectedSourceTest : public ::testing::Test {
   ConnectedSourceTest() {
     Static::initialise(new User());
     Context::instance()->initialise(EventSourceManagerRef(
-      new EpollSourceManager()
+      new TestEpollManager()
     ));
 
     // Start listening for connections.

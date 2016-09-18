@@ -17,8 +17,7 @@
         "core.posix.test",
         "core.posix.user",
         "core.event.source.unix",
-        "core.event.testing",
-        "ext.event.manager.epoll"
+        "core.event.testing"
       ],
       "type": "lib"
     }

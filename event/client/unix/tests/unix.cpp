@@ -13,10 +13,9 @@
 #include "core/model/event.h"
 #include "core/posix/user.h"
 
+#include "core/event/testing.h"
 #include "core/protocols/test/t_message.pb.h"
 #include "core/utility/protobuf.h"
-
-#include "ext/event/manager/epoll.h"
 
 #define SOCKET_PATH "core.event.client.unix.socket"
 
@@ -36,10 +35,9 @@ using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
 using sf::core::posix::User;
 
+using sf::core::event::TestEpollManager;
 using sf::core::protocol::test::Message;
 using sf::core::utility::MessageIO;
-
-using sf::ext::event::EpollSourceManager;
 
 
 class TestUnixClient : public UnixClient {
@@ -97,7 +95,7 @@ class UnixClientTest : public ::testing::Test {
     // Prepare context.
     Static::initialise(new User());
     Context::instance()->initialise(
-        EventSourceManagerRef(new EpollSourceManager())
+        EventSourceManagerRef(new TestEpollManager())
     );
 
     // Create a test "server" with a UnixSource.

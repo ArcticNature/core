@@ -18,7 +18,7 @@
 #include "core/utility/lua.h"
 #include "core/utility/lua/table.h"
 
-#include "ext/event/manager/epoll.h"
+#include "core/event/testing.h"
 #include "ext/repository/git.h"
 #include "./base.h"
 
@@ -48,7 +48,7 @@ using sf::core::test::NodeConfigIntentsOrderTest;
 using sf::core::test::TestIntentLoader;
 using sf::core::test::TestLoader;
 
-using sf::ext::event::EpollSourceManager;
+using sf::core::event::TestEpollManager;
 using sf::ext::repository::GitRepo;
 
 
@@ -129,7 +129,7 @@ class EventManagerIntent : public MockIntent {
       return;
     }
     context->initialise(
-        EventSourceManagerRef(new EpollSourceManager())
+        EventSourceManagerRef(new TestEpollManager())
     );
   }
 };
@@ -301,7 +301,7 @@ NodeConfigIntentTest::NodeConfigIntentTest() {
   Static::parser(new TestParser());
   Static::repository(RepositoryRef(new GitRepo("config-example/")));
 
-  EventSourceManagerRef manager(new EpollSourceManager());
+  EventSourceManagerRef manager(new TestEpollManager());
   Context::instance()->initialise(manager);
   manager->add(EventSourceRef(new ManualSource()));
 

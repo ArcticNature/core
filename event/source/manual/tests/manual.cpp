@@ -7,7 +7,6 @@
 
 #include "core/event/testing.h"
 #include "core/posix/user.h"
-#include "ext/event/manager/epoll.h"
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -17,9 +16,9 @@ using sf::core::model::EventRef;
 using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
 
+using sf::core::event::TestEpollManager;
 using sf::core::event::TestEvent;
 using sf::core::posix::User;
-using sf::ext::event::EpollSourceManager;
 
 
 class ManualSourceTest : public ::testing::Test {
@@ -29,7 +28,7 @@ class ManualSourceTest : public ::testing::Test {
   ManualSourceTest() {
     Static::initialise(new User());
     Context::instance()->initialise(EventSourceManagerRef(
-        new EpollSourceManager()
+        new TestEpollManager()
     ));
 
     // Create an instance for the tests.

@@ -15,8 +15,8 @@
     "release": { "type": "lib" },
     "test":    {
       "deps": [
-        "core.posix.user",
-        "ext.event.manager.epoll"
+        "core.event.testing",
+        "core.posix.user"
       ],
       "type": "lib"
     }
