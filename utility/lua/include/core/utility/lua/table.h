@@ -52,6 +52,9 @@ namespace utility {
     //! Gets a string from a table.
     std::string toString(int key);
     std::string toString(std::string key);
+
+    //! Gets a table from a table.
+    LuaTable toTable(std::string key);
   };
 
 }  // namespace utility

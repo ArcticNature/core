@@ -161,3 +161,8 @@ std::string LuaTable::toString(std::string key) {
   this->state->stack()->remove(-2);
   return this->state->stack()->toString(-1, true);
 }
+
+LuaTable LuaTable::toTable(std::string key) {
+  this->toStack(key);
+  return LuaTable(this->state, -1, true);
+}
