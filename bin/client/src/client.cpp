@@ -54,7 +54,7 @@ class ApiFdDrain : public FdDrain {
 class ApiClient : public UnixClient {
  public:
   static std::string Connect(std::string path) {
-    return UnixClient::Connect<ApiClient, ApiFdDrain>(path, "api");
+    return UnixClient::Connect<ApiClient, ApiFdDrain>(path, "api").second;
   }
 
   ApiClient(int fd, std::string id, std::string drain_id)

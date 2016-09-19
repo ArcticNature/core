@@ -111,6 +111,5 @@ void ScheduledSource::registerCallback(
 ) {
   ScheduledClosure closure;
   closure.callback = callback;
-  closure.closure  = nullptr;
   this->registerCallback(score, closure);
 }

@@ -60,7 +60,7 @@ EventRef SpawnerToDaemon::process(Message message) {
 std::string SpawnerToDaemon::Connect(std::string path) {
   return UnixClient::Connect<SpawnerToDaemon, SpawnerToDaemonFdDrain>(
       path, "spawner-to-daemon"
-  );
+  ).second;
 }
 
 SpawnerToDaemon::SpawnerToDaemon(

@@ -60,10 +60,16 @@ class ScheduledSourceTest : public ::testing::Test {
 
 
 static bool fn_called;
-EventRef test_callback(void* closure) {
+
+void delete_bool(void* block) {
+  bool* boolean = reinterpret_cast<bool*>(block);
+  delete boolean;
+}
+
+EventRef test_callback(std::shared_ptr<void> closure) {
   fn_called = true;
-  if (closure != nullptr) {
-    bool* called = reinterpret_cast<bool*>(closure);
+  if (closure) {
+    bool* called = reinterpret_cast<bool*>(closure.get());
     *called = true;
   }
   return EventRef();
@@ -71,11 +77,17 @@ EventRef test_callback(void* closure) {
 
 
 TEST_F(ScheduledSourceTest, CallsClosure) {
-  bool called = false;
-  ScheduledClosure closure = {test_callback, &called};
-  this->source->registerCallback(0, closure);
+  ScheduledClosure callback;
+  std::shared_ptr<void> closure(new bool);
+  bool* called = reinterpret_cast<bool*>(closure.get());
+
+  *called = false;
+  callback.callback = test_callback;
+  callback.closure = closure;
+
+  this->source->registerCallback(0, callback);
   EventRef event = this->wait(2);
-  ASSERT_TRUE(called);
+  ASSERT_TRUE(*called);
   ASSERT_EQ(nullptr, event.get());
 }
 

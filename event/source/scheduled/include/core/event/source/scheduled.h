@@ -2,6 +2,7 @@
 #ifndef CORE_EVENT_SOURCE_SCHEDULED_H_
 #define CORE_EVENT_SOURCE_SCHEDULED_H_
 
+#include <memory>
 #include <string>
 
 #include "core/model/event.h"
@@ -21,13 +22,28 @@ namespace event {
    * The callback may return an EventRef if it so whishes.
    * If not it must return an empty EventRef.
    */
-  typedef sf::core::model::EventRef (*scheduled_callback)(void*);
+  typedef sf::core::model::EventRef (*scheduled_callback)(
+      std::shared_ptr<void> closure
+  );
 
 
   //! Structure to hold the callback for a scheduled event.
   struct ScheduledClosure {
+    //! Function to call when the scheduler triggers the event.
     scheduled_callback callback;
-    void* closure;
+
+    //! Pointer passed as an argument to the callback.
+    std::shared_ptr<void> closure;
+
+    //! Re-schedule this callback during configuration updates.
+    /*!
+     * If this is false (default) the callback is discarded
+     * in the event of a manager's reconfiguration.
+     *
+     * Only one off tasks that need to be executed even after
+     * node reconfigurations should set this to true.
+     */
+    bool keep_on_reconfigure = false;
   };
 
 

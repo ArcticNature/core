@@ -81,7 +81,7 @@ class UnixClientTest : public ::testing::Test {
    std::string connect() {
      return UnixClient::Connect<TestUnixClient, TestFdDrain>(
          SOCKET_PATH, "test"
-     );
+     ).second;
    }
 
    bool sendTestMessage(EventDrainRef drain) {
