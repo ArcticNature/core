@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <fcntl.h>
 #include <string>
+#include <utility>
 
 #include "core/bin/manager.h"
 #include "core/context/context.h"

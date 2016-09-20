@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "core/model/event.h"
 #include "core/utility/scored-list.h"
@@ -45,6 +46,8 @@ namespace event {
      */
     bool keep_on_reconfigure = false;
   };
+  typedef sf::core::utility::ScoredList<ScheduledClosure>
+    ScheduledClosureList;
 
 
   //! Manages time delayed events.
@@ -52,12 +55,18 @@ namespace event {
    protected:
     int tick;
     int timer_fd;
-
-    sf::core::utility::ScoredList<ScheduledClosure> closures;
+    ScheduledClosureList closures;
 
    public:
     ScheduledSource(int tick, std::string id);
     ~ScheduledSource();
+
+    //! Returns a list of scored callbacks.
+    /*!
+     * This can be used to easily re-register callbacks with
+     * `keep_on_reconfigure == true` on a new SchedulerSource.
+     */
+    std::vector<ScheduledClosureList::ScoredValue> keepCallbacks();
 
     void registerCallback(unsigned int score, ScheduledClosure closure);
     void registerCallback(unsigned int score, scheduled_callback callback);

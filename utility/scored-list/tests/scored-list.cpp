@@ -8,6 +8,10 @@ using sf::core::utility::ScoredList;
 
 typedef ScoredList<int> TestList;
 
+bool filter_even_values(int value) {
+  return (value % 2) == 0;
+}
+
 
 TEST(ScoredList, Empty) {
   TestList list;
@@ -97,4 +101,21 @@ TEST(ScoredList, PopReducesScore) {
   std::vector<int> values = list.pop();
   ASSERT_EQ(1, values.size());
   ASSERT_EQ(4, values[0]);
+}
+
+TEST(ScoredList, FilterEvenValues) {
+  TestList list;
+  list.insert(1, 4);
+  list.insert(2, 5);
+  list.insert(3, 6);
+  list.insert(3, 8);
+
+  std::vector<TestList::ScoredValue> evens = list.filter(filter_even_values);
+  ASSERT_EQ(3, evens.size());
+  ASSERT_EQ(1, evens[0].score);
+  ASSERT_EQ(4, evens[0].value);
+  ASSERT_EQ(3, evens[1].score);
+  ASSERT_EQ(6, evens[1].value);
+  ASSERT_EQ(3, evens[2].score);
+  ASSERT_EQ(8, evens[2].value);
 }

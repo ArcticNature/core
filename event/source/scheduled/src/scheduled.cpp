@@ -18,6 +18,7 @@ using sf::core::context::Static;
 
 using sf::core::event::ManualSource;
 using sf::core::event::ScheduledClosure;
+using sf::core::event::ScheduledClosureList;
 using sf::core::event::ScheduledSource;
 
 using sf::core::model::EventRef;
@@ -25,6 +26,11 @@ using sf::core::model::EventSource;
 using sf::core::model::LogInfo;
 
 using sf::core::utility::string::toString;
+
+
+bool callbacks_to_keep_on_reconfig(ScheduledClosure callback) {
+  return callback.keep_on_reconfigure;
+}
 
 
 ScheduledSource::ScheduledSource(int tick, std::string id) : EventSource(id) {
@@ -98,6 +104,11 @@ EventRef ScheduledSource::parse() {
   }
 
   return maybe_return;
+}
+
+std::vector<ScheduledClosureList::ScoredValue>
+ScheduledSource::keepCallbacks() {
+  return this->closures.filter(callbacks_to_keep_on_reconfig);
 }
 
 void ScheduledSource::registerCallback(

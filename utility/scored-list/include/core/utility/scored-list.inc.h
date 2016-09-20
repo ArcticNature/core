@@ -24,6 +24,31 @@ namespace utility {
   }
 
   template<class Value>
+  std::vector<typename ScoredList<Value>::ScoredValue>
+  ScoredList<Value>::filter(ScoredList<Value>::ScoredListFilter predicate) {
+    unsigned int score = 0;
+    ScoredList<Value>::Bucket* bucket = this->head;
+    std::vector<ScoredList<Value>::ScoredValue> result;
+
+    while (bucket) {
+      score += bucket->score;
+      typename std::vector<Value>::iterator it;
+
+      for (it = bucket->values.begin();
+           it != bucket->values.end(); it++) {
+        if (predicate(*it)) {
+          ScoredList<Value>::ScoredValue value;
+          value.score = score;
+          value.value = *it;
+          result.push_back(value);
+        }
+      }
+      bucket = bucket->next;
+    }
+    return result;
+  }
+
+  template<class Value>
   void ScoredList<Value>::insert(unsigned int score, Value value) {
     // If there is no head create one now.
     if (this->head == nullptr) {

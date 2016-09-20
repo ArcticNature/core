@@ -23,9 +23,21 @@ namespace utility {
     Bucket* head;
 
    public:
+    //! Type of ScoredList::filter predicates.
+    typedef bool (*ScoredListFilter)(Value value);
+
+    //! Value with its score.
+    struct ScoredValue {
+      unsigned int score;
+      Value value;
+    };
+
     ScoredList<Value>();
     ~ScoredList<Value>();
 
+    std::vector<ScoredList<Value>::ScoredValue> filter(
+        ScoredList<Value>::ScoredListFilter predicate
+    );
     void insert(unsigned int score, Value value);
     std::vector<Value> pop();
   };

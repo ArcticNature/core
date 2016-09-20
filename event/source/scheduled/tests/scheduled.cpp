@@ -18,6 +18,7 @@ using sf::core::context::Static;
 
 using sf::core::event::ManualSource;
 using sf::core::event::ScheduledClosure;
+using sf::core::event::ScheduledClosureList;
 using sf::core::event::ScheduledSource;
 
 using sf::core::model::Event;
@@ -109,4 +110,26 @@ TEST_F(ScheduledSourceTest, Waits) {
 
   ASSERT_TRUE(fn_called);
   ASSERT_EQ(nullptr, event.get());
+}
+
+TEST_F(ScheduledSourceTest, ListKeptCallbacks) {
+  ScheduledClosure callback;
+  std::vector<ScheduledClosureList::ScoredValue> callbacks;
+
+  callback.callback = test_callback;
+  callback.keep_on_reconfigure = true;
+  this->source->registerCallback(1, test_callback);
+  this->source->registerCallback(3, callback);
+  this->source->registerCallback(4, test_callback);
+  this->source->registerCallback(7, callback);
+  this->source->registerCallback(7, callback);
+  callbacks = this->source->keepCallbacks();
+
+  ASSERT_EQ(3, callbacks.size());
+  ASSERT_EQ(3, callbacks[0].score);
+  ASSERT_EQ(7, callbacks[1].score);
+  ASSERT_EQ(7, callbacks[2].score);
+  ASSERT_EQ(&test_callback, callbacks[0].value.callback);
+  ASSERT_EQ(&test_callback, callbacks[1].value.callback);
+  ASSERT_EQ(&test_callback, callbacks[2].value.callback);
 }

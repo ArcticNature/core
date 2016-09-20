@@ -2,6 +2,7 @@
 #include "core/bin/manager.h"
 
 #include <string>
+#include <utility>
 
 #include "core/bin/manager/event/config.h"
 #include "core/cluster/node.h"
