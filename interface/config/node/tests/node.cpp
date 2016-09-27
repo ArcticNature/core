@@ -130,3 +130,28 @@ TEST_F(NodeConfigIntentsOrderTest, MissingDepends) {
       "null"
   });
 }
+
+// event.tcp.default -?> event.tcp
+TEST_F(NodeConfigIntentsOrderTest, OptionalMissing) {
+  this->useIntent("event_tcp_default");
+  this->useIntent("event_manager");
+  this->loader->loadToSort();
+  ASSERT_ORDER({
+      "event.manager",
+      "event.tcp.default",
+      "null"
+  });
+}
+
+TEST_F(NodeConfigIntentsOrderTest, OptionalSorted) {
+  this->useIntent("event_tcp_default");
+  this->useIntent("event_tcp");
+  this->useIntent("event_manager");
+  this->loader->loadToSort();
+  ASSERT_ORDER({
+      "event.manager",
+      "event.tcp",
+      "event.tcp.default",
+      "null"
+  });
+}

@@ -27,6 +27,13 @@ namespace interface {
    public:
     explicit NodeConfigIntent(std::string id);
 
+    //! List of features to configure before this.
+    /*!
+     * Unlike `depends`, features in this list are not required
+     * to exist but if they do they must be configured first.
+     */
+    virtual std::vector<std::string> after() const;
+
     //! Returns the intent id.
     const std::string id() const;
 
@@ -83,6 +90,10 @@ namespace interface {
    */
   class NodeConfigLoader {
    protected:
+    //! Implements `core.events_from`.
+    static int lua_events_from(lua_State* state);
+
+   protected:
     bool loaded;
     std::string effective;
     std::string symbolic;
@@ -119,7 +130,7 @@ namespace interface {
     explicit NodeConfigLoader(std::string symbolic);
 
     //! Apps and intent to the list of configuration steps.
-    void addIntent(NodeConfigIntentRef intent);
+    virtual void addIntent(NodeConfigIntentRef intent);
 
     //! Run the configuration loading process.
     void load();

@@ -42,7 +42,9 @@ using sf::core::posix::User;
 using sf::core::utility::Lua;
 using sf::core::utility::LuaTable;
 
+using sf::core::test::MockIntent;
 using sf::core::test::NodeConfigIntentTest;
+using sf::core::test::NodeConfigEventsFrom;
 using sf::core::test::NodeConfigLoaderTest;
 using sf::core::test::NodeConfigIntentsOrderTest;
 using sf::core::test::TestIntentLoader;
@@ -61,31 +63,27 @@ class TestParser : public CLIParser {
 };
 
 
-class MockIntent : public NodeConfigIntent {
- protected:
-  std::string _provides;
+MockIntent::MockIntent(
+    std::string id, std::string provides
+) : NodeConfigIntent(id) {
+  this->_provides = provides;
+}
 
- public:
-  MockIntent(std::string id, std::string provides) : NodeConfigIntent(id) {
-    this->_provides = provides;
-  }
+std::vector<std::string> MockIntent::depends() const {
+  return std::vector<std::string>();
+}
 
-  std::vector<std::string> depends() const {
-    return std::vector<std::string>();
-  }
+std::string MockIntent::provides() const {
+  return this->_provides;
+}
 
-  std::string provides() const {
-    return this->_provides;
-  }
+void MockIntent::apply(ContextRef context) {
+  // Noop.
+}
 
-  void apply(ContextRef context) {
-    // Noop.
-  }
-
-  void verify(ContextRef context) {
-    // Noop.
-  }
-};
+void MockIntent::verify(ContextRef context) {
+  // Noop.
+}
 
 class Cycle1Intent : public MockIntent {
  public:
@@ -147,6 +145,27 @@ class EventTcpIntent : public MockIntent {
   }
 };
 
+class EventTcpDefaultIntent : public MockIntent {
+ public:
+  EventTcpDefaultIntent() : MockIntent(
+      "event.tcp.default", "event.tcp.default"
+  ) {
+    // Noop.
+  }
+
+  std::vector<std::string> after() const {
+    std::vector<std::string> deps;
+    deps.push_back("event.tcp");
+    return deps;
+  }
+
+  std::vector<std::string> depends() const {
+    std::vector<std::string> deps;
+    deps.push_back("event.manager");
+    return deps;
+  }
+};
+
 class EventUnixIntent : public MockIntent {
  public:
   EventUnixIntent() : MockIntent("event.unix", "event.unix") {
@@ -181,6 +200,8 @@ void TestLoader::registerIntents() {
   test.fromStack("event_manager");
   type.wrap(this->lua, new EventTcpIntent());
   test.fromStack("event_tcp");
+  type.wrap(this->lua, new EventTcpDefaultIntent());
+  test.fromStack("event_tcp_default");
   type.wrap(this->lua, new EventUnixIntent());
   test.fromStack("event_unix");
   type.wrap(this->lua, new NullIntent());
@@ -212,6 +233,7 @@ void TestLoader::collectIntents() {
   std::vector<std::string> intents = {
     "cycle1",
     "cycle2",
+    "event_tcp_default",
     "event_tcp",
     "event_manager",
     "event_unix",
@@ -235,10 +257,13 @@ void TestLoader::collectIntents() {
 }
 
 void TestLoader::initLua() {
+  NodeConfigIntentLuaProxy type;
+  type.initType(this->lua);
+
   this->init_count += 1;
   this->lua.doString("core = {}");
   this->lua.doString("connector = {}");
-  this->lua.doString("function events_from(src) end");
+  this->lua.doString("core.events_from = function(src) return false; end");
 
   this->registerIntents();
   this->lua.doString("intents = {}");
@@ -273,6 +298,34 @@ void TestIntentLoader::collectIntents() {
   for (it = this->mocks.begin(); it != this->mocks.end(); it++) {
     NodeConfigLoader::addIntent(*it);
   }
+}
+
+Lua* TestIntentLoader::getLua() {
+  return &this->lua;
+}
+
+void TestIntentLoader::initLua() {
+  NodeConfigLoader::initLua();
+}
+
+std::vector<NodeConfigIntentRef> TestIntentLoader::getMocks() {
+  return this->mocks;
+}
+
+
+NodeConfigEventsFrom::NodeConfigEventsFrom() {
+  git_libgit2_init();
+  Static::parser(new TestParser());
+  Static::repository(RepositoryRef(new GitRepo("config-example/")));
+  this->loader = std::shared_ptr<TestIntentLoader>(
+      new TestIntentLoader()
+  );
+}
+
+NodeConfigEventsFrom::~NodeConfigEventsFrom() {
+  this->loader = std::shared_ptr<TestIntentLoader>();
+  Static::destroy();
+  git_libgit2_shutdown();
 }
 
 

@@ -9,6 +9,7 @@
 
 #include "lua.hpp"
 
+#include "core/exceptions/lua.h"
 #include "core/utility/lua/table.h"
 
 namespace sf {
@@ -20,6 +21,7 @@ namespace utility {
   class LuaRegistry;
   class LuaStack;
   class LuaTypeProxy;
+  class LuaUpvalues;
 
 
   //! Wrapper for a LUA state.
@@ -30,6 +32,7 @@ namespace utility {
     friend LuaStack;
     friend LuaTable;
     friend LuaTypeProxy;
+    friend LuaUpvalues;
 
     std::shared_ptr<lua_State> state;
     std::shared_ptr<LuaRegistry> _registry;
@@ -148,6 +151,9 @@ namespace utility {
     //! Pushes a closure onto the stack.
     void push(lua_CFunction value, int close_with);
 
+    //! Pushes a boolean onto the stack.
+    void pushBool(bool value);
+
     //! Pushes nil onto the stack.
     void pushNil();
 
@@ -176,6 +182,9 @@ namespace utility {
     //! Returns the current size of the stack.
     int size();
 
+    //! Returns (and optionally pops) a boolean.
+    bool toBoolean(int index = -1, bool pop = false);
+
     //! Returns (and optionally pops) an int.
     int toInt(int index = -1, bool pop = false);
 
@@ -184,6 +193,34 @@ namespace utility {
 
     //! Returns the type of the value on the stack.
     int type(int index = -1);
+
+    //! Returns an interface to lua upvalues.
+    LuaUpvalues upvalues();
+  };
+
+
+  //! Helper class to access Lua upvalues.
+  class LuaUpvalues {
+   protected:
+    Lua* state;
+
+   public:
+    explicit LuaUpvalues(Lua* state);
+
+    //! Returns a light userdata pointer stored in an upvalue.
+    template <typename type>
+    type* toLightUserdata(int idx) {
+      int full_idx = lua_upvalueindex(idx);
+      lua_State* state = this->state->state.get();
+      if (this->state->stack()->type(full_idx) != LUA_TLIGHTUSERDATA) {
+        throw sf::core::exception::LuaTypeError(
+            "lightuserdata",
+            lua_typename(state, lua_type(state, idx))
+        );
+      }
+      void* pointer = lua_touserdata(state, full_idx);
+      return reinterpret_cast<type*>(pointer);
+    };
   };
 
 }  // namespace utility

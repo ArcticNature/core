@@ -41,7 +41,7 @@ class ScheduledSourceTest : public ::testing::Test {
     ));
 
     // Create an instance for the tests.
-    this->source = new ScheduledSource(1, "test");
+    this->source = new ScheduledSource(1);
     Context::sourceManager()->addSource(EventSourceRef(source));
     Context::sourceManager()->addSource(
         EventSourceRef(new ManualSource())

@@ -16,6 +16,20 @@ namespace sf {
 namespace core {
 namespace test {
 
+  //! Intent that does nothing but can be used in tests.
+  class MockIntent : public sf::core::interface::NodeConfigIntent {
+   protected:
+    std::string _provides;
+
+   public:
+    MockIntent(std::string id, std::string provides);
+
+    std::vector<std::string> depends() const;
+    std::string provides() const;
+    void apply(sf::core::context::ContextRef context);
+    void verify(sf::core::context::ContextRef context);
+  };
+
   //! Node config loaded to test on.
   class TestLoader : public sf::core::interface::NodeConfigLoader {
    protected:
@@ -47,8 +61,22 @@ namespace test {
     TestIntentLoader();
     void addIntent(sf::core::interface::NodeConfigIntentRef intent);
     void collectIntents();
+
+    sf::core::utility::Lua* getLua();
+    void initLua();
+
+    std::vector<sf::core::interface::NodeConfigIntentRef> getMocks();
   };
 
+
+  //! Test case for node configuraation environment.
+  class NodeConfigEventsFrom : public ::testing::Test {
+   protected:
+    std::shared_ptr<TestIntentLoader> loader;
+
+    NodeConfigEventsFrom();
+    ~NodeConfigEventsFrom();
+  };
 
   //! Test case for node configuration loader tests.
   class NodeConfigLoaderTest : public ::testing::Test {

@@ -66,6 +66,9 @@ namespace exception {
   //! Thrown when a LuaTypeProxy is defined twice.
   MSG_EXCEPTION(LuaException, LuaTypeExists);
 
+  //! Thrown when a LuaTypeProxy is defined twice.
+  MSG_EXCEPTION(LuaException, LuaTypeNotFound);
+
 }  // namespace exception
 }  // namespace core
 }  // namespace sf

@@ -6,9 +6,10 @@
 #include "core/exceptions/lua.h"
 #include "core/utility/lua.h"
 
-using sf::core::exception::LuaTypeExists;
-using sf::core::exception::LuaRuntimeError;
 using sf::core::exception::LuaInvalidProxyUse;
+using sf::core::exception::LuaRuntimeError;
+using sf::core::exception::LuaTypeExists;
+using sf::core::exception::LuaTypeNotFound;
 
 using sf::core::utility::Lua;
 using sf::core::utility::LuaTypeProxy;
@@ -113,9 +114,29 @@ void LuaTypeProxy::bind(Lua lua, void* instance) {
   *pointer = nullptr;
 
   // Set the metatable.
-  luaL_getmetatable(state, name.c_str());
+  int has_table = luaL_getmetatable(state, name.c_str());
+  if (!has_table) {
+    throw LuaTypeNotFound(name);
+  }
   lua_setmetatable(state, -2);
 
   // Store the instance in the userdata.
   *pointer = instance;
+}
+
+bool LuaTypeProxy::typeOf(int index) {
+  lua_State*  state = this->state();
+  std::string name  = this->typeId();
+  bool  type_of = false;
+  void* block = lua_touserdata(state, index);
+  if (block != nullptr) {  // Is userdata.
+    if (lua_getmetatable(state, index)) {  // Push metatable to stack.
+      luaL_getmetatable(state, name.c_str());
+      if (lua_rawequal(state, -1, -2)) {  // Compare metatables.
+        type_of = true;
+      }
+      lua_pop(state, 2);  // And pop them.
+    }
+  }
+  return type_of;
 }

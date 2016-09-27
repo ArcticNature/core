@@ -24,6 +24,7 @@ using sf::core::utility::LuaRegistry;
 using sf::core::utility::LuaStack;
 using sf::core::utility::LuaStreamReader;
 using sf::core::utility::LuaTable;
+using sf::core::utility::LuaUpvalues;
 
 
 Lua* Lua::fetchFrom(lua_State* state) {
@@ -259,6 +260,12 @@ void LuaStack::push(lua_CFunction value, int close_with) {
   lua_pushcclosure(state, value, close_with);
 }
 
+void LuaStack::pushBool(bool value) {
+  lua_State* state = this->state->state.get();
+  lua_checkstack(state, 1);
+  lua_pushboolean(state, value);
+}
+
 void LuaStack::pushNil() {
   lua_State* state = this->state->state.get();
   lua_checkstack(state, 1);
@@ -278,6 +285,22 @@ std::string LuaStack::represent(int index) {
 
 int LuaStack::size() {
   return lua_gettop(this->state->state.get());
+}
+
+bool LuaStack::toBoolean(int index, bool pop) {
+  lua_State* state = this->state->state.get();
+  if (lua_type(state, index) != LUA_TBOOLEAN) {
+    throw LuaTypeError(
+      "boolean",
+      lua_typename(state, lua_type(state, index))
+    );
+  }
+
+  bool value = lua_toboolean(state, index);
+  if (pop) {
+    lua_remove(state, index);
+  }
+  return value;
 }
 
 int LuaStack::toInt(int index, bool pop) {
@@ -314,4 +337,13 @@ std::string LuaStack::toString(int index, bool pop) {
 
 int LuaStack::type(int index) {
   return lua_type(this->state->state.get(), index);
+}
+
+LuaUpvalues LuaStack::upvalues() {
+  return LuaUpvalues(this->state);
+}
+
+
+LuaUpvalues::LuaUpvalues(Lua* state) {
+  this->state = state;
 }

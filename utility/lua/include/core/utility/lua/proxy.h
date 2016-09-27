@@ -97,6 +97,9 @@ namespace utility {
       this->bind(lua, reinterpret_cast<void*>(instance));
     }
 
+    //! Checks that the value at the given index is of this type.
+    bool typeOf(int index);
+
    protected:
     //! LUA garbage collector callback for proxyed instances.
     static int lua_proxy_gc(lua_State* state);

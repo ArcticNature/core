@@ -12,6 +12,7 @@
 #include "core/context/static.h"
 #include "core/exceptions/configuration.h"
 
+#include "core/model/logger.h"
 #include "core/model/repository.h"
 #include "core/utility/lua/proxy.h"
 
@@ -33,6 +34,8 @@ using sf::core::lifecycle::NodeConfigLifecycleArg;
 using sf::core::model::IStreamRef;
 using sf::core::model::RepositoryVersionId;
 using sf::core::utility::Lua;
+using sf::core::utility::LuaTable;
+using sf::core::utility::LuaUpvalues;
 using sf::core::utility::lua_proxy_delete;
 
 
@@ -40,8 +43,47 @@ NodeConfigIntent::NodeConfigIntent(std::string id) : _id(id) {
   // Noop.
 }
 
+std::vector<std::string> NodeConfigIntent::after() const {
+  std::vector<std::string> none;
+  return none;
+};
+
 const std::string NodeConfigIntent::id() const {
   return this->_id;
+}
+
+
+int NodeConfigLoader::lua_events_from(lua_State* state) {
+  Lua* lua = Lua::fetchFrom(state);
+  lua->stack()->arguments()->any(1);
+  bool added = false;
+
+  // If a function is passed execute it and use the result.
+  if (lua->stack()->type(1) == LUA_TFUNCTION) {
+    DEBUG(
+        Context::logger(),
+        "Resolving function passed to 'core.events_from' ..."
+    );
+    lua->call(0, 1);
+  }
+
+  // Extract the intent.
+  NodeConfigIntentLuaProxy proxy(*lua);
+  if (proxy.typeOf(1)) {
+    LuaUpvalues upvalues = lua->stack()->upvalues();
+    NodeConfigLoader* loader = upvalues.toLightUserdata<NodeConfigLoader>(1);
+    loader->addIntent(proxy.get(1));
+    added = true;
+
+  } else {
+    DEBUG(
+        Context::logger(),
+        "Skipping argument passed to 'core.events_from' due to incorrect type."
+    );
+  }
+
+  lua->stack()->pushBool(added);
+  return 1;
 }
 
 
@@ -54,9 +96,6 @@ void NodeConfigLoader::apply() {
 }
 
 void NodeConfigLoader::initialise() {
-  NodeConfigIntentLuaProxy type;
-  type.initType(this->lua);
-
   this->initLua();
   this->new_context = ContextRef(new Context());
   this->effective = Static::repository()->resolveVersion(this->symbolic);
@@ -111,31 +150,60 @@ void NodeConfigLoader::sort() {
     }
     pending.insert(id);
 
-    // Pre-pend any new dependencies.
-    std::vector<std::string> depends = intent->depends();
-    if (!depends.empty()) {
-      bool pushed = false;
-      std::vector<std::string>::iterator it;
+    // Pre-pend any new dependencies/optional dependencies.
+    bool pushed = false;
+    std::vector<std::string> before_me = intent->after();
+    std::vector<std::string> depends   = intent->depends();
 
+    if (!depends.empty()) {
+      std::vector<std::string>::iterator it;
       for (it = depends.begin(); it != depends.end(); it++) {
+        // Check that a provider exists.
         this->requireProvider(*it);
         NodeConfigIntentRef provided_by = this->providers.at(*it);
 
+        // Make sure there are no loops.
         if (pending.find(provided_by->id()) != pending.end()) {
           throw InvalidConfiguration(
             "Circular dependency in feature configuration."
           );
         }
+
+        // Enqueue needed dependencies.
         if (visited.find(provided_by->id()) == visited.end()) {
           pushed = true;
           intents.push_front(provided_by);
         }
       }
+    }
 
-      // Delay current intent if any dep was pushed.
-      if (pushed) {
-        continue;
+    if (!before_me.empty()) {
+      std::vector<std::string>::iterator it;
+      for (it = before_me.begin(); it != before_me.end(); it++) {
+        // Check if the provider is registered.
+        if (this->providers.find(*it) == this->providers.end()) {
+          continue;
+        }
+
+        // Make sure there are no loops.
+        NodeConfigIntentRef provided_by = this->providers.at(*it);
+        if (pending.find(provided_by->id()) != pending.end()) {
+          throw InvalidConfiguration(
+            "Circular dependency in feature configuration."
+          );
+        }
+
+        // Enqueue needed dependencies.
+        if (visited.find(provided_by->id()) == visited.end()) {
+          pushed = true;
+          intents.push_front(provided_by);
+        }
       }
+    }
+
+    // Delay current intent if any dependency was pushed.
+    if (pushed) {
+      continue;
     }
 
     // Move the intent to the sorted pile.
@@ -174,6 +242,9 @@ void NodeConfigLoader::collectIntents() {
 
 void NodeConfigLoader::initLua() {
   // Essential lua configuration that Lifecycle handlers may relay on.
+  NodeConfigIntentLuaProxy type;
+  type.initType(this->lua);
+
   this->initLuaTables();
   this->initLuaFunctions();
   this->initLuaPatches();
@@ -184,10 +255,10 @@ void NodeConfigLoader::initLua() {
 }
 
 void NodeConfigLoader::initLuaFunctions() {
-  this->lua.doString("loggers.console = function() end");
-  this->lua.doString("sources.scheduler = function() end");
-  this->lua.doString("sources.tcp = function() end");
-  this->lua.doString("events_from = function() end");
+  LuaTable core = this->lua.globals()->toTable("core");
+  this->lua.stack()->pushLight<NodeConfigLoader>(this);
+  this->lua.stack()->push(NodeConfigLoader::lua_events_from, 1);
+  core.fromStack("events_from");
 }
 
 void NodeConfigLoader::initLuaTables() {
@@ -207,7 +278,10 @@ void NodeConfigLoader::initLuaTables() {
 }
 
 void NodeConfigLoader::initLuaPatches() {
-  //
+  this->lua.doString("loggers.console = function() return nil end");
+  this->lua.doString("sources.scheduler = function() return nil end");
+  this->lua.doString("sources.tcp = function() return nil end");
+  this->lua.doString("sources.unix = function() return nil end");
 }
 
 
@@ -283,6 +357,9 @@ NodeConfigIntentRef NodeConfigIntentLuaProxy::get(int idx, bool pop) {
   std::string name = this->typeId();
   void* block = luaL_checkudata(this->state(), idx, name.c_str());
   void** pointer = reinterpret_cast<void**>(block);
+  if (pop) {
+    lua_remove(this->state(), idx);
+  }
 
   // Create ref copy.
   NodeConfigIntentRef* ref = reinterpret_cast<NodeConfigIntentRef*>(*pointer);

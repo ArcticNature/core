@@ -14,6 +14,7 @@ using sf::core::exception::LuaRuntimeError;
 using sf::core::exception::LuaSyntaxError;
 using sf::core::exception::LuaTypeError;
 using sf::core::exception::LuaTypeExists;
+using sf::core::exception::LuaTypeNotFound;
 using sf::core::exception::LuaValueError;
 using sf::core::exception::SfException;
 
@@ -71,6 +72,15 @@ LuaTypeExists::LuaTypeExists(std::string type_id) : LuaException(
 
 int LuaTypeExists::getCode() const {
   return -1008;
+}
+
+
+LuaTypeNotFound::LuaTypeNotFound(std::string type_id) : LuaException(
+    "Unable to find LuaTypeProxy for '" + type_id + "'."
+) { }
+
+int LuaTypeNotFound::getCode() const {
+  return -1010;
 }
 
 

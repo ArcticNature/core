@@ -33,7 +33,7 @@ bool callbacks_to_keep_on_reconfig(ScheduledClosure callback) {
 }
 
 
-ScheduledSource::ScheduledSource(int tick, std::string id) : EventSource(id) {
+ScheduledSource::ScheduledSource(int tick) : EventSource("scheduler") {
   this->tick = tick;
   this->timer_fd = 0;
 }

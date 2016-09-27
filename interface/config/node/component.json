@@ -6,6 +6,7 @@
     "core.context.dynamic",
     "core.cluster.node",
     "core.event.source.manual",
+    "core.event.source.scheduled",
     "core.interface.lifecycle",
     "core.model.repository",
     "core.utility.lua"
