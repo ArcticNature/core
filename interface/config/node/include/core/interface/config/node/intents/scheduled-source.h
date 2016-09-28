@@ -37,6 +37,25 @@ namespace interface {
     void verify(sf::core::context::ContextRef context);
   };
 
+
+  //! Create a ScheduledSource based on user configuration.
+  class ScheduledSourceIntent : public NodeConfigIntent {
+   protected:
+    static const std::vector<std::string> DEPS;
+
+   protected:
+    int tick;
+
+   public:
+    ScheduledSourceIntent(int tick);
+
+    std::vector<std::string> depends() const;
+    std::string provides() const;
+
+    void apply(sf::core::context::ContextRef context);
+    void verify(sf::core::context::ContextRef context);
+  };
+
 }  // namespace interface
 }  // namespace core
 }  // namespace sf

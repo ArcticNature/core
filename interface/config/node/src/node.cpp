@@ -279,7 +279,6 @@ void NodeConfigLoader::initLuaTables() {
 
 void NodeConfigLoader::initLuaPatches() {
   this->lua.doString("loggers.console = function() return nil end");
-  this->lua.doString("sources.scheduler = function() return nil end");
   this->lua.doString("sources.tcp = function() return nil end");
   this->lua.doString("sources.unix = function() return nil end");
 }

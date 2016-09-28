@@ -19,6 +19,7 @@ using sf::core::event::ScheduledSource;
 using sf::core::exception::EventSourceNotFound;
 
 using sf::core::interface::DefaultScheduledSourceIntent;
+using sf::core::interface::ScheduledSourceIntent;
 using sf::core::model::EventSourceRef;
 
 
@@ -27,6 +28,10 @@ const std::vector<std::string> DefaultScheduledSourceIntent::AFTER = {
 };
 
 const std::vector<std::string> DefaultScheduledSourceIntent::DEPS = {
+  "event.manager"
+};
+
+const std::vector<std::string> ScheduledSourceIntent::DEPS = {
   "event.manager"
 };
 
@@ -81,4 +86,29 @@ void DefaultScheduledSourceIntent::apply(ContextRef context) {
 
 void DefaultScheduledSourceIntent::verify(ContextRef context) {
   // NOOP.
+}
+
+
+ScheduledSourceIntent::ScheduledSourceIntent(
+    int tick
+) : NodeConfigIntent("event.source.scheduled") {
+  this->tick = tick;
+}
+
+std::vector<std::string> ScheduledSourceIntent::depends() const {
+  return ScheduledSourceIntent::DEPS;
+}
+
+std::string ScheduledSourceIntent::provides() const {
+  return "event.source.scheduled";
+}
+
+void ScheduledSourceIntent::apply(ContextRef context) {
+  context->instanceSourceManager()->add(EventSourceRef(
+      new ScheduledSource(this->tick)
+  ));
+}
+
+void ScheduledSourceIntent::verify(ContextRef context) {
+  // Noop.
 }

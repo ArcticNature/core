@@ -6,6 +6,7 @@
 #include "core/exceptions/lua.h"
 #include "core/utility/lua/registry.h"
 #include "core/utility/lua/stream.h"
+#include "core/utility/lua/table.h"
 
 #define LUA_SELF_REF_KEY "_sf_lua_self_ref"
 
@@ -143,6 +144,12 @@ bool LuaArguments::boolean(int number) {
 lua_Integer LuaArguments::reference(int number) {
   this->state->stack()->duplicate(number);
   return this->state->registry()->referenceTop();
+}
+
+LuaTable LuaArguments::table(int number) {
+  Lua* lua = this->state;
+  luaL_checktype(lua->state.get(), number, LUA_TTABLE);
+  return LuaTable(lua, number, false);
 }
 
 

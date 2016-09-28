@@ -3,28 +3,34 @@
 #include <vector>
 
 #include "core/context/context.h"
+#include "core/exceptions/lua.h"
 #include "core/interface/config/node.h"
 
 #include "core/interface/config/node/intents/manager-sources.h"
 #include "core/interface/config/node/intents/manual-source.h"
+#include "core/interface/config/node/intents/scheduled-source.h"
 
 #include "core/interface/lifecycle.h"
 #include "core/model/logger.h"
 #include "core/utility/lua.h"
 
 using sf::core::context::Context;
+using sf::core::exception::LuaTypeError;
 using sf::core::interface::NodeConfigIntentLuaProxy;
 using sf::core::interface::NodeConfigIntentRef;
 using sf::core::interface::NodeConfigLoader;
 
 using sf::core::interface::CopyManagerSourcesIntent;
 using sf::core::interface::CopyManualSourceIntent;
+using sf::core::interface::DefaultScheduledSourceIntent;
+using sf::core::interface::ScheduledSourceIntent;
 
 using sf::core::lifecycle::NodeConfigLifecycleArg;
 using sf::core::lifecycle::NodeConfigLifecycleHandler;
 
 using sf::core::model::LogInfo;
 using sf::core::utility::Lua;
+using sf::core::utility::LuaStack;
 using sf::core::utility::LuaTable;
 
 
@@ -56,9 +62,8 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
         lua->call(0, 1);
       }
 
-      // Skip if not the correct userdata.
-      // TODO(stefano): guard against incorrect userdata type.
-      if (lua->stack()->type() != LUA_TUSERDATA) {
+      // Skip if not the correct type.
+      if (!lua_intents.typeOf(-1)) {
         lua->stack()->remove(-1);
         LogInfo info = {{"attribute", *attr}};
         DEBUGV(
@@ -80,7 +85,10 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
         NodeConfigIntentRef(new CopyManagerSourcesIntent())
     );
 
-    // TODO(stefano): Add or import ScheduledSource.
+    // Add or import ScheduledSource.
+    loader->addIntent(
+        NodeConfigIntentRef(new DefaultScheduledSourceIntent())
+    );
   }
 
  public:
@@ -99,4 +107,39 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
 };
 
 
+class NodeLuaInit : public NodeConfigLifecycleHandler {
+ protected:
+  static int lua_sources_scheduled(lua_State* state) {
+    Lua* lua = Lua::fetchFrom(state);
+    LuaTable options = lua->stack()->arguments()->table(1);
+
+    // Default values.
+    int tick = 1;
+
+    // Get optional values.
+    try {
+      tick = options.toInt("tick");
+    } catch (LuaTypeError&) {
+      // Noop.
+    }
+
+    // Create the intent.
+    NodeConfigIntentLuaProxy intent;
+    intent.wrap(*lua, new ScheduledSourceIntent(tick));
+    return 1;
+  }
+
+ public:
+  void handle(std::string event, NodeConfigLifecycleArg* arg) {
+    Lua* lua = arg->lua();
+    LuaStack* stack = lua->stack();
+    LuaTable  sources = lua->globals()->toTable("sources");
+    stack->pushLight<NodeConfigLoader>(arg->loader());
+    stack->push(NodeLuaInit::lua_sources_scheduled, 1);
+    sources.fromStack("scheduler");
+  }
+};
+
+
 LifecycleStaticOn("config::node::collect", NodeLuaCollect);
+LifecycleStaticOn("config::node::init-lua", NodeLuaInit);
