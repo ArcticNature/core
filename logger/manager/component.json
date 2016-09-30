@@ -1,0 +1,14 @@
+{
+  "name": "core.logger.daemon",
+  "type": "c++",
+
+  "deps": [
+    "core.model.logger"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
