@@ -50,8 +50,8 @@ std::string Event::id() const {
   return this->_id;
 }
 
-void Event::rescue(SfException* ex) {
-  throw;
+void Event::rescue(std::exception_ptr ex) {
+  std::rethrow_exception(ex);
 }
 
 
@@ -67,7 +67,7 @@ std::string EventDrain::id() const {
   return this->drain_id;
 }
 
-bool EventDrain::handleError(SfException* ex) {
+bool EventDrain::rescue(std::exception_ptr ex) {
   return false;
 }
 

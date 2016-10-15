@@ -66,7 +66,3 @@ void NodeStatusRequest::handle() {
   EventDrainRef drain = Static::drains()->get(this->drain());
   MessageIO<Message>::send(drain->getFD(), message);
 }
-
-void NodeStatusRequest::rescue(SfException* ex) {
-  Event::rescue(ex);
-}

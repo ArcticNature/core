@@ -37,21 +37,26 @@ void AsyncPorcess::disableSIGINT() {
 }
 
 void AsyncPorcess::handleLoopError(
-    EventRef event, SfException* ex, bool drain
+    EventRef event, std::exception_ptr exception, bool drain
 ) {
   if (event && drain) {
     try {
       // TODO(stefano): Find drain to which to send error information.
     } catch (SfException& drain_ex) {
-      this->handleLoopError(event, &drain_ex, false);
+      this->handleLoopError(event, std::current_exception(), false);
     }
   }
 
-  LogInfo vars = {
-    {"error", ex->what()}, {"trace", ex->getTrace()},
-    {"drain_error", drain ? "yes" : "no" }
-  };
-  ERRORV(Context::Logger(), "Error during run loop. ${error}", vars);
+  try {
+    std::rethrow_exception(exception);
+  } catch(SfException& ex) {
+    LogInfo vars = {
+      {"error", ex.what()},
+      {"trace", ex.getTrace()},
+      {"drain_error", drain ? "yes" : "no" }
+    };
+    ERRORV(Context::Logger(), "Error during run loop. ${error}", vars);
+  }
 }
 
 void AsyncPorcess::loop() {
@@ -72,18 +77,18 @@ void AsyncPorcess::loop() {
       } catch(CleanExit&) {
         throw;
       } catch(SfException& ex) {
-        event->rescue(&ex);
+        event->rescue(std::current_exception());
       }
 
     } catch (CleanExit&) {
       break;
 
     } catch (AbortException& ex) {
-      this->handleLoopError(event, &ex, true);
+      this->handleLoopError(event, std::current_exception(), true);
       throw;
 
     } catch (SfException& ex) {
-      this->handleLoopError(event, &ex, true);
+      this->handleLoopError(event, std::current_exception(), true);
     }
   }
 }

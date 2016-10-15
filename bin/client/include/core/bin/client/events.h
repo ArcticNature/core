@@ -37,7 +37,6 @@ namespace bin {
         int callback_ref, bool details, std::string drain
     );
     void handle();
-    void rescue(sf::core::exception::SfException* ex);
   };
 
 }  // namespace bin

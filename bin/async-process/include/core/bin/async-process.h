@@ -2,6 +2,8 @@
 #ifndef CORE_BIN_ASYNC_PROCESS_H_
 #define CORE_BIN_ASYNC_PROCESS_H_
 
+#include <exception>
+
 #include "core/exceptions/base.h"
 #include "core/model/event.h"
 
@@ -19,8 +21,7 @@ namespace bin {
     //! Handles an error raised by the event loop.
     void handleLoopError(
         sf::core::model::EventRef event,
-        sf::core::exception::SfException* ex,
-        bool drain
+        std::exception_ptr ex, bool drain
     );
 
     //! Runs the event loop.

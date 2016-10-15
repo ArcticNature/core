@@ -2,6 +2,7 @@
 #ifndef CORE_MODEL_EVENT_H_
 #define CORE_MODEL_EVENT_H_
 
+#include <exception>
 #include <map>
 #include <memory>
 #include <string>
@@ -55,7 +56,7 @@ namespace model {
     virtual void handle() = 0;
 
     //! Attempt to rescure form an handling error.
-    virtual void rescue(sf::core::exception::SfException* ex);
+    virtual void rescue(std::exception_ptr ex);
   };
   typedef std::shared_ptr<Event> EventRef;
 
@@ -97,7 +98,7 @@ namespace model {
      *
      * \returns True to indicate that the exception was handled.
      */
-    virtual bool handleError(sf::core::exception::SfException* ex);
+    virtual bool rescue(std::exception_ptr ex);
 
     //! Sends an ack down the drain.
     virtual void sendAck() = 0;

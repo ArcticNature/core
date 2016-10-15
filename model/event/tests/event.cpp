@@ -98,8 +98,8 @@ TEST(Event, Rescue) {
   FailEvent event;
   try {
     event.handle();
-  } catch (SfException& ex) {
-    ASSERT_THROW(event.rescue(&ex), IncorrectSourceType);
+  } catch (SfException&) {
+    ASSERT_THROW(event.rescue(std::current_exception()), IncorrectSourceType);
   }
 }
 
