@@ -17,8 +17,8 @@ using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainRef;
 
 using sf::core::model::EventSource;
-using sf::core::model::EventSourceManager;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManager;
 
 
 class FailEvent : public Event {
@@ -74,13 +74,17 @@ class TestSource2 : public EventSource {
 };
 
 
-class TestEventSourceManager : public EventSourceManager {
+class TestLoopManager : public LoopManager {
  public:
   void add(EventSourceRef source) {
     this->sources[source->id()] = source;
   }
   
-  void remove(std::string id) {
+  void removeDrain(std::string id) {
+    this->drains.erase(id);
+  }
+
+  void removeSource(std::string id) {
     this->sources.erase(id);
   }
 
@@ -147,20 +151,20 @@ TEST(EventSource, id) {
   ASSERT_EQ("id", drain.id());
 }
 
-TEST(EventSourceManager, Get) {
-  TestEventSourceManager manager;
-  manager.addSource(EventSourceRef(new TestSource("id")));
+TEST(LoopManager, Get) {
+  TestLoopManager manager;
+  manager.add(EventSourceRef(new TestSource("id")));
   TestSource* source = manager.get<TestSource>("id");
   ASSERT_NE(nullptr, source);
 }
 
-TEST(EventSourceManager, NotFound) {
-  TestEventSourceManager manager;
+TEST(LoopManager, NotFound) {
+  TestLoopManager manager;
   ASSERT_THROW(manager.get<TestSource>("id"), EventSourceNotFound);
 }
 
-TEST(EventSourceManager, WrongType) {
-  TestEventSourceManager manager;
-  manager.addSource(EventSourceRef(new TestSource("id")));
+TEST(LoopManager, WrongType) {
+  TestLoopManager manager;
+  manager.add(EventSourceRef(new TestSource("id")));
   ASSERT_THROW(manager.get<TestSource2>("id"), IncorrectSourceType);
 }

@@ -10,16 +10,10 @@ namespace core {
 namespace registry {
 
   //! Type of factory functions for event source managers.
-  typedef sf::core::model::EventSourceManagerRef (*make_source_manager)();
-
-  //! Type of factory functions for event drain managers.
-  typedef sf::core::model::EventDrainManagerRef (*make_drain_manager)();
+  typedef sf::core::model::LoopManagerRef (*make_loop_manager)();
 
   //! Registry class for event source managers.
-  class EventSourceManager : public Registry<make_source_manager> {};
-
-  //! Registry class for event drain managers.
-  class EventDrainManager : public Registry<make_drain_manager> {};
+  class LoopManager : public Registry<make_loop_manager> {};
 
 }  // namespace registry
 }  // namespace core

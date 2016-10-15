@@ -70,13 +70,13 @@ int main(int argc, char** argv) {
       {"trace", ex.getTrace()}
     };
     ERRORV(
-        Logger::fallback(),
+        Context::Logger(),
         "Daemon terminating due to an error: ${error}", vars
     );
 
     Process::Exit();
     sf::core::context::Daemon::destroy();
-    Context::destroy();
+    Context::Destroy();
     Logger::destroyFallback();
     Static::destroy();
     return ex.getCode();
@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
   int exit_code = sf::core::context::Daemon::instance()->exitCode();
   Process::Exit();
   sf::core::context::Daemon::destroy();
-  Context::destroy();
+  Context::Destroy();
   Logger::destroyFallback();
   Static::destroy();
   return exit_code;

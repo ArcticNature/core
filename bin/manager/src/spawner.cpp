@@ -77,7 +77,7 @@ EventRef ManagerToSpawner::parse() {
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(
-        Context::logger(), "Source ${source-id} received invalid event.",
+        Context::Logger(), "Source ${source-id} received invalid event.",
         info
     );
     return EventRef();
@@ -95,7 +95,7 @@ EventRef ManagerToSpawner::parse() {
     {"event-name", Message::Code_Name(message.code())}
   };
   ERRORV(
-      Context::logger(),
+      Context::Logger(),
       "Source ${source-id} received unkown event ${event-name}.", info
   );
   return EventRef();

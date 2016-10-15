@@ -27,11 +27,11 @@ using sf::core::exception::ProcessNotFound;
 
 using sf::core::model::CLIParser;
 using sf::core::model::EventSourceRef;
-using sf::core::model::EventSourceManagerRef;
+using sf::core::model::LoopManagerRef;
 
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
-using sf::core::registry::EventSourceManager;
+using sf::core::registry::LoopManager;
 
 using sf::core::utility::SubProcess;
 using sf::core::utility::SubProcessRef;
@@ -39,7 +39,7 @@ using sf::core::utility::processDirectory;
 
 
 void Daemon::cleanEnvironment() {
-  DEBUG(Logger::fallback(), "Resetting environment.");
+  DEBUG(Context::Logger(), "Resetting environment.");
   CLIParser*  parser = Static::parser();
   std::string stderr = parser->getString("stderr");
   std::string stdin  = parser->getString("stdin");
@@ -53,13 +53,13 @@ void Daemon::cleanEnvironment() {
 }
 
 void Daemon::daemonise() {
-  INFO(Logger::fallback(), "Forking into daemon mode.");
+  INFO(Context::Logger(), "Forking into daemon mode.");
   this->maskSigHup();
   this->detatchFromParentProcess();
 }
 
 void Daemon::dropUser() {
-  INFO(Logger::fallback(), "Dropping privileges.");
+  INFO(Context::Logger(), "Dropping privileges.");
 
   CLIParser*  parser = Static::parser();
   std::string group  = parser->getString("group");
@@ -67,7 +67,7 @@ void Daemon::dropUser() {
 
   LogInfo info = { {"group", group}, {"user", user} };
   DEBUGV(
-      Logger::fallback(),
+      Context::Logger(),
       "Dropping privileges to user ${user} and group ${group}.",
       info
   );
@@ -82,9 +82,9 @@ void Daemon::createSockets() {
   std::string spawner_path = parser->getString("spawner-socket");
 
   // Link to Manager and Spawner.
-  EventSourceManagerRef sources = Context::sourceManager();
-  sources->addSource(EventSourceRef(new DaemonToManagerSource(manager_path)));
-  sources->addSource(EventSourceRef(new DaemonToSpawnerSource(spawner_path)));
+  LoopManagerRef loop = Context::LoopManager();
+  loop->add(EventSourceRef(new DaemonToManagerSource(manager_path)));
+  loop->add(EventSourceRef(new DaemonToSpawnerSource(spawner_path)));
 }
 
 void Daemon::forkManager() {
@@ -140,14 +140,14 @@ void Daemon::forkSpawner() {
 
 
 void Daemon::configureEvents() {
-  DEBUG(Logger::fallback(), "Setting up event subsystem.");
+  DEBUG(Context::Logger(), "Setting up event subsystem.");
   this->registerDefaultSourceManager();
-  EventSourceManagerRef sources = Context::sourceManager();
-  sources->addSource(EventSourceRef(new DaemonSignalSource()));
+  LoopManagerRef loop = Context::LoopManager();
+  loop->add(EventSourceRef(new DaemonSignalSource()));
 }
 
 void Daemon::disableSignals() {
-  DEBUG(Logger::fallback(), "Disabling signals.");
+  DEBUG(Context::Logger(), "Disabling signals.");
 
   sigset_t mask;
   sigemptyset(&mask);
@@ -156,7 +156,7 @@ void Daemon::disableSignals() {
   sigaddset(&mask, SIGUSR2);
 
 #if TRAP_SIGINT
-  DEBUG(Logger::fallback(), "Trapping SIGINT too.");
+  DEBUG(Context::Logger(), "Trapping SIGINT too.");
   sigaddset(&mask, SIGINT);
 #endif
 
@@ -223,7 +223,7 @@ std::string Daemon::findSpawner() {
 
 
 void Daemon::initialise() {
-  INFO(Logger::fallback(), "Initialising daemon.");
+  INFO(Context::Logger(), "Initialising daemon.");
 
   // Prepare for process.
   CLIParser* parser = Static::parser();

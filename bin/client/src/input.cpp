@@ -114,7 +114,7 @@ EnableReadline::EnableReadline() : Event("enable-readline", "NULL") {
 }
 
 void EnableReadline::handle() {
-  Context::sourceManager()->addSource(
+  Context::LoopManager()->add(
       ReadlineEventSource::instance(EnableReadline::parse)
   );
 }

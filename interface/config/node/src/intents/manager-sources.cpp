@@ -24,11 +24,11 @@ CopyManagerSourcesIntent::CopyManagerSourcesIntent(
 }
 
 void CopyManagerSourcesIntent::apply(ContextRef context) {
-  context->instanceSourceManager()->add(
-      Context::sourceManager()->fetch(this->daemon_source)
+  context->loopManager()->add(
+      Context::LoopManager()->fetch(this->daemon_source)
   );
-  context->instanceSourceManager()->add(
-      Context::sourceManager()->fetch(this->spawner_source)
+  context->loopManager()->add(
+      Context::LoopManager()->fetch(this->spawner_source)
   );
 }
 
@@ -41,6 +41,6 @@ std::string CopyManagerSourcesIntent::provides() const {
 }
 
 void CopyManagerSourcesIntent::verify(ContextRef context) {
-  Context::sourceManager()->fetch(this->daemon_source);
-  Context::sourceManager()->fetch(this->spawner_source);
+  Context::LoopManager()->fetch(this->daemon_source);
+  Context::LoopManager()->fetch(this->spawner_source);
 }

@@ -38,18 +38,18 @@ EventRef mock_event(std::shared_ptr<void> closure) {
 
 TEST_F(NodeConfigIntentTest, ScheduledSourceIsCreated) {
   ASSERT_THROW(
-      Context::sourceManager()->fetch("scheduler"),
+      Context::LoopManager()->fetch("scheduler"),
       EventSourceNotFound
   );
   this->addIntent(NodeConfigIntentRef(new DefaultScheduledSourceIntent()));
   this->load();
-  Context::sourceManager()->fetch("scheduler");
+  Context::LoopManager()->fetch("scheduler");
 }
 
 TEST_F(NodeConfigIntentTest, ScheduledSourceIsCreatedAndPopulated) {
   EventSourceRef source(new ScheduledSource(4));
-  Context::sourceManager()->add(source);
-  ScheduledSource* scheduler = Context::sourceManager()->get<
+  Context::LoopManager()->add(source);
+  ScheduledSource* scheduler = Context::LoopManager()->get<
       ScheduledSource
   >("scheduler");
 
@@ -62,10 +62,10 @@ TEST_F(NodeConfigIntentTest, ScheduledSourceIsCreatedAndPopulated) {
   this->load();
 
   EventSourceRef manual(new ManualSource());
-  Context::sourceManager()->fetch("scheduler");
-  Context::sourceManager()->add(manual);
+  Context::LoopManager()->fetch("scheduler");
+  Context::LoopManager()->add(manual);
 
   sleep(2);  // Seconds.
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
   ASSERT_NE(nullptr, event.get());
 }

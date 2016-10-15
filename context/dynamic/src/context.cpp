@@ -10,33 +10,33 @@ using sf::core::exception::ContextUninitialised;
 
 using sf::core::model::Logger;
 using sf::core::model::LoggerRef;
-using sf::core::model::EventSourceManagerRef;
+using sf::core::model::LoopManagerRef;
 
 
 ContextRef Context::_instance;
 
 
-LoggerRef Context::logger() {
-  return Context::instance()->_logger;
+void Context::Destroy() {
+  Context::_instance = ContextRef();
 }
 
-EventSourceManagerRef Context::sourceManager() {
-  EventSourceManagerRef manager = Context::instance()->source_manager;
-  if (manager.get() == nullptr) {
-    throw ContextUninitialised("Event source manager not initialised.");
-  }
-  return manager;
-}
-
-void Context::initialise(ContextRef context) {
+void Context::Initialise(ContextRef context) {
   Context::_instance = context;
 }
 
-ContextRef Context::instance() {
+ContextRef Context::Instance() {
   if (Context::_instance.get() == nullptr) {
     Context::_instance = ContextRef(new Context());
   }
   return Context::_instance;
+}
+
+LoggerRef Context::Logger() {
+  return Context::Instance()->_logger;
+}
+
+LoopManagerRef Context::LoopManager() {
+  return Context::Instance()->loopManager();
 }
 
 
@@ -45,33 +45,20 @@ Context::Context() {
 }
 
 Context::~Context() {
-  this->source_manager = EventSourceManagerRef();
+  this->loop_manager = LoopManagerRef();
 }
 
 void Context::initialise(LoggerRef logger) {
   this->_logger = logger;
 }
 
-void Context::initialise(EventSourceManagerRef manager) {
-  this->source_manager = manager;
+void Context::initialise(LoopManagerRef manager) {
+  this->loop_manager = manager;
 }
 
-EventSourceManagerRef Context::instanceSourceManager() {
-  return this->source_manager;
+LoopManagerRef Context::loopManager() {
+  if (this->loop_manager.get() == nullptr) {
+    throw ContextUninitialised("Loop manager not initialised.");
+  }
+  return this->loop_manager;
 }
-
-
-void Context::destroy() {
-  Context::_instance = ContextRef();
-}
-
-
-// Some methods should not be used in release versions but
-// are needed for tests and could be helpful for debugging.
-#if DEBUG_BUILD
-
-void Context::reset() {
-  Context::_instance = ContextRef();
-}
-
-#endif  // DEBUG_BUILD

@@ -51,7 +51,7 @@ void Manager::connectSpawner() {
 }
 
 void Manager::defaultSources() {
-  Context::sourceManager()->add(EventSourceRef(new ManualSource()));
+  Context::LoopManager()->add(EventSourceRef(new ManualSource()));
 }
 
 void Manager::initialise() {
@@ -66,7 +66,7 @@ void Manager::initialise() {
   CLIParser*  parser   = Static::parser();
   std::string conf_ver = parser->getString("repo-version");
   EventRef load_config(new LoadConfiguration(conf_ver, "NULL", true));
-  Context::sourceManager()->get<ManualSource>("manual")->enqueueEvent(
+  Context::LoopManager()->get<ManualSource>("manual")->enqueueEvent(
       load_config
   );
 

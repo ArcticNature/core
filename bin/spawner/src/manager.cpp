@@ -67,7 +67,7 @@ EventDrainRef SpawnerToManagerSource::clientDrain(int fd, std::string id) {
   std::string   drain_id = drain->id();
 
   LogInfo info = {{"drain-id", drain_id}};
-  DEBUGV(Context::logger(), "Created manager drain ${drain-id}", info);
+  DEBUGV(Context::Logger(), "Created manager drain ${drain-id}", info);
 
   Static::drains()->add(drain);
   Static::options()->setString("manager-drain", drain_id);
@@ -78,6 +78,6 @@ EventSourceRef SpawnerToManagerSource::clientSource(
     int fd, std::string id, std::string drain_id
 ) {
   LogInfo info = {{"source-id", id}};
-  DEBUGV(Context::logger(), "Creating manager source ${source-id}", info);
+  DEBUGV(Context::Logger(), "Creating manager source ${source-id}", info);
   return EventSourceRef(new ManagerFdSource(fd, id, drain_id));
 }

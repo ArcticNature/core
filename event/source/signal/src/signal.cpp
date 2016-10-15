@@ -55,7 +55,7 @@ EventRef SignalSource::handleSignal(int signo) {
     default:
       LogInfo vars = {{"signal", toString(signo)}};
       ERRORV(
-          Context::logger(),
+          Context::Logger(),
           "Received unrecognised signal ${signal}.",
           vars
       );

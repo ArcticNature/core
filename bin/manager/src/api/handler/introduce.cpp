@@ -50,7 +50,7 @@ class ClientIntroduceEvent : public Event {
     std::string pid = toString(Static::posix()->getpid());
     std::string client_id = num + "@" + node_name + "!" + pid;
     LogInfo info = {{"client_id", client_id}};
-    DEBUGV(Context::logger(), "Welcoming new client: '${client_id}'", info);
+    DEBUGV(Context::Logger(), "Welcoming new client: '${client_id}'", info);
 
     // Build client response.
     Message response;

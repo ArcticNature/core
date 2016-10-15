@@ -14,21 +14,21 @@ using sf::core::event::ManualSource;
 using sf::core::interface::CopyManualSourceIntent;
 using sf::core::interface::NodeConfigIntentRef;
 
-using sf::core::model::EventSourceManagerRef;
+using sf::core::model::LoopManagerRef;
 using sf::core::test::NodeConfigIntentTest;
 
 
 TEST_F(NodeConfigIntentTest, EnsureManualSourceIsCarried) {
-  ContextRef old_context = Context::instance();
-  ManualSource* old_manual = 
-      Context::sourceManager()->get<ManualSource>("manual");
+  ContextRef old_context = Context::Instance();
+  ManualSource* old_manual =
+    Context::LoopManager()->get<ManualSource>("manual");
 
   this->addIntent(NodeConfigIntentRef(new CopyManualSourceIntent()));
   this->load();
 
-  ContextRef new_context = Context::instance();
+  ContextRef new_context = Context::Instance();
   ManualSource* new_manual =
-      Context::sourceManager()->get<ManualSource>("manual");
+      Context::LoopManager()->get<ManualSource>("manual");
   ASSERT_EQ(old_manual, new_manual);
   ASSERT_NE(old_context.get(), new_context.get());
 }

@@ -47,7 +47,7 @@ void UnixSource::openSocket() {
   // Log the opening of the server socket.
   LogInfo info = { {"socket",  this->path} };
   INFOV(
-      Context::logger(),
+      Context::Logger(),
       "Listening for connections on UNIX socket at ${socket}.",
       info
   );
@@ -99,7 +99,7 @@ EventRef UnixSource::parse() {
 
   // Add drain and source to contexts.
   Static::drains()->add(drain);
-  Context::sourceManager()->addSource(source);
+  Context::LoopManager()->add(source);
 
   // Done.
   return EventRef();

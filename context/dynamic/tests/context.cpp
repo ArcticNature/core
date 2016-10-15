@@ -11,8 +11,8 @@ using sf::core::exception::ContextUninitialised;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManager;
-using sf::core::model::EventSourceManagerRef;
+using sf::core::model::LoopManager;
+using sf::core::model::LoopManagerRef;
 using sf::core::model::EventSourceRef;
 
 using sf::core::model::Logger;
@@ -28,10 +28,10 @@ class ContextTest : public ::testing::Test {
  public:
   ContextTest() {
     this->context = ContextRef(new Context());
-    Context::initialise(this->context);
+    Context::Initialise(this->context);
   }
   ~ContextTest() {
-    Context::reset();
+    Context::Destroy();
     Logger::destroyFallback();
   }
 };
@@ -50,35 +50,36 @@ class NoopLogger : public Logger {
 };
 
 
-class NoopSourceManager : public EventSourceManager {
+class NoopLoopManager : public LoopManager {
   public:
    void add(EventSourceRef source) {}
-   void remove(std::string id) {}
+   void removeDrain(std::string id) {}
+   void removeSource(std::string id) {}
    EventRef wait(int timeout = -1) {}
 };
 
 
 TEST_F(ContextTest, Defaults) {
-  ASSERT_EQ(Logger::fallback(), Context::logger());
-  ASSERT_THROW(Context::sourceManager(), ContextUninitialised);
+  ASSERT_EQ(Logger::fallback(), Context::Logger());
+  ASSERT_THROW(Context::LoopManager(), ContextUninitialised);
 }
 
 TEST_F(ContextTest, ReplaceActiveContext) {
   ContextRef context(new Context());
-  ASSERT_NE(context, Context::instance());
+  ASSERT_NE(context, Context::Instance());
 
-  Context::initialise(context);
-  ASSERT_EQ(context, Context::instance());
+  Context::Initialise(context);
+  ASSERT_EQ(context, Context::Instance());
 }
 
 TEST_F(ContextTest, SetLogger) {
   LoggerRef logger(new NoopLogger());
   this->context->initialise(logger);
-  ASSERT_EQ(logger, Context::logger());
+  ASSERT_EQ(logger, Context::Logger());
 }
 
 TEST_F(ContextTest, SetSourceManager) {
-  EventSourceManagerRef manager(new NoopSourceManager());
+  LoopManagerRef manager(new NoopLoopManager());
   this->context->initialise(manager);
-  ASSERT_EQ(manager, Context::sourceManager());
+  ASSERT_EQ(manager, Context::LoopManager());
 }

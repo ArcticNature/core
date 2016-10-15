@@ -72,14 +72,14 @@ int main(int argc, char** argv) {
       {"trace", ex.getTrace()}
     };
     ERRORV(
-        Logger::fallback(),
+        Context::Logger(),
         "Client terminating due to an error: ${error}", vars
     );
 
     Process::Exit();
     sf::core::context::Client::destroy();
     ReadlineEventSource::destroy();
-    Context::destroy();
+    Context::Destroy();
     Logger::destroyFallback();
     Static::destroy();
     return ex.getCode();
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
   Process::Exit();
   sf::core::context::Client::destroy();
   ReadlineEventSource::destroy();
-  Context::destroy();
+  Context::Destroy();
   Logger::destroyFallback();
   Static::destroy();
   return 0;

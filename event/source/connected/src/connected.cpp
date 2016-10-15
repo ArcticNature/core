@@ -89,7 +89,7 @@ void ConnectedSource::onerror() {
     {"source-id", this->id()}
   };
   ERRORV(
-      Context::logger(),
+      Context::Logger(),
       "A ConnectedSource encountered an error: ${message}",
       info
   );
@@ -104,7 +104,7 @@ void ConnectedSource::onerror() {
       {"source-id", this->id()}
     };
     ERRORV(
-        Context::logger(),
+        Context::Logger(),
         "Unable to disconnect source: ${message}",
         info
     );
@@ -118,7 +118,7 @@ void ConnectedSource::removeDrain() {
 }
 
 void ConnectedSource::removeSource() {
-  Context::sourceManager()->removeSource(this->id());
+  Context::LoopManager()->removeSource(this->id());
 }
 
 void ConnectedSource::safeCleanUp(bool self) {
@@ -138,7 +138,7 @@ void ConnectedSource::safeCleanUp(bool self) {
       {"source-id", this->id()}
     };
     ERRORV(
-        Context::logger(),
+        Context::Logger(),
         "Unable to disconnect source: ${message}",
         info
     );
@@ -157,7 +157,7 @@ void ConnectedSource::safeCleanUp(bool self) {
       {"source-id", this->id()}
     };
     ERRORV(
-        Context::logger(),
+        Context::Logger(),
         "Unable to remove source: ${message}",
         info
     );
@@ -175,7 +175,7 @@ void ConnectedSource::safeCleanUp(bool self) {
       {"source-id", this->id()}
     };
     ERRORV(
-        Context::logger(),
+        Context::Logger(),
         "Unable to remove drain: ${message}",
         info
     );

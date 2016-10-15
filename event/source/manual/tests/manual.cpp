@@ -13,8 +13,8 @@ using sf::core::context::Static;
 using sf::core::event::ManualSource;
 
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 
 using sf::core::event::TestEpollManager;
 using sf::core::event::TestEvent;
@@ -27,23 +27,21 @@ class ManualSourceTest : public ::testing::Test {
 
   ManualSourceTest() {
     Static::initialise(new User());
-    Context::instance()->initialise(EventSourceManagerRef(
-        new TestEpollManager()
-    ));
+    Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
     // Create an instance for the tests.
     this->source = new ManualSource();
-    Context::sourceManager()->addSource(EventSourceRef(source));
+    Context::LoopManager()->add(EventSourceRef(source));
   }
 
   ~ManualSourceTest() {
-    Context::destroy();
+    Context::Destroy();
     Static::destroy();
   }
 };
 
 TEST_F(ManualSourceTest, NoOp) {
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
   ASSERT_EQ(nullptr, event.get());
 }
 
@@ -51,7 +49,7 @@ TEST_F(ManualSourceTest, EnqueueOne) {
   EventRef test1 = EventRef(new TestEvent());
   this->source->enqueueEvent(test1);
 
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
   ASSERT_EQ(test1.get(), event.get());
 }
 
@@ -62,8 +60,8 @@ TEST_F(ManualSourceTest, EnqueueTwo) {
   this->source->enqueueEvent(test1);
   this->source->enqueueEvent(test2);
 
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
   ASSERT_EQ(test1.get(), event.get());
-  event = Context::sourceManager()->wait(1);
+  event = Context::LoopManager()->wait(1);
   ASSERT_EQ(test2.get(), event.get());
 }

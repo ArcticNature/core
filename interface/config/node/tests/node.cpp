@@ -44,7 +44,7 @@ TEST_F(NodeConfigLoaderTest, NewContext) {
   this->loader->load();
   ContextRef context = this->loader->getContext();
   ASSERT_NE(nullptr, context.get());
-  ASSERT_THROW(context->sourceManager(), ContextUninitialised);
+  ASSERT_THROW(context->loopManager(), ContextUninitialised);
 }
 
 TEST_F(NodeConfigLoaderTest, ProcessesFiles) {
@@ -65,7 +65,7 @@ TEST_F(NodeConfigLoaderTest, IntentsAreCollected) {
 TEST_F(NodeConfigLoaderTest, CheckNewContext) {
   this->loader->load();
   ContextRef expected = this->loader->getContext();
-  ContextRef actual = Context::instance();
+  ContextRef actual = Context::Instance();
   ASSERT_EQ(expected.get(), actual.get());
 }
 

@@ -31,8 +31,8 @@ using sf::core::event::UnixSource;
 
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 using sf::core::posix::User;
 
 using sf::core::event::TestEpollManager;
@@ -94,17 +94,15 @@ class UnixClientTest : public ::testing::Test {
   UnixClientTest() {
     // Prepare context.
     Static::initialise(new User());
-    Context::instance()->initialise(
-        EventSourceManagerRef(new TestEpollManager())
-    );
+    Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
     // Create a test "server" with a UnixSource.
     EventSourceRef server(new TestUnixServer(SOCKET_PATH, "test"));
-    Context::sourceManager()->addSource(server);
+    Context::LoopManager()->add(server);
   }
   ~UnixClientTest() {
     TestUnixServer::server_side_drain = EventDrainRef();
-    Context::destroy();
+    Context::Destroy();
     Static::destroy();
   }
 };
@@ -118,13 +116,13 @@ TEST_F(UnixClientTest, ConnectsRegistersDrain) {
 
 TEST_F(UnixClientTest, ConnectsRegistersSource) {
   this->connect();
-  Context::sourceManager()->removeSource("test-5-unix-client-fd");
+  Context::LoopManager()->removeSource("test-5-unix-client-fd");
 }
 
 TEST_F(UnixClientTest, SendsAMessage) {
   // Establish the connection.
   std::string drain_id = this->connect();
-  Context::sourceManager()->wait(1);
+  Context::LoopManager()->wait(1);
   EventDrainRef drain = Static::drains()->get(drain_id);
 
   // Send message over the drain.
@@ -132,7 +130,7 @@ TEST_F(UnixClientTest, SendsAMessage) {
   ASSERT_TRUE(sent);
 
   // Server receives the message.
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
   ASSERT_NE(nullptr, event.get());
   ASSERT_EQ("abc", event->correlation());
 }
@@ -140,7 +138,7 @@ TEST_F(UnixClientTest, SendsAMessage) {
 TEST_F(UnixClientTest, RecievesAMessage) {
   // Establish the connection.
   this->connect();
-  Context::sourceManager()->wait(1);
+  Context::LoopManager()->wait(1);
   EventDrainRef drain = TestUnixServer::server_side_drain;
   ASSERT_NE(nullptr, drain.get());
 
@@ -149,7 +147,7 @@ TEST_F(UnixClientTest, RecievesAMessage) {
   ASSERT_TRUE(sent);
 
   // Server receives the message.
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
   ASSERT_NE(nullptr, event.get());
   ASSERT_EQ("def", event->correlation());
 }

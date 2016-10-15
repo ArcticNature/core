@@ -50,7 +50,7 @@ class ClientIntroduceResponse : public Event {
       {"node_name", this->node_name}
     };
     DEBUGV(
-        Context::logger(),
+        Context::Logger(),
         "Received id ${client_id} from node ${node_name}.",
         info
     );
@@ -61,7 +61,7 @@ class ClientIntroduceResponse : public Event {
     Static::options()->setString("process-name", client_id);
 
     // Enqueue async readline enable.
-    ManualSource* manual = Context::sourceManager()->get<
+    ManualSource* manual = Context::LoopManager()->get<
       ManualSource
     >("manual");
     EventRef async = EventLifecycle::make<EnableReadline>();

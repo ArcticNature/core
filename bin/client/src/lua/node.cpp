@@ -35,7 +35,7 @@ void NodeLuaBinding::status(Lua* lua, int callback_ref, bool details) {
   );
 
   // Enqueue it for handling.
-  ManualSource* manual = Context::sourceManager()->get<ManualSource>("manual");
+  ManualSource* manual = Context::LoopManager()->get<ManualSource>("manual");
   manual->enqueueEvent(request);
 }
 

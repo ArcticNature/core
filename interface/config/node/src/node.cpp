@@ -61,7 +61,7 @@ int NodeConfigLoader::lua_events_from(lua_State* state) {
   // If a function is passed execute it and use the result.
   if (lua->stack()->type(1) == LUA_TFUNCTION) {
     DEBUG(
-        Context::logger(),
+        Context::Logger(),
         "Resolving function passed to 'core.events_from' ..."
     );
     lua->call(0, 1);
@@ -77,7 +77,7 @@ int NodeConfigLoader::lua_events_from(lua_State* state) {
 
   } else {
     DEBUG(
-        Context::logger(),
+        Context::Logger(),
         "Skipping argument passed to 'core.events_from' due to incorrect type."
     );
   }
@@ -130,7 +130,7 @@ void NodeConfigLoader::run() {
 }
 
 void NodeConfigLoader::sort() {
-  DEBUG(Context::logger(), "Sorting node configuration intents ...");
+  DEBUG(Context::Logger(), "Sorting node configuration intents ...");
 
   // Visit all intents and sort them by dependency.
   std::deque<NodeConfigIntentRef> intents = this->intents;
@@ -214,11 +214,11 @@ void NodeConfigLoader::sort() {
   }
 
   this->intents = sorted;
-  DEBUG(Context::logger(), "Node configuration intents sorted!");
+  DEBUG(Context::Logger(), "Node configuration intents sorted!");
 }
 
 void NodeConfigLoader::updateSystem() {
-  Context::initialise(this->new_context);
+  Context::Initialise(this->new_context);
   RepositoryVersionId new_version(this->effective, this->symbolic);
   Node::me()->configVersion(new_version);
 }

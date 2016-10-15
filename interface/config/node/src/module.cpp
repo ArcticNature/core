@@ -56,7 +56,7 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
       if (lua->stack()->type() == LUA_TFUNCTION) {
         LogInfo info = {{"attribute", *attr}};
         DEBUGV(
-            Context::logger(),
+            Context::Logger(),
             "Resolving function in 'core.${attribute}' ...", info
         );
         lua->call(0, 1);
@@ -67,7 +67,7 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
         lua->stack()->remove(-1);
         LogInfo info = {{"attribute", *attr}};
         DEBUGV(
-            Context::logger(),
+            Context::Logger(),
             "Skipping 'core.${attribute}' due to incorrect type.", info
         );
         continue;
@@ -93,7 +93,7 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
 
  public:
   void handle(std::string event, NodeConfigLifecycleArg* arg) {
-    DEBUG(Context::logger(), "Collecting node configuration intents ...");
+    DEBUG(Context::Logger(), "Collecting node configuration intents ...");
 
     // Collect intents and defaults.
     NodeConfigLoader* loader = arg->loader();
@@ -101,7 +101,7 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
     this->collectCoreIntents(loader, lua);
     this->collectDefaults(loader);
 
-    DEBUG(Context::logger(), "Node configuration intents collected!");
+    DEBUG(Context::Logger(), "Node configuration intents collected!");
 
   }
 };

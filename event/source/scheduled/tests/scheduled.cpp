@@ -23,8 +23,8 @@ using sf::core::event::ScheduledSource;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 
 using sf::core::event::TestEpollManager;
 using sf::core::posix::User;
@@ -36,26 +36,22 @@ class ScheduledSourceTest : public ::testing::Test {
 
   ScheduledSourceTest() {
     Static::initialise(new User());
-    Context::instance()->initialise(EventSourceManagerRef(
-        new TestEpollManager()
-    ));
+    Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
     // Create an instance for the tests.
     this->source = new ScheduledSource(1);
-    Context::sourceManager()->addSource(EventSourceRef(source));
-    Context::sourceManager()->addSource(
-        EventSourceRef(new ManualSource())
-    );
+    Context::LoopManager()->add(EventSourceRef(source));
+    Context::LoopManager()->add(EventSourceRef(new ManualSource()));
   }
 
   ~ScheduledSourceTest() {
-    Context::destroy();
+    Context::Destroy();
     Static::destroy();
   }
 
   EventRef wait(int units) {
     sleep(units);
-    return Context::sourceManager()->wait(1);
+    return Context::LoopManager()->wait(1);
   }
 };
 

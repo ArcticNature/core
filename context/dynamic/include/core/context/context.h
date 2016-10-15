@@ -20,34 +20,30 @@ namespace context {
     static ContextRef _instance;
 
    public:
-    static sf::core::model::LoggerRef logger();
-    static sf::core::model::EventSourceManagerRef sourceManager();
+    static sf::core::model::LoggerRef Logger();
+    static sf::core::model::LoopManagerRef LoopManager();
 
     // Context managment function.
-    static void initialise(ContextRef context);
-    static ContextRef instance();
+    static void Initialise(ContextRef context);
+    static ContextRef Instance();
 
     //! Cleans up all the allocated resources.
-    static void destroy();
-
-#if DEBUG_BUILD
-    static void reset();
-#endif  // DEBUG_BUILD
+    static void Destroy();
 
    protected:
     sf::core::model::LoggerRef _logger;
-    sf::core::model::EventSourceManagerRef source_manager;
+    sf::core::model::LoopManagerRef loop_manager;
 
    public:
     Context();
     ~Context();
 
     void initialise(sf::core::model::LoggerRef logger);
-    void initialise(sf::core::model::EventSourceManagerRef source_manager);
+    void initialise(sf::core::model::LoopManagerRef manager);
 
     // Instance version of fetch methods.
     // Needed by node configuration to manipulate new context.
-    sf::core::model::EventSourceManagerRef instanceSourceManager();
+    sf::core::model::LoopManagerRef loopManager();
   };
 
 }  // namespace context

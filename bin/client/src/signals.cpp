@@ -22,8 +22,8 @@ using sf::core::event::SignalSource;
 
 using sf::core::exception::CleanExit;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 
 
 class ClientSignalSource : public SignalSource {
@@ -36,7 +36,7 @@ class ClientSignalSource : public SignalSource {
     Static::posix()->sigaddset(&mask, SIGTERM);
 
 #if TRAP_SIGINT
-    DEBUG(Context::logger(), "Trapping SIGINT too.");
+    DEBUG(Context::Logger(), "Trapping SIGINT too.");
     Static::posix()->sigaddset(&mask, SIGINT);
 #endif
 
@@ -44,7 +44,7 @@ class ClientSignalSource : public SignalSource {
   }
 
   EventRef handleStop() {
-    INFO(Context::logger(), "Terminating client ...");
+    INFO(Context::Logger(), "Terminating client ...");
     throw CleanExit();
   }
 
@@ -60,6 +60,5 @@ class ClientSignalSource : public SignalSource {
 
 
 void Client::maskSignals() {
-  EventSourceManagerRef sources = Context::sourceManager();
-  sources->addSource(EventSourceRef(new ClientSignalSource()));
+  Context::LoopManager()->add(EventSourceRef(new ClientSignalSource()));
 }

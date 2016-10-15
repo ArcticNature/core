@@ -24,7 +24,7 @@ EventDrainRef UnixServer::clientDrain(int fd, std::string id) {
   std::string   drain_id = drain->id();
   LogInfo info = {{"drain-id", drain_id}};
   DEBUGV(
-      Context::logger(),
+      Context::Logger(),
       "Created drain ${drain-id} for unix connection.", info
   );
   return drain;
@@ -40,7 +40,7 @@ EventSourceRef UnixServer::clientSource(
     {"source-id", source_id}
   };
   DEBUGV(
-      Context::logger(),
+      Context::Logger(),
       "Created source ${source-id} for unix connection.", info
   );
   return source;

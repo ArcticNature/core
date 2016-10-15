@@ -70,19 +70,19 @@ int main(int argc, char** argv) {
       {"trace", ex.getTrace()}
     };
     ERRORV(
-        Logger::fallback(),
+        Context::Logger(),
         "Manager terminating due to an error: ${error}", vars
     );
 
     Process::Exit();
-    Context::destroy();
+    Context::Destroy();
     Logger::destroyFallback();
     Static::destroy();
     return ex.getCode();
   }
 
   Process::Exit();
-  Context::destroy();
+  Context::Destroy();
   Logger::destroyFallback();
   Static::destroy();
   return 0;

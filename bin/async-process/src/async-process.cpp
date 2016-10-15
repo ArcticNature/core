@@ -20,14 +20,14 @@ using sf::core::exception::ContextUninitialised;
 using sf::core::exception::SfException;
 
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::LogInfo;
+using sf::core::model::LoopManagerRef;
 
-using sf::core::registry::EventSourceManager;
+using sf::core::registry::LoopManager;
 
 
 void AsyncPorcess::disableSIGINT() {
-  INFO(Context::logger(), "Disabling SIGINT.");
+  INFO(Context::Logger(), "Disabling SIGINT.");
 
   sigset_t mask;
   Static::posix()->sigemptyset(&mask);
@@ -51,19 +51,19 @@ void AsyncPorcess::handleLoopError(
     {"error", ex->what()}, {"trace", ex->getTrace()},
     {"drain_error", drain ? "yes" : "no" }
   };
-  ERRORV(Context::logger(), "Error during run loop. ${error}", vars);
+  ERRORV(Context::Logger(), "Error during run loop. ${error}", vars);
 }
 
 void AsyncPorcess::loop() {
   while (true) {
     EventRef event;
-    EventSourceManagerRef source = Context::sourceManager();
-    if (!source) {
-      throw ContextUninitialised("Need event source to run!");
+    LoopManagerRef loop = Context::LoopManager();
+    if (!loop) {
+      throw ContextUninitialised("Need a LoopManager to run!");
     }
 
     try {
-      event = source->wait();
+      event = loop->wait();
       if (!event) { continue; }
 
       // Attempt to handle or rescue.
@@ -89,18 +89,18 @@ void AsyncPorcess::loop() {
 }
 
 void AsyncPorcess::registerDefaultSourceManager() {
-  DEBUG(Context::logger(), "Configuring default event source manager.");
+  DEBUG(Context::Logger(), "Configuring default event source manager.");
 
-  EventSourceManagerRef manager;
+  LoopManagerRef manager;
   std::string manager_name = DEAFULT_EVENT_SOURCE_MANAGER;
-  manager = EventSourceManager::instance()->get(manager_name)();
+  manager = LoopManager::instance()->get(manager_name)();
 
-  Context::instance()->initialise(manager);
+  Context::Instance()->initialise(manager);
 }
 
 
 void AsyncPorcess::run() {
-  INFO(Context::logger(), "Starting run loop.");
+  INFO(Context::Logger(), "Starting run loop.");
   this->loop();
-  INFO(Context::logger(), "Terminating cleanly.");
+  INFO(Context::Logger(), "Terminating cleanly.");
 }

@@ -26,7 +26,7 @@ namespace event {
     // Debug log the path to the socket.
     sf::core::model::LogInfo info = { {"socket", socket} };
     DEBUGV(
-        sf::core::context::Context::logger(),
+        sf::core::context::Context::Logger(),
         "Establishing UNIX socket at ${socket}.",
         info
     );
@@ -63,7 +63,7 @@ namespace event {
 
     // Register in event managers.
     sf::core::context::Static::drains()->add(drain);
-    sf::core::context::Context::sourceManager()->addSource(source);
+    sf::core::context::Context::LoopManager()->add(source);
 
     // Log connection established.
     info = {
@@ -72,7 +72,7 @@ namespace event {
       {"source-id", source->id()}
     };
     INFOV(
-        sf::core::context::Context::logger(),
+        sf::core::context::Context::Logger(),
         "Connected to UNIX socket at ${socket}.",
         info
     );

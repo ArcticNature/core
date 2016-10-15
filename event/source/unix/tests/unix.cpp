@@ -39,8 +39,8 @@ using sf::core::model::Event;
 using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 
 using sf::core::posix::User;
 using sf::core::protocol::test::Message;
@@ -111,9 +111,7 @@ class UnixSourceTest : public ::testing::Test {
     this->client_fd = -1;
 
     Static::initialise(new User());
-    Context::instance()->initialise(EventSourceManagerRef(
-        new TestEpollManager()
-    ));
+    Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
     // Ensure that the socket file does not exist.
     if (this->fileExists(SOCKET_FILE)) {
@@ -125,7 +123,7 @@ class UnixSourceTest : public ::testing::Test {
     if (this->client_fd != -1) {
       Static::posix()->close(this->client_fd);
     }
-    Context::destroy();
+    Context::Destroy();
     Static::destroy();
   }
 };
@@ -148,26 +146,26 @@ TEST_F(UnixSourceTest, DeletesSockFile) {
 }
 
 TEST_F(UnixSourceTest, ConnectAddsSource) {
-  EventSourceManagerRef sources = Context::sourceManager();
+  LoopManagerRef  loop = Context::LoopManager();
   TestUnixSource* source = new TestUnixSource(SOCKET_FILE, "test");
 
-  sources->addSource(EventSourceRef(source));
+  loop->add(EventSourceRef(source));
   this->connect();
-  EventRef event = sources->wait(1);
+  EventRef event = loop->wait(1);
 
   std::string client_id = source->sources[0];
-  sources->removeSource(client_id);
+  loop->removeSource(client_id);
   ASSERT_EQ(nullptr, event.get());
 }
 
 TEST_F(UnixSourceTest, ConnectAddsDrain) {
   EventDrainManager* drains = Static::drains();
-  EventSourceManagerRef sources = Context::sourceManager();
+  LoopManagerRef  loop = Context::LoopManager();
   TestUnixSource* source = new TestUnixSource(SOCKET_FILE, "test");
 
-  sources->addSource(EventSourceRef(source));
+  loop->add(EventSourceRef(source));
   this->connect();
-  EventRef event = sources->wait(1);
+  EventRef event = loop->wait(1);
 
   std::string client_id = source->drains[0];
   drains->remove(client_id);
@@ -177,11 +175,11 @@ TEST_F(UnixSourceTest, ConnectAddsDrain) {
 TEST_F(UnixSourceTest, ClientToServer) {
   // Create UNIX source and connect client.
   EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
-  EventSourceManagerRef sources = Context::sourceManager();
+  LoopManagerRef loop = Context::LoopManager();
 
-  sources->addSource(source);
+  loop->add(source);
   this->connect();
-  sources->wait(1);
+  loop->wait(1);
 
   // Send message throug the client.
   Message message;
@@ -190,7 +188,7 @@ TEST_F(UnixSourceTest, ClientToServer) {
   ASSERT_TRUE(sent);
 
   // Check that the message is parsed from the source.
-  EventRef event = sources->wait(10);
+  EventRef event = loop->wait(10);
   ASSERT_NE(nullptr, event.get());
   ASSERT_NE(nullptr, dynamic_cast<TestEvent*>(event.get()));
 }
@@ -198,11 +196,11 @@ TEST_F(UnixSourceTest, ClientToServer) {
 TEST_F(UnixSourceTest, ServerToClient) {
   // Create UNIX source and connect client.
   EventSourceRef source(new TestUnixSource(SOCKET_FILE, "test"));
-  EventSourceManagerRef sources = Context::sourceManager();
+  LoopManagerRef loop = Context::LoopManager();
 
-  sources->addSource(source);
+  loop->add(source);
   this->connect();
-  sources->wait(1);
+  loop->wait(1);
 
   // Send message down the drain.
   int remote_fd = this->client_fd + 1;

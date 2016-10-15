@@ -23,7 +23,7 @@ FdDrain::FdDrain(int fd, std::string id) : EventDrain(id + "-fd") {
 
 FdDrain::~FdDrain() {
   LogInfo info = {{"drain-id", this->id()}};
-  INFOV(Context::logger(), "Closing drain ${drain-id}", info);
+  INFOV(Context::Logger(), "Closing drain ${drain-id}", info);
 
   Static::posix()->shutdown(this->fd, SHUT_WR);
   Static::posix()->close(this->fd);

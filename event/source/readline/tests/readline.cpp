@@ -23,8 +23,8 @@ using sf::core::event::ReadlineEventSource;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 
 using sf::core::event::TestEpollManager;
 using sf::core::posix::User;
@@ -57,9 +57,7 @@ class ReadlineSourceTest : public ::testing::Test {
 
   ReadlineSourceTest() {
     Static::initialise(new User());
-    Context::instance()->initialise(EventSourceManagerRef(
-        new TestEpollManager()
-    ));
+    Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
     // Redirect stdin from a pipe.
     int buff[2];
@@ -71,14 +69,14 @@ class ReadlineSourceTest : public ::testing::Test {
 
     // Create an instance for the tests.
     Static::options()->setString("client-id", "TEST");
-    Context::sourceManager()->addSource(
+    Context::LoopManager()->add(
         ReadlineEventSource::instance(test_readline_parser)
     );
   }
 
   ~ReadlineSourceTest() {
     ReadlineEventSource::destroy();
-    Context::destroy();
+    Context::Destroy();
     Static::destroy();
 
     // Restore initial stdin.
@@ -102,7 +100,7 @@ class ReadlineSourceTest : public ::testing::Test {
   }
 
   void ASSERT_LINE(std::string expected) {
-    EventRef   actual = Context::sourceManager()->wait(1);
+    EventRef   actual = Context::LoopManager()->wait(1);
     LineEvent* event  = dynamic_cast<LineEvent*>(actual.get());
     ASSERT_NE(nullptr, event);
     ASSERT_EQ(expected, event->line);

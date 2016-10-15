@@ -58,7 +58,7 @@ namespace event {
     ScheduledClosureList closures;
 
    public:
-    ScheduledSource(int tick);
+    explicit ScheduledSource(int tick);
     ~ScheduledSource();
 
     //! Returns a list of scored callbacks.

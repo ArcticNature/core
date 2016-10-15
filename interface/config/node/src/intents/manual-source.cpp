@@ -18,9 +18,7 @@ CopyManualSourceIntent::CopyManualSourceIntent() : NodeConfigIntent(
 }
 
 void CopyManualSourceIntent::apply(ContextRef context) {
-  context->instanceSourceManager()->add(
-      Context::sourceManager()->fetch("manual")
-  );
+  context->loopManager()->add(Context::LoopManager()->fetch("manual"));
 }
 
 std::vector<std::string> CopyManualSourceIntent::depends() const {
@@ -32,5 +30,5 @@ std::string CopyManualSourceIntent::provides() const {
 }
 
 void CopyManualSourceIntent::verify(ContextRef context) {
-  Context::sourceManager()->fetch("manual");
+  Context::LoopManager()->fetch("manual");
 }

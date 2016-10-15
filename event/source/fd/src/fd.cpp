@@ -18,7 +18,7 @@ using sf::core::model::LogInfo;
 
 void FdSource::disconnect() {
   LogInfo info = {{"source-id", this->id()}};
-  INFOV(Context::logger(), "Closing source ${source-id}", info);
+  INFOV(Context::Logger(), "Closing source ${source-id}", info);
 
   Static::posix()->shutdown(this->fd, SHUT_RD);
   Static::posix()->close(this->fd);

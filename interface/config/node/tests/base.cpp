@@ -34,8 +34,8 @@ using sf::core::interface::NodeConfigIntentLuaProxy;
 using sf::core::interface::NodeConfigLoader;
 
 using sf::core::model::CLIParser;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 using sf::core::model::RepositoryRef;
 
 using sf::core::posix::User;
@@ -126,9 +126,7 @@ class EventManagerIntent : public MockIntent {
     if (this->noop) {
       return;
     }
-    context->initialise(
-        EventSourceManagerRef(new TestEpollManager())
-    );
+    context->initialise(LoopManagerRef(new TestEpollManager()));
   }
 };
 
@@ -354,8 +352,8 @@ NodeConfigIntentTest::NodeConfigIntentTest() {
   Static::parser(new TestParser());
   Static::repository(RepositoryRef(new GitRepo("config-example/")));
 
-  EventSourceManagerRef manager(new TestEpollManager());
-  Context::instance()->initialise(manager);
+  LoopManagerRef manager(new TestEpollManager());
+  Context::Instance()->initialise(manager);
   manager->add(EventSourceRef(new ManualSource()));
 
   this->loader = std::shared_ptr<TestIntentLoader>(
@@ -365,7 +363,7 @@ NodeConfigIntentTest::NodeConfigIntentTest() {
 
 NodeConfigIntentTest::~NodeConfigIntentTest() {
   this->loader.reset();
-  Context::destroy();
+  Context::Destroy();
   Static::destroy();
   git_libgit2_shutdown();
 }

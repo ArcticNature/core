@@ -47,7 +47,7 @@ void LoadConfiguration::handle() {
     {"requested", this->version}
   };
   INFOV(
-      Context::logger(),
+      Context::Logger(),
       "Loading configuration '${requested}' (currently at '${current}').",
       info
   );
@@ -63,7 +63,7 @@ void LoadConfiguration::handle() {
   // Update status again.
   info = {{"requested", Node::me()->configVersion().effective()}};
   INFOV(
-      Context::logger(), "Configuration '${requested}' loaded).",
+      Context::Logger(), "Configuration '${requested}' loaded).",
       info
   );
   Node::me()->status()->set("configuration", NodeStatusDetail(
@@ -73,7 +73,7 @@ void LoadConfiguration::handle() {
 
   // TODO(stefano): remove this when config works.
   EventSourceRef server(new UnixServer("/tmp/snow-fox.socket"));
-  Context::sourceManager()->addSource(server);
+  Context::LoopManager()->add(server);
 }
 
 void LoadConfiguration::rescue(SfException* ex) {

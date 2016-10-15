@@ -56,11 +56,9 @@ std::string DefaultScheduledSourceIntent::provides() const {
 void DefaultScheduledSourceIntent::apply(ContextRef context) {
   // Create a ScheduledSource if none is in the context.
   try {
-    context->instanceSourceManager()->fetch("scheduler");
+    context->loopManager()->fetch("scheduler");
   } catch (EventSourceNotFound& ex) {
-    context->instanceSourceManager()->add(EventSourceRef(
-        new ScheduledSource(1)
-    ));
+    context->loopManager()->add(EventSourceRef(new ScheduledSource(1)));
   }
 
   // Copy all the callbacks to keep (if a ScheduledSource exists).
@@ -68,7 +66,7 @@ void DefaultScheduledSourceIntent::apply(ContextRef context) {
   std::vector<ScheduledClosureList::ScoredValue>::iterator it;
 
   try {
-    ScheduledSource* old_scheduler = Context::sourceManager()->get<
+    ScheduledSource* old_scheduler = Context::LoopManager()->get<
       ScheduledSource
     >("scheduler");
     callbacks = old_scheduler->keepCallbacks();
@@ -77,7 +75,7 @@ void DefaultScheduledSourceIntent::apply(ContextRef context) {
   }
 
   ScheduledSource* new_scheduler =
-    context->instanceSourceManager()->get<ScheduledSource>("scheduler");
+    context->loopManager()->get<ScheduledSource>("scheduler");
 
   for (it = callbacks.begin(); it != callbacks.end(); it++) {
     new_scheduler->registerCallback(it->score, it->value);
@@ -104,9 +102,7 @@ std::string ScheduledSourceIntent::provides() const {
 }
 
 void ScheduledSourceIntent::apply(ContextRef context) {
-  context->instanceSourceManager()->add(EventSourceRef(
-      new ScheduledSource(this->tick)
-  ));
+  context->loopManager()->add(EventSourceRef(new ScheduledSource(this->tick)));
 }
 
 void ScheduledSourceIntent::verify(ContextRef context) {

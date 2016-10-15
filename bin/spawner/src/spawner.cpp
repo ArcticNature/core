@@ -30,8 +30,7 @@ void Spawner::connectDaemon() {
 void Spawner::managerSocket() {
   CLIParser*  parser = Static::parser();
   std::string manager_path = parser->getString("spawner-manager-socket");
-
-  Context::sourceManager()->addSource(EventSourceRef(
+  Context::LoopManager()->add(EventSourceRef(
       new SpawnerToManagerSource(manager_path)
   ));
 }

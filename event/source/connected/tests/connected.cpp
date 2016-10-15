@@ -29,8 +29,8 @@ using sf::core::event::UnixSource;
 using sf::core::model::EventDrain;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
-using sf::core::model::EventSourceManagerRef;
 using sf::core::model::EventSourceRef;
+using sf::core::model::LoopManagerRef;
 
 using sf::core::event::TestEpollManager;
 using sf::core::event::TestEvent;
@@ -120,18 +120,16 @@ class ConnectedSourceTest : public ::testing::Test {
  public:
   ConnectedSourceTest() {
     Static::initialise(new User());
-    Context::instance()->initialise(EventSourceManagerRef(
-      new TestEpollManager()
-    ));
+    Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
     // Start listening for connections.
     ConnectedUnixSource* listen = new ConnectedUnixSource(SOCKET_PATH);
-    Context::sourceManager()->addSource(EventSourceRef(listen));
+    Context::LoopManager()->add(EventSourceRef(listen));
 
     // Connect to the server.
     EventSourceRef client(new TestUnixClient(SOCKET_PATH));
-    Context::sourceManager()->addSource(client);
-    Context::sourceManager()->wait(1);
+    Context::LoopManager()->add(client);
+    Context::LoopManager()->wait(1);
 
     // Keep references to useful bits.
     this->server    = listen->getClientSource();
@@ -145,7 +143,7 @@ class ConnectedSourceTest : public ::testing::Test {
     this->client = EventSourceRef();
     this->server = EventSourceRef();
     this->server_drain = EventDrainRef();
-    Context::destroy();
+    Context::Destroy();
     Static::destroy();
   }
 
@@ -153,7 +151,7 @@ class ConnectedSourceTest : public ::testing::Test {
     std::string id  = this->client->id();
     this->client    = EventSourceRef();
     this->client_fd = -1;
-    Context::sourceManager()->removeSource(id);
+    Context::LoopManager()->removeSource(id);
   }
 };
 
@@ -187,7 +185,7 @@ TEST_F(ConnectedSourceTest, DetectOpen) {
 
 
 TEST_F(ConnectedSourceTest, SourceIsRemovedFromManager) {
-  EventSourceManagerRef manager = Context::sourceManager();
+  LoopManagerRef manager = Context::LoopManager();
   this->closeClient();
   EventRef event = manager->wait(1);
 
@@ -198,7 +196,7 @@ TEST_F(ConnectedSourceTest, SourceIsRemovedFromManager) {
 TEST_F(ConnectedSourceTest, DrainIsRemovedFromManager) {
   std::string drain_id = this->server_drain->id();
   this->closeClient();
-  EventRef event = Context::sourceManager()->wait(1);
+  EventRef event = Context::LoopManager()->wait(1);
 
   ASSERT_EQ(nullptr, event.get());
   ASSERT_THROW(Static::drains()->remove(drain_id), EventDrainNotFound);

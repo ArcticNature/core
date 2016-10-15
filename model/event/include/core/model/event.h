@@ -164,22 +164,23 @@ namespace model {
   typedef std::shared_ptr<EventSource> EventSourceRef;
 
 
-  //! Manages event sources.
+  //! Manages event sources and drains.
   /**
-   * As the system can receive events from multiple sources, an
-   * EventSourceManager is responsible for coordinating the reading
-   * and handling od these events.
+   * As the system can receive events from multiple sources and send data to
+   * multiple drains, a LoopManager is responsible for coordinating the
+   * reading and handling of these events as well as the flushing of drains.
    *
-   * The EventSourceManager instance in use is stored in the Context
-   * so there is only one **active** EventSourceManager (but there could
-   * be multiple EventSourceManager instances).
+   * The LoopManager instance in use is stored in the Context so there is only
+   * one **active** LoopManager (but there could be multiple LoopManager
+   * instances existing in the system).
    */
-  class EventSourceManager {
+  class LoopManager {
    protected:
+    std::map<std::string, EventDrainRef>  drains;
     std::map<std::string, EventSourceRef> sources;
 
    public:
-    virtual ~EventSourceManager();
+    virtual ~LoopManager();
 
     //! Returns a pointer to the requested event source.
     template<typename EventSrc>
@@ -197,27 +198,27 @@ namespace model {
 
     //! Adds an event source to the manager.
     virtual void add(EventSourceRef source) = 0;
-    void addSource(EventSourceRef source);
 
     //! Returns en event source reference for the requested source.
     EventSourceRef fetch(std::string id) const;
 
+    //! Removes an event drain from the manager.
+    virtual void removeDrain(std::string id) = 0;
+
     //! Removes an event source from the manager.
-    virtual void remove(std::string id) = 0;
-    void removeSource(std::string id);
+    virtual void removeSource(std::string id) = 0;
 
     //! Waits for one or more file descriptors to be ready.
     /**
      * The method blocks the execution of the current thread until
      * an event is returned or until timeout expires.
      *
-     * 
      * \param timeout How long (in ms) to block for before giving up.
      * The default of -1 will block indefinitely.
      */
     virtual EventRef wait(int timeout = -1) = 0;
   };
-  typedef std::shared_ptr<EventSourceManager> EventSourceManagerRef;
+  typedef std::shared_ptr<LoopManager> LoopManagerRef;
 
 }  // namespace model
 }  // namespace core

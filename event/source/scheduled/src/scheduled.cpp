@@ -62,7 +62,7 @@ EventRef ScheduledSource::parse() {
   if (count > 1) {
     LogInfo info = {{"ticks", toString(count)}};
     WARNINGV(
-        Context::logger(),
+        Context::Logger(),
         "Multiple ticks (${ticks}) occurred before the Scheduler could "
         "catch up with them. This may indicate system overload.",
         info
@@ -75,7 +75,7 @@ EventRef ScheduledSource::parse() {
   // Oterwise return the one event or nullptr.
   bool single_return = true;
   EventRef maybe_return;
-  ManualSource* manual = Context::sourceManager()->get<ManualSource>("manual");
+  ManualSource* manual = Context::LoopManager()->get<ManualSource>("manual");
   std::vector<ScheduledClosure> closures = this->closures.pop();
   std::vector<ScheduledClosure>::iterator it;
 

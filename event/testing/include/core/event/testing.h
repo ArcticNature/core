@@ -36,17 +36,19 @@ namespace event {
   };
 
 
-  class TestEpollManager : public sf::core::model::EventSourceManager {
+  class TestEpollManager : public sf::core::model::LoopManager {
    protected:
     int epoll_fd;
-    std::map<int, sf::core::model::EventSourceRef> index;
+    std::map<int, sf::core::model::EventDrainRef>  drainsIndex;
+    std::map<int, sf::core::model::EventSourceRef> sourcesIndex;
 
    public:
     TestEpollManager();
     virtual ~TestEpollManager();
 
     void add(sf::core::model::EventSourceRef source);
-    void remove(std::string id);
+    void removeDrain(std::string id);
+    void removeSource(std::string id);
     sf::core::model::EventRef wait(int timeout = -1);
   };
 

@@ -104,9 +104,7 @@ void Client::introduceToServer() {
 void Client::initialise() {
   // Initialise event sources.
   this->registerDefaultSourceManager();
-  Context::sourceManager()->addSource(EventSourceRef(
-        new ManualSource()
-  ));
+  Context::LoopManager()->add(EventSourceRef(new ManualSource()));
 
   // Initialise client.
   this->maskSignals();
