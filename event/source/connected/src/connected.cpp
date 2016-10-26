@@ -26,6 +26,7 @@ using sf::core::event::FileDescriptorState;
 using sf::core::model::EventSource;
 using sf::core::model::LogInfo;
 
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventSource;
 using sf::core::utility::string::toString;
 
@@ -59,7 +60,7 @@ FileDescriptorState ConnectedSource::checkFdState(int fd) {
 
 
 bool ConnectedSource::checkFD() {
-  int fd = this->getFD();
+  int fd = this->fd();
   FileDescriptorState state = ConnectedSource::checkFdState(fd);
   switch (state) {
     case FileDescriptorState::CLOSED:
@@ -114,7 +115,7 @@ void ConnectedSource::onerror() {
 }
 
 void ConnectedSource::removeDrain() {
-  Static::drains()->remove(this->drain_id);
+  Static::drains()->remove(this->drain->id());
 }
 
 void ConnectedSource::removeSource() {
@@ -123,7 +124,7 @@ void ConnectedSource::removeSource() {
 
 void ConnectedSource::safeCleanUp(bool self) {
   // If the fd is -1, it was closed while parsing.
-  if (this->getFD() == -1) {
+  if (this->_closed) {
     return;
   }
 
@@ -171,7 +172,7 @@ void ConnectedSource::safeCleanUp(bool self) {
       {"code",  toString(ex.getCode())},
       {"trace", ex.getTrace()},
       {"message",   ex.what()},
-      {"drain-id",  this->drain_id},
+      {"drain-id",  this->drain->id()},
       {"source-id", this->id()}
     };
     ERRORV(
@@ -183,5 +184,7 @@ void ConnectedSource::safeCleanUp(bool self) {
 }
 
 ConnectedSource::ConnectedSource(
-    std::string id, std::string drain
-) : EventSource(id), drain_id(drain) {}
+    std::string id, EventDrainRef drain
+) : EventSource(id), drain(drain) {
+  this->_closed = false;
+}

@@ -4,6 +4,8 @@
 #include "core/bin/daemon.h"
 #include "core/context/daemon.h"
 #include "core/context/static.h"
+
+#include "core/event/drain/null.h"
 #include "core/exceptions/base.h"
 
 #include "core/model/event.h"
@@ -19,10 +21,12 @@
 using sf::core::bin::TerminateDaemon;
 using sf::core::context::Static;
 
+using sf::core::event::NullDrain;
 using sf::core::exception::CleanExit;
 using sf::core::exception::SfException;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 
@@ -76,7 +80,7 @@ void TerminateDaemon::stopManager() {
   ManagerMessage message;
   message.set_code(ManagerMessage::Shutdown);
 
-  int drain = this->context->managerDrain()->getFD();
+  int drain = this->context->managerDrain()->fd();
   MessageIO<ManagerMessage>::send(drain, message);
 }
 
@@ -86,13 +90,13 @@ void TerminateDaemon::stopSpawner() {
   SpwanerMessage message;
   message.set_code(SpwanerMessage::Shutdown);
 
-  int drain = this->context->spawnerDrain()->getFD();
+  int drain = this->context->spawnerDrain()->fd();
   MessageIO<SpwanerMessage>::send(drain, message);
 }
 
 
 TerminateDaemon::TerminateDaemon(std::string correlation) : Event(
-    correlation, "NULL"
+    correlation, EventDrainRef(new NullDrain())
 ) {
   this->context = sf::core::context::Daemon::instance();
 }

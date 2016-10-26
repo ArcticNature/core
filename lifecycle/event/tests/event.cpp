@@ -14,8 +14,11 @@ using sf::core::interface::BaseLifecycleHandler;
 
 using sf::core::context::Static;
 using sf::core::lifecycle::EventLifecycle;
+
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 
+using sf::core::event::MockDrain;
 using sf::core::event::TestEvent;
 using sf::core::model::CLIParser;
 
@@ -30,8 +33,13 @@ class NullParser : public CLIParser {
 
 class TestEvent2 : public TestEvent {
  public:
-  TestEvent2() : TestEvent() {}
-  TestEvent2(std::string cor, std::string drain) : TestEvent(cor, drain) {}
+  TestEvent2() : TestEvent() {
+    // Noop.
+  }
+
+  TestEvent2(std::string cor, EventDrainRef drain) : TestEvent(cor, drain) {
+    // Noop.
+  }
 };
 
 
@@ -56,6 +64,10 @@ class EventLifecycleTest : public ::testing::Test {
   ~EventLifecycleTest() {
     EventLifecycle::reset();
     Static::destroy();
+  }
+
+  EventDrainRef nullDrain() {
+    return EventDrainRef(new MockDrain("NULL"));
   }
 };
 
@@ -84,7 +96,7 @@ TEST_F(EventLifecycleTest, CorrelationIsIdIfNotSet) {
 }
 
 TEST_F(EventLifecycleTest, CorrelationIsPreserved) {
-  EventRef event(new TestEvent("set-outside", "NULL"));
+  EventRef event(new TestEvent("set-outside", this->nullDrain()));
   EventLifecycle::Init(event);
   ASSERT_EQ("set-outside", event->correlation());
 }

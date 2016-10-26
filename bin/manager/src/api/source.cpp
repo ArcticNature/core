@@ -17,6 +17,7 @@ using sf::core::event::FdSource;
 using sf::core::exception::CorruptedData;
 using sf::core::lifecycle::EventLifecycle;
 
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::protocol::public_api::Message;
 using sf::core::protocol::public_api::Message_Code_Name;
@@ -27,7 +28,7 @@ using sf::core::utility::MessageIO;
 
 
 ApiFdSource::ApiFdSource(
-    int fd, std::string id, std::string drain
+    int fd, std::string id, EventDrainRef drain
 ) : FdSource(fd, id, drain) {
   // NOOP.
 }
@@ -38,7 +39,7 @@ EventRef ApiFdSource::parse() {
   }
 
   // Parse event.
-  int fd = this->getFD();
+  int fd = this->fd();
   Message message;
   bool parsed = MessageIO<Message>::parse(fd, &message);
   if (!parsed) {
@@ -48,7 +49,7 @@ EventRef ApiFdSource::parse() {
   // Create event.
   std::string event_name = "Req::" + Message_Code_Name(message.code());
   ApiEventFactory factory = ApiHandlerRegistry::Get(event_name);
-  EventRef event = factory(message, this->drain_id);
+  EventRef event = factory(message, this->drain);
 
   // Initialise event and return.
   EventLifecycle::Init(event);

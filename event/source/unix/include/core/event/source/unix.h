@@ -19,6 +19,7 @@ namespace event {
     std::string path;
 
     void openSocket();
+    sf::core::model::EventRef parse();
 
     //! Returns the event drain for the client.
     /*!
@@ -48,15 +49,14 @@ namespace event {
      * \param drain_id The full id of the client drain.
      */
     virtual sf::core::model::EventSourceRef clientSource(
-        int fd, std::string id, std::string drain_id
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
     ) = 0;
 
    public:
     UnixSource(std::string socket, std::string id);
     ~UnixSource();
-
-    int getFD();
-    sf::core::model::EventRef parse();
+    int fd();
   };
 
 }  // namespace event

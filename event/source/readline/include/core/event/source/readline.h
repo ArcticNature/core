@@ -28,13 +28,12 @@ namespace event {
     LineParser _parser;
 
     explicit ReadlineEventSource(LineParser parser);
+    sf::core::model::EventRef parse();
     bool hasMoreData();
 
    public:
     virtual ~ReadlineEventSource();
-
-    int getFD();
-    sf::core::model::EventRef parse();
+    int fd();
 
    protected:
     static sf::core::model::EventSourceRef _instance;

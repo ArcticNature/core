@@ -22,10 +22,12 @@ using sf::core::context::Static;
 using sf::core::event::ReadlineEventSource;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LoopManagerRef;
 
+using sf::core::event::MockDrain;
 using sf::core::event::TestEpollManager;
 using sf::core::posix::User;
 
@@ -34,7 +36,9 @@ class LineEvent : public Event {
  public:
   std::string line;
 
-  LineEvent(std::string line) : Event("test", "NULL") {
+  LineEvent(std::string line) : Event(
+      "test", EventDrainRef(new MockDrain("NULL"))
+  ) {
     this->line = line;
   }
 

@@ -20,9 +20,3 @@ using sf::core::utility::MessageIO;
 ApiFdDrain::ApiFdDrain(int fd, std::string id) : FdDrain(fd, id) {
   // NOOP.
 }
-
-void ApiFdDrain::sendAck() {
-  Message message;
-  message.set_code(Message::Ack);
-  MessageIO<Message>::send(this->getFD(), message);
-}

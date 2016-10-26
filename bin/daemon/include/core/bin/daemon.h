@@ -90,7 +90,8 @@ namespace bin {
    protected:
     sf::core::model::EventDrainRef  clientDrain(int fd, std::string id);
     sf::core::model::EventSourceRef clientSource(
-        int fd, std::string id, std::string drain_id
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
     );
 
    public:
@@ -103,7 +104,8 @@ namespace bin {
    protected:
     sf::core::model::EventDrainRef  clientDrain(int fd, std::string id);
     sf::core::model::EventSourceRef clientSource(
-        int fd, std::string id, std::string drain_id
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
     );
 
    public:

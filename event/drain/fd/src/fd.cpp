@@ -18,17 +18,21 @@ using sf::core::model::LogInfo;
 
 
 FdDrain::FdDrain(int fd, std::string id) : EventDrain(id + "-fd") {
-  this->fd = fd;
+  this->_fd = fd;
 }
 
 FdDrain::~FdDrain() {
   LogInfo info = {{"drain-id", this->id()}};
   INFOV(Context::Logger(), "Closing drain ${drain-id}", info);
 
-  Static::posix()->shutdown(this->fd, SHUT_WR);
-  Static::posix()->close(this->fd);
+  Static::posix()->shutdown(this->_fd, SHUT_WR);
+  Static::posix()->close(this->_fd);
 }
 
-int FdDrain::getFD() {
-  return this->fd;
+int FdDrain::fd() {
+  return this->_fd;
+}
+
+bool FdDrain::flush() {
+  return true;
 }

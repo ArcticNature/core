@@ -22,14 +22,13 @@ NullDrain::~NullDrain() {
   }
 }
 
-int NullDrain::getFD() {
+bool NullDrain::flush() {
+  return true;
+}
+
+int NullDrain::fd() {
   if (this->null_fd == -1) {
     this->null_fd = Static::posix()->open("/dev/null", O_WRONLY, 0);
   }
   return this->null_fd;
 }
-
-void NullDrain::sendAck() {
-}
-
-

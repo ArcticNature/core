@@ -4,6 +4,7 @@
 #include "core/bin/client/events.h"
 #include "core/context/client.h"
 
+#include "core/event/drain/null.h"
 #include "core/lifecycle/event.h"
 #include "core/model/event.h"
 
@@ -19,8 +20,10 @@ using sf::core::bin::NodeStatusContext;
 using sf::core::bin::NSClientContextRef;
 using sf::core::context::Client;
 
+using sf::core::event::NullDrain;
 using sf::core::lifecycle::EventLifecycle;
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 
 using sf::core::protocol::public_api::Message;
@@ -48,7 +51,7 @@ class NodeInfo : public Event {
  public:
   NodeInfo(
       std::string correlation, Message message
-  ) : Event(correlation, "NULL") {
+  ) : Event(correlation, EventDrainRef(new NullDrain)) {
     this->message = message;
   }
 
@@ -111,7 +114,7 @@ class NodeInfo : public Event {
   }
 };
 
-EventRef node_info_res(Message message, std::string drain) {
+EventRef node_info_res(Message message, EventDrainRef drain) {
   return EventLifecycle::make<NodeInfo>(message.correlation_id(), message);
 }
 

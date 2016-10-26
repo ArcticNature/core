@@ -16,7 +16,7 @@ namespace event {
   //! Unix socket client connector.
   class UnixClient : public FdSource {
    protected:
-    UnixClient(int fd, std::string id, std::string drain_id);
+    UnixClient(int fd, std::string id, sf::core::model::EventDrainRef drain);
 
    public:
     //! Creates a subclass of the UnixClient and the associated drain.

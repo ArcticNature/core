@@ -75,7 +75,7 @@ UnixSource::~UnixSource() {
   }
 }
 
-int UnixSource::getFD() {
+int UnixSource::fd() {
   if (this->socket_fd == -1) {
     this->openSocket();
   }
@@ -95,10 +95,10 @@ EventRef UnixSource::parse() {
   // Generate client drain and source.
   std::string id = this->id() + "-client-" + toString(client_fd);
   EventDrainRef  drain  = this->clientDrain(drain_fd, id);
-  EventSourceRef source = this->clientSource(client_fd, id, drain->id());
+  EventSourceRef source = this->clientSource(client_fd, id, drain);
 
   // Add drain and source to contexts.
-  Static::drains()->add(drain);
+  Static::drains()->add(drain->id(), drain);
   Context::LoopManager()->add(source);
 
   // Done.

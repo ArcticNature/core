@@ -5,6 +5,7 @@
 #include "core/context/daemon.h"
 #include "core/context/static.h"
 
+#include "core/event/drain/null.h"
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
@@ -16,7 +17,10 @@ using sf::core::context::Daemon;
 using sf::core::context::DaemonRef;
 using sf::core::context::Static;
 
+using sf::core::event::NullDrain;
+
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::Logger;
 
 
@@ -37,7 +41,10 @@ bool SigChild::checkChild(pid_t pid) {
 }
 
 
-SigChild::SigChild(std::string correlation) : Event(correlation, "NULL") {
+SigChild::SigChild(std::string correlation) : Event(
+    correlation, EventDrainRef(new NullDrain())
+) {
+  // Noop.
 }
 
 void SigChild::handle() {

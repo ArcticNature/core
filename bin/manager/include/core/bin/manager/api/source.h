@@ -12,9 +12,11 @@ namespace bin {
 
   //! Server-side event source for the public API.
   class ApiFdSource : public sf::core::event::FdSource {
-   public:
-    ApiFdSource(int fd, std::string id, std::string drain);
+   protected:
     sf::core::model::EventRef parse();
+
+   public:
+    ApiFdSource(int fd, std::string id, sf::core::model::EventDrainRef drain);
   };
 
 }  // namespace bin

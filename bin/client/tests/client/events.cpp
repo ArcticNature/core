@@ -41,6 +41,8 @@ using sf::core::utility::MessageIO;
 
 class NodeStatusRequestTest : public ::testing::Test {
  protected:
+  EventDrainRef null;
+  EventDrainRef mock;
   MockDrain* mock_drain;
   int test_reference;
 
@@ -49,22 +51,26 @@ class NodeStatusRequestTest : public ::testing::Test {
     Static::options()->setString("process-name", "test");
     Static::initialise(new User());
     this->mock_drain = new MockDrain("mock");
+    this->mock = EventDrainRef(this->mock_drain);
+    this->null = EventDrainRef(new NullDrain());
 
-    Static::drains()->add(EventDrainRef(this->mock_drain));
-    Static::drains()->add(EventDrainRef(new NullDrain()));
+    Static::drains()->add(this->mock->id(), this->mock);
+    Static::drains()->add(this->null->id(), this->null);
 
     Client::lua().doString("return function()\n  return 2\nend");
     this->test_reference = Client::lua().registry()->referenceTop();
   }
 
   ~NodeStatusRequestTest() {
+    this->mock.reset();
+    this->null.reset();
     NodeStatusContext::destroy();
     EventLifecycle::reset();
     Client::destroy();
     Static::destroy();
   }
 
-  EventRef make(std::string drain) {
+  EventRef make(EventDrainRef drain) {
     return EventLifecycle::make<NodeStatusRequest>(
         this->test_reference, true, drain
     );
@@ -73,14 +79,14 @@ class NodeStatusRequestTest : public ::testing::Test {
 
 
 TEST_F(NodeStatusRequestTest, EventContextIsCreated) {
-  EventRef event = this->make("NULL");
+  EventRef event = this->make(this->null);
   event->handle();
   NSClientContextRef context = NodeStatusContext::pop(event->correlation());
   ASSERT_EQ(this->test_reference, context->callback_ref);
 }
 
 TEST_F(NodeStatusRequestTest, SendsRequest) {
-  EventRef event = this->make("mock");
+  EventRef event = this->make(this->mock);
   Message  message;
   event->handle();
   bool parsed = MessageIO<Message>::parse(

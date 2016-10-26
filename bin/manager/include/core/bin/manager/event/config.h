@@ -2,6 +2,7 @@
 #ifndef CORE_BIN_MANAGER_EVENT_CONFIG_H_
 #define CORE_BIN_MANAGER_EVENT_CONFIG_H_
 
+#include <exception>
 #include <string>
 
 #include "core/model/event.h"
@@ -18,10 +19,11 @@ namespace bin {
 
    public:
     LoadConfiguration(
-        std::string version, std::string drain, bool abort = false
+        std::string version,
+        sf::core::model::EventDrainRef drain, bool abort = false
     );
     virtual void handle();
-    virtual void rescue(sf::core::exception::SfException* ex);
+    virtual void rescue(std::exception_ptr ex);
   };
 
 }  // namespace bin

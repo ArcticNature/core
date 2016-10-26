@@ -32,21 +32,19 @@ using sf::core::utility::MessageIO;
 
 class SpawnerFdDrain : public FdDrain {
  public:
-  SpawnerFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->fd, message);
+  SpawnerFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
 
 class SpawnerFdSource : public FdSource {
  public:
-  SpawnerFdSource(int fd, std::string id, std::string drain_id) : FdSource(
-      fd, id, drain_id
-  ) {}
+  SpawnerFdSource(int fd, std::string id, EventDrainRef drain) : FdSource(
+      fd, id, drain
+  ) {
+    // Noop.
+  }
 
   EventRef parse() {
     if (!this->checkFD()) {
@@ -69,15 +67,14 @@ EventDrainRef DaemonToSpawnerSource::clientDrain(int fd, std::string id) {
   LogInfo info = {{"drain-id", drain_id}};
   DEBUGV(Context::Logger(), "Created spawner drain ${drain-id}", info);
 
-  Static::drains()->add(drain);
   Static::options()->setString("spawner-drain", drain_id);
   return drain;
 }
 
 EventSourceRef DaemonToSpawnerSource::clientSource(
-    int fd, std::string id, std::string drain_id
+    int fd, std::string id, EventDrainRef drain
 ) {
   LogInfo info = {{"source-id", id}};
   DEBUGV(Context::Logger(), "Creating spawner source ${source-id}", info);
-  return EventSourceRef(new SpawnerFdSource(fd, id, drain_id));
+  return EventSourceRef(new SpawnerFdSource(fd, id, drain));
 }

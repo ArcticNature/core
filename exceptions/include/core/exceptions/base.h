@@ -175,6 +175,9 @@ namespace exception {
   //! Thrown when an operation on a dynamic object is not allowed.
   MSG_EXCEPTION(SfException, InvalidValueOperation);
 
+  //! Thrown when an item was not found.
+  MSG_EXCEPTION(SfException, ItemNotFound);
+
   //! Thrown when a method that has not been implemented is called.
   MSG_EXCEPTION(SfException, NotImplemented);
 

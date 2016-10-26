@@ -34,9 +34,11 @@ using sf::core::event::TestUnixClient;
 
 using sf::core::exception::ErrNoException;
 using sf::core::exception::EventSourceNotFound;
+using sf::core::exception::ItemNotFound;
 
 using sf::core::model::Event;
 using sf::core::model::EventDrain;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
@@ -44,6 +46,22 @@ using sf::core::model::LogInfo;
 using sf::core::protocol::test::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+class NullDrain : public EventDrain {
+ public:
+  NullDrain() : EventDrain("NULL") {
+    // Noop.
+  }
+
+  int fd() {
+    return -1;
+  }
+
+  bool flush() {
+    return true;
+  }
+};
 
 
 MockDrain::MockDrain(std::string id) : EventDrain(id) {
@@ -60,7 +78,7 @@ MockDrain::~MockDrain() {
   }
 }
 
-int MockDrain::getFD() {
+int MockDrain::fd() {
   if (this->write_fd == 0) {
     int pipe[2];
     Static::posix()->pipe(pipe, O_NONBLOCK);
@@ -70,22 +88,30 @@ int MockDrain::getFD() {
   return this->write_fd;
 }
 
-void MockDrain::sendAck() {
-  // NOOP.
+bool MockDrain::flush() {
+  return true;
 }
 
 int MockDrain::readFD() {
+  this->fd();  // Ensure drain is open.
   return this->read_fd;
 }
 
 
-TestEvent::TestEvent() : Event("", "NULL") {}
-TestEvent::TestEvent(std::string correlation, std::string drain) : Event(
-    correlation, drain
+TestEvent::TestEvent() : Event(
+    "", EventDrainRef(new NullDrain())
 ) {
+  // Noop.
+}
+
+TestEvent::TestEvent(
+    std::string correlation, EventDrainRef drain
+) : Event(correlation, drain) {
+  // Noop.
 }
 
 void TestEvent::handle() {
+  // Noop.
 }
 
 
@@ -97,17 +123,19 @@ TestEpollManager::~TestEpollManager() {
   Static::posix()->close(this->epoll_fd, true);
 }
 
+void TestEpollManager::add(EventDrainRef drain) {
+  // Noop.
+}
 
 void TestEpollManager::add(EventSourceRef source) {
   struct epoll_event event;
-  int fd = source->getFD();
+  int fd = source->fd();
   event.data.fd = fd;
   event.events  = EPOLLIN | EPOLLRDHUP | EPOLLPRI | EPOLLERR | EPOLLHUP;
 
   Static::posix()->epoll_control(this->epoll_fd, EPOLL_CTL_ADD, fd, &event);
 
-  this->sources[source->id()] = source;
-  this->sourcesIndex[fd] = source;
+  this->sources.add(source);
 }
 
 void TestEpollManager::removeDrain(std::string id) {
@@ -115,14 +143,15 @@ void TestEpollManager::removeDrain(std::string id) {
 }
 
 void TestEpollManager::removeSource(std::string id) {
-  if (this->sources.find(id) == this->sources.end()) {
+  EventSourceRef source;
+  try {
+    source = this->sources.get(id);
+  } catch(ItemNotFound&) {
     throw EventSourceNotFound(id);
   }
 
-  EventSourceRef source = this->sources.at(id);
-  int fd = source->getFD();
-
   try {
+    int fd = source->fd();
     Static::posix()->epoll_control(this->epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
   } catch (ErrNoException& ex) {
     if (ex.getCode() != EBADF) {
@@ -131,8 +160,7 @@ void TestEpollManager::removeSource(std::string id) {
     // Ignore bad file descriptors only.
   }
 
-  this->sourcesIndex.erase(fd);
-  this->sources.erase(id);
+  this->sources.remove(id);
 }
 
 EventRef TestEpollManager::wait(int timeout) {
@@ -145,18 +173,19 @@ EventRef TestEpollManager::wait(int timeout) {
     return EventRef();
   }
 
-  if (this->sourcesIndex.find(fd) == this->sourcesIndex.end()) {
+  try {
+    return this->sources.get(fd)->fetch();
+  } catch (EventSourceNotFound&) {
     LogInfo vars = {{"source", toString(fd)}};
     ERRORV(Context::Logger(), "Unable to find source for FD ${source}.", vars);
     return EventRef();
   }
-
-  return this->sourcesIndex[fd]->parse();
 }
 
 
-TestFdDrain::TestFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-void TestFdDrain::sendAck() {}
+TestFdDrain::TestFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+  // Noop.
+}
 
 
 void TestUnixClient::openSocket() {
@@ -178,23 +207,25 @@ void TestUnixClient::openSocket() {
 
 
 TestFdSource::TestFdSource(int fd, std::string id) : EventSource("fd-" + id) {
-  this->fd = fd;
+  this->_fd = fd;
 }
 
 TestFdSource::~TestFdSource() {
-  Static::posix()->shutdown(this->fd, SHUT_RD);
-  Static::posix()->close(this->fd);
+  Static::posix()->shutdown(this->_fd, SHUT_RD);
+  Static::posix()->close(this->_fd);
 }
 
-int TestFdSource::getFD() {
-  return this->fd;
+int TestFdSource::fd() {
+  return this->_fd;
 }
 
 EventRef TestFdSource::parse() {
   Message message;
-  bool valid = MessageIO<Message>::parse(this->fd, &message);
+  bool valid = MessageIO<Message>::parse(this->_fd, &message);
   if (valid && message.code() == Message::Test) {
-    return EventRef(new TestEvent("abc", "NULL"));
+    return EventRef(new TestEvent(
+          "abc", EventDrainRef(new NullDrain())
+    ));
   }
   return EventRef();
 }
@@ -220,7 +251,7 @@ TestUnixClient::~TestUnixClient() {
   }
 }
 
-int TestUnixClient::getFD() {
+int TestUnixClient::fd() {
   if (this->socket_fd == -1) {
     this->openSocket();
   }

@@ -72,7 +72,7 @@ SignalSource::~SignalSource() {
   Static::posix()->close(this->signal_fd);
 }
 
-int SignalSource::getFD() {
+int SignalSource::fd() {
   if (this->signal_fd == -1) {
     this->createSignalFd();
   }

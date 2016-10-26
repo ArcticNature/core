@@ -58,11 +58,11 @@ namespace event {
 
     // Create the source.
     sf::core::model::EventSourceRef source(new SourceClass(
-          source_fd, fd_id, drain->id()
+          source_fd, fd_id, drain
     ));
 
     // Register in event managers.
-    sf::core::context::Static::drains()->add(drain);
+    sf::core::context::Static::drains()->add(drain->id(), drain);
     sf::core::context::Context::LoopManager()->add(source);
 
     // Log connection established.

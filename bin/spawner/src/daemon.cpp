@@ -37,12 +37,8 @@ using sf::core::utility::string::toString;
 
 
 class SpawnerToDaemonFdDrain : public FdDrain { public:
-  SpawnerToDaemonFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->getFD(), message);
+  SpawnerToDaemonFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
@@ -64,8 +60,10 @@ std::string SpawnerToDaemon::Connect(std::string path) {
 }
 
 SpawnerToDaemon::SpawnerToDaemon(
-    int fd, std::string id, std::string drain_id
-) : UnixClient(fd, id, drain_id) {}
+    int fd, std::string id, EventDrainRef drain
+) : UnixClient(fd, id, drain) {
+  // Noop.
+}
 
 EventRef SpawnerToDaemon::parse() {
   if (!this->checkFD()) {
@@ -73,7 +71,7 @@ EventRef SpawnerToDaemon::parse() {
   }
 
   Message message;
-  bool valid = MessageIO<Message>::parse(this->getFD(), &message);
+  bool valid = MessageIO<Message>::parse(this->fd(), &message);
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(

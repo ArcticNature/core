@@ -23,9 +23,6 @@
 using sf::core::context::Context;
 using sf::core::context::Static;
 
-using sf::core::event::TestEvent;
-using sf::core::event::TestFdDrain;
-using sf::core::event::TestFdSource;
 using sf::core::event::UnixClient;
 using sf::core::event::UnixSource;
 
@@ -35,20 +32,31 @@ using sf::core::model::EventSourceRef;
 using sf::core::model::LoopManagerRef;
 using sf::core::posix::User;
 
-using sf::core::event::TestEpollManager;
 using sf::core::protocol::test::Message;
 using sf::core::utility::MessageIO;
 
+using sf::core::event::MockDrain;
+using sf::core::event::TestEpollManager;
+using sf::core::event::TestEvent;
+using sf::core::event::TestFdDrain;
+using sf::core::event::TestFdSource;
+
 
 class TestUnixClient : public UnixClient {
- public:
-  TestUnixClient(int fd, std::string id, std::string drain_id) : UnixClient(
-      fd, id, drain_id
-  ) {}
-
+ protected:
   EventRef parse() {
-    return EventRef(new TestEvent("def", "NULL"));
+    return EventRef(new TestEvent(
+          "def", EventDrainRef(new MockDrain("NULL"))
+    ));
   }
+
+ public:
+  TestUnixClient(int fd, std::string id, EventDrainRef drain) : UnixClient(
+      fd, id, drain
+  ) {
+    // Noop.
+  }
+
 };
 
 
@@ -60,7 +68,7 @@ class TestUnixServer : public UnixSource {
     return drain;
   }
 
-  EventSourceRef clientSource(int fd, std::string id, std::string drain_id) {
+  EventSourceRef clientSource(int fd, std::string id, EventDrainRef drain) {
     TestFdSource* source = new TestFdSource(fd, id);
     return EventSourceRef(source);
   }
@@ -87,7 +95,7 @@ class UnixClientTest : public ::testing::Test {
    bool sendTestMessage(EventDrainRef drain) {
      Message message;
      message.set_code(Message::Test);
-     return MessageIO<Message>::send(drain->getFD(), message);
+     return MessageIO<Message>::send(drain->fd(), message);
    }
 
  public:

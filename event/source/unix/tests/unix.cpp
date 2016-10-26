@@ -66,7 +66,7 @@ class TestUnixSource : public UnixSource {
     return drain;
   }
 
-  EventSourceRef clientSource(int fd, std::string id, std::string drain_id) {
+  EventSourceRef clientSource(int fd, std::string id, EventDrainRef drain) {
     EventSourceRef source(new TestFdSource(fd, id));
     this->sources.push_back(source->id());
     return source;
@@ -131,7 +131,7 @@ class UnixSourceTest : public ::testing::Test {
 
 TEST_F(UnixSourceTest, CreatesSockFile) {
   TestUnixSource source(SOCKET_FILE, "id");
-  int fd = source.getFD();
+  int fd = source.fd();
 
   ASSERT_NE(-1, fd);
   ASSERT_TRUE(this->fileExists(SOCKET_FILE));
@@ -140,7 +140,7 @@ TEST_F(UnixSourceTest, CreatesSockFile) {
 TEST_F(UnixSourceTest, DeletesSockFile) {
   {
     TestUnixSource source(SOCKET_FILE, "id");
-    int fd = source.getFD();
+    int fd = source.fd();
   }
   ASSERT_FALSE(this->fileExists(SOCKET_FILE));
 }
@@ -209,7 +209,7 @@ TEST_F(UnixSourceTest, ServerToClient) {
 
   Message message;
   message.set_code(Message::Test);
-  bool sent = MessageIO<Message>::send(drain->getFD(), message);
+  bool sent = MessageIO<Message>::send(drain->fd(), message);
   ASSERT_TRUE(sent);
 
   // Check that the message is read from the client.

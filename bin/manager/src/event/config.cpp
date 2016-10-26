@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include "core/bin/manager/event/config.h"
 
+#include <exception>
 #include <string>
 
 #include "core/bin/manager/api/server.h"
@@ -28,12 +29,13 @@ using sf::core::exception::SfException;
 
 using sf::core::interface::NodeConfigLoader;
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
 
 
 LoadConfiguration::LoadConfiguration(
-    std::string version, std::string drain, bool abort
+    std::string version, EventDrainRef drain, bool abort
 ) : Event("", drain) {
   this->abort = abort;
   this->version = version;
@@ -76,9 +78,13 @@ void LoadConfiguration::handle() {
   Context::LoopManager()->add(server);
 }
 
-void LoadConfiguration::rescue(SfException* ex) {
+void LoadConfiguration::rescue(std::exception_ptr ex) {
   if (this->abort) {
-    throw AbortException(*ex);
+    try {
+      std::rethrow_exception(ex);
+    } catch (SfException& nested) {
+      throw AbortException(nested);
+    }
   }
-  throw;
+  std::rethrow_exception(ex);
 }

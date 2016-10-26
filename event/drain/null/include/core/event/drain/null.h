@@ -13,13 +13,12 @@ namespace event {
   class NullDrain : public sf::core::model::EventDrain {
    protected:
     int null_fd;
+    bool flush();
 
    public:
     NullDrain();
     ~NullDrain();
-
-    int getFD();
-    void sendAck();
+    int fd();
   };
 
 }  // namespace event

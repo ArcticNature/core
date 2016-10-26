@@ -53,7 +53,7 @@ ReadlineEventSource::~ReadlineEventSource() {
   Static::posix()->close(this->input_fd);
 }
 
-int ReadlineEventSource::getFD() {
+int ReadlineEventSource::fd() {
   return this->input_fd;
 }
 

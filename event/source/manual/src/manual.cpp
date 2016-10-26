@@ -21,7 +21,7 @@ ManualSource::~ManualSource() {
   Static::posix()->close(this->internal_queue_fd);
 }
 
-int ManualSource::getFD() {
+int ManualSource::fd() {
   if (this->internal_queue_fd == 0) {
     this->internal_queue_fd = Static::posix()->eventfd(
         0, EFD_NONBLOCK | EFD_SEMAPHORE
@@ -32,10 +32,14 @@ int ManualSource::getFD() {
   return this->internal_queue_fd;
 }
 
-void ManualSource::enqueueEvent(EventRef event) {
+void ManualSource::enqueue(EventRef event) {
   eventfd_t value = 1;
   this->internal_event_queue.push(event);
   Static::posix()->write(this->internal_queue_fd, &value, sizeof(value));
+}
+
+void ManualSource::enqueueEvent(EventRef event) {
+  this->enqueue(event);
 }
 
 EventRef ManualSource::parse() {

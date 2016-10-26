@@ -21,7 +21,7 @@ class NullDrainInitHandler : public BaseLifecycleHandler {
  public:
   void handle(std::string event, BaseLifecycleArg*) {
     EventDrainRef drain(new NullDrain());
-    Static::drains()->add(drain);
+    Static::drains()->add(drain->id(), drain);
   }
 };
 

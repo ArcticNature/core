@@ -42,7 +42,7 @@ ScheduledSource::~ScheduledSource() {
   Static::posix()->close(this->timer_fd);
 }
 
-int ScheduledSource::getFD() {
+int ScheduledSource::fd() {
   if (this->timer_fd == 0) {
     struct itimerspec interval  = {0};
     interval.it_interval.tv_sec = this->tick;
@@ -75,7 +75,9 @@ EventRef ScheduledSource::parse() {
   // Oterwise return the one event or nullptr.
   bool single_return = true;
   EventRef maybe_return;
-  ManualSource* manual = Context::LoopManager()->get<ManualSource>("manual");
+  ManualSource* manual = Context::LoopManager()->downcast<ManualSource>(
+      "manual"
+  );
   std::vector<ScheduledClosure> closures = this->closures.pop();
   std::vector<ScheduledClosure>::iterator it;
 

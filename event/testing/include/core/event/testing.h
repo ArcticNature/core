@@ -21,17 +21,19 @@ namespace event {
    public:
     explicit MockDrain(std::string id);
     ~MockDrain();
-    int  getFD();
-    void sendAck();
-    int readFD();
+    int  fd();
+    bool flush();
+    int  readFD();
   };
 
 
   class TestEvent : public sf::core::model::Event {
    public:
     TestEvent();
-    TestEvent(std::string correlation, std::string drain);
-
+    TestEvent(
+        std::string correlation,
+        sf::core::model::EventDrainRef drain
+    );
     virtual void handle();
   };
 
@@ -39,13 +41,12 @@ namespace event {
   class TestEpollManager : public sf::core::model::LoopManager {
    protected:
     int epoll_fd;
-    std::map<int, sf::core::model::EventDrainRef>  drainsIndex;
-    std::map<int, sf::core::model::EventSourceRef> sourcesIndex;
 
    public:
     TestEpollManager();
     virtual ~TestEpollManager();
 
+    void add(sf::core::model::EventDrainRef drain);
     void add(sf::core::model::EventSourceRef source);
     void removeDrain(std::string id);
     void removeSource(std::string id);
@@ -56,20 +57,20 @@ namespace event {
   class TestFdDrain : public sf::core::event::FdDrain {
    public:
     TestFdDrain(int fd, std::string id);
-    void sendAck();
   };
+
 
   class TestFdSource : public sf::core::model::EventSource {
    protected:
-    int fd;
+    int _fd;
+    sf::core::model::EventRef parse();
 
    public:
     TestFdSource(int fd, std::string id);
     ~TestFdSource();
-
-    int getFD();
-    sf::core::model::EventRef parse();
+    int fd();
   };
+
 
   class TestUnixClient : public sf::core::model::EventSource {
    protected:
@@ -77,13 +78,13 @@ namespace event {
     std::string path;
 
     void openSocket();
+    sf::core::model::EventRef parse();
 
    public:
     explicit TestUnixClient(std::string socket);
     ~TestUnixClient();
 
-    int getFD();
-    sf::core::model::EventRef parse();
+    int fd();
   };
 
 }  // namespace event

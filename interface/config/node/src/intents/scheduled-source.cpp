@@ -66,16 +66,15 @@ void DefaultScheduledSourceIntent::apply(ContextRef context) {
   std::vector<ScheduledClosureList::ScoredValue>::iterator it;
 
   try {
-    ScheduledSource* old_scheduler = Context::LoopManager()->get<
-      ScheduledSource
-    >("scheduler");
+    ScheduledSource* old_scheduler =
+      Context::LoopManager()->downcast<ScheduledSource>("scheduler");
     callbacks = old_scheduler->keepCallbacks();
   } catch (EventSourceNotFound& ex) {
     // NOOP.
   }
 
   ScheduledSource* new_scheduler =
-    context->loopManager()->get<ScheduledSource>("scheduler");
+    context->loopManager()->downcast<ScheduledSource>("scheduler");
 
   for (it = callbacks.begin(); it != callbacks.end(); it++) {
     new_scheduler->registerCallback(it->score, it->value);

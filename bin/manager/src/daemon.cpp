@@ -39,12 +39,8 @@ using sf::core::utility::string::toString;
 
 class ManagerToDaemonFdDrain : public FdDrain {
  public:
-  ManagerToDaemonFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->getFD(), message);
+  ManagerToDaemonFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
@@ -61,7 +57,7 @@ EventRef ManagerToDaemon::process(Message message) {
 
 std::pair<std::string, std::string> ManagerToDaemon::Connect(
     std::string path
-  ) {
+) {
   return UnixClient::Connect<ManagerToDaemon, ManagerToDaemonFdDrain>(
       path, "manager-to-daemon"
   );
@@ -69,8 +65,10 @@ std::pair<std::string, std::string> ManagerToDaemon::Connect(
 
 
 ManagerToDaemon::ManagerToDaemon(
-    int fd, std::string id, std::string drain_id
-) : UnixClient(fd, id, drain_id) {}
+    int fd, std::string id, EventDrainRef drain
+) : UnixClient(fd, id, drain) {
+  // Noop.
+}
 
 EventRef ManagerToDaemon::parse() {
   if (!this->checkFD()) {
@@ -78,7 +76,7 @@ EventRef ManagerToDaemon::parse() {
   }
 
   Message message;
-  bool valid = MessageIO<Message>::parse(this->getFD(), &message);
+  bool valid = MessageIO<Message>::parse(this->fd(), &message);
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(

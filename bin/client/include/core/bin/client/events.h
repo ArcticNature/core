@@ -34,7 +34,8 @@ namespace bin {
 
    public:
     NodeStatusRequest(
-        int callback_ref, bool details, std::string drain
+        int callback_ref, bool details,
+        sf::core::model::EventDrainRef drain
     );
     void handle();
   };

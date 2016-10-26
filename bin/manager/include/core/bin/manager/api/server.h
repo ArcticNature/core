@@ -5,6 +5,7 @@
 #include <string>
 
 #include "core/event/source/unix.h"
+#include "core/model/event.h"
 
 namespace sf {
 namespace core {
@@ -17,7 +18,8 @@ namespace bin {
         int fd, std::string id
     );
     sf::core::model::EventSourceRef clientSource(
-        int fd, std::string id, std::string drain_id
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
     );
 
    public:

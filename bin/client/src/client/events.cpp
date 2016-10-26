@@ -42,7 +42,7 @@ NSClientContext::~NSClientContext() {
 
 
 NodeStatusRequest::NodeStatusRequest(
-    int callback_ref, bool details, std::string drain
+    int callback_ref, bool details, EventDrainRef drain
 ) : Event("", drain) {
   this->callback_ref = callback_ref;
   this->details = details;
@@ -63,6 +63,5 @@ void NodeStatusRequest::handle() {
   info->set_details(this->details);
 
   // Send status request.
-  EventDrainRef drain = Static::drains()->get(this->drain());
-  MessageIO<Message>::send(drain->getFD(), message);
+  MessageIO<Message>::send(this->drain()->fd(), message);
 }

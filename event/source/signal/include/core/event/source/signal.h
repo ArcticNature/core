@@ -18,6 +18,7 @@ namespace event {
   class SignalSource : public sf::core::model::EventSource {
    protected:
     int signal_fd;
+    sf::core::model::EventRef parse();
 
     //! Initialises the signalfd to return to the event manager.
     void createSignalFd();
@@ -40,9 +41,7 @@ namespace event {
    public:
     explicit SignalSource(std::string id);
     ~SignalSource();
-
-    int getFD();
-    sf::core::model::EventRef parse();
+    int fd();
   };
 
 }  // namespace event

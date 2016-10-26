@@ -15,7 +15,7 @@ namespace registry {
   //! Signature of factory functions to create events.
   typedef sf::core::model::EventRef (*ApiEventFactory)(
       sf::core::protocol::public_api::Message message,
-      std::string drain
+      sf::core::model::EventDrainRef drain
   );
 
   //! Factory registry for public API message parsing.

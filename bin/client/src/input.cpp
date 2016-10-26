@@ -11,6 +11,7 @@
 #include "core/event/source/readline.h"
 #include "core/exceptions/lua.h"
 
+#include "core/event/drain/null.h"
 #include "core/model/event.h"
 
 #include "core/lifecycle/event.h"
@@ -23,6 +24,7 @@ using sf::core::bin::ExecuteString;
 using sf::core::context::Client;
 using sf::core::context::Context;
 
+using sf::core::event::NullDrain;
 using sf::core::event::ReadlineEventSource;
 using sf::core::exception::CleanExit;
 using sf::core::exception::LuaSyntaxError;
@@ -30,6 +32,7 @@ using sf::core::exception::SfException;
 
 using sf::core::lifecycle::EventLifecycle;
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 
 using sf::core::utility::Lua;
@@ -59,7 +62,7 @@ void ExecuteString::printStack() {
 
 ExecuteString::ExecuteString(
     std::string code, int line, std::ostream* out
-) : Event("stdin:" + toString(line), "NULL") {
+) : Event("stdin:" + toString(line), EventDrainRef(new NullDrain())) {
   this->out  = out;
   this->code = code;
   this->line = line;
@@ -109,7 +112,9 @@ EventRef EnableReadline::parse(std::string line) {
 }
 
 
-EnableReadline::EnableReadline() : Event("enable-readline", "NULL") {
+EnableReadline::EnableReadline() : Event(
+    "enable-readline", EventDrainRef(new NullDrain())
+) {
   // NOOP.
 }
 

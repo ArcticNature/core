@@ -9,6 +9,7 @@
 
 #include "core/exceptions/base.h"
 #include "core/exceptions/event.h"
+#include "core/utility/lookup-table.h"
 
 
 namespace sf {
@@ -27,24 +28,24 @@ namespace model {
    * SnowFox rective engine.
    *
    * Each event has a correlation id (to link it to other events that
-   * cooperatively react to the user or the system) and a drain id (to
+   * cooperatively react to the user or the system) and a drain (to
    * know where to send the result of an operation when done).
    */
   class Event {
    protected:
-    std::string _id;
     std::string correlation_id;
-    std::string drain_id;
+    std::string event_id;
+    EventDrainRef _drain;
 
    public:
-    Event(std::string correlation, std::string drain);
+    Event(std::string correlation, EventDrainRef drain);
     virtual ~Event();
 
     //! Returns the event correlation id.
     std::string correlation() const;
 
-    //! Returns the id of the drain for this event.
-    std::string drain() const;
+    //! Returns the event drain associated to this event.
+    EventDrainRef drain() const;
 
     //! Initialises the event id, if missing.
     std::string id(std::string id);
@@ -74,60 +75,66 @@ namespace model {
   class EventDrain {
    protected:
     const std::string drain_id;
+    std::vector<std::string> buffer;
 
    public:
     explicit EventDrain(std::string id);
     virtual ~EventDrain();
 
+    //! Enqueues a chunk of data to send.
+    /*!
+     * The chunk to send is stored in a string.
+     *
+     * The string instance is stored intentally until
+     * it is flushed to the file descriptor.
+     *
+     * When sending ProtBuf messages use SerializeToString:
+     * https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message_lite#MessageLite.SerializeToString.details
+     */
+    virtual void enqueue(const std::string& chunk);
+
+    //! \returns The writable file descriptor to send data to.
+    virtual int fd() = 0;
+
+    //! Flushes the internal buffer.
+    /*!
+     * Uses the internal `send` operator to perform the write.
+     *
+     * \returns true if the buffer is empty after the operation.
+     */
+    virtual bool flush() = 0;
+
     //! \returns the ID of the event drain.
     std::string id() const;
 
-    //! \returns The writable file descriptor to send data to.
-    virtual int getFD() = 0;
-
-    //! Handles exceptions that were thrown while handling an event.
+    //! Handles exceptions thrown while enqueuing or flushing.
     /**
-     * When an exception is thrown by the handle method of an Event,
-     * this method is called with that exception.
-     * This method should notify the drain about the error.
+     * When an exception is thrown while enqueuing data to send or
+     * while flushing data, this method is called with that exception.
      * 
      * It is possible to throw exceptions from within this method
      * but these are not caught.
-     * Any exception that is thrown from this method will result in
-     * the termination of the server.
-     *
-     * \returns True to indicate that the exception was handled.
      */
-    virtual bool rescue(std::exception_ptr ex);
+    virtual void rescue(std::exception_ptr ex);
 
-    //! Sends an ack down the drain.
-    virtual void sendAck() = 0;
+    //! Returns a Promise that is resolved/rejected when the drain is closed.
+    // TODO(stefano): Promise whenClosed() const;
   };
 
 
   //! Manages a set of event drains.
-  /**
-   * EventDrains are registerd by the system or EventSources into the
-   * EventDrainManager so that Events and other components in the
-   * system can used them whenever needed.
+  /*!
+   * This is usefull to make drains available to other parts of the system.
    *
-   * Sources are repsonible for de-registering Drains when they are
-   * no longer needed.
+   * Examples are:
+   *   - The spanwer/manager/daemon drains.
+   *   - The HttpRequest drain.
    */
-  class EventDrainManager {
-   protected:
-    std::map<std::string, EventDrainRef> drains;
-
-   public:
-    //! Adds an event drain to the set.
-    void add(EventDrainRef drain);
-
-    //! \returns an EventDrain by reference.
-    EventDrainRef get(std::string id) const;
-
-    //! Removes an EventDrain from the set.
-    void remove(std::string id);
-  };
+  typedef sf::core::utility::LookupTable<
+    EventDrainRef,
+    sf::core::exception::DuplicateEventDrain,
+    sf::core::exception::EventDrainNotFound
+  > EventDrainManager;
   typedef std::shared_ptr<EventDrainManager> EventDrainManagerRef;
 
 
@@ -144,6 +151,14 @@ namespace model {
    protected:
     const std::string source_id;
 
+    //! Parses an event from the source.
+    /*!
+     * Called when the EventSourceManager determines that the source is ready
+     * for reading.
+     * \returns an Event to handle or nullptr if no event needs handling.
+     */
+    virtual EventRef parse() = 0;
+
    public:
     explicit EventSource(std::string id);
     virtual ~EventSource();
@@ -152,17 +167,44 @@ namespace model {
     std::string id() const;
 
     //! \returns the file descriptor to wait for events on.
-    virtual int getFD() = 0;
+    virtual int fd() = 0;
 
-    //! Parses an event from the source.
-    /**
-     * Called when the EventSourceManager determines that the source is ready
-     * for reading.
-     * \returns an Event to handle or nullptr if no event needs handling.
+    //! Fetches an event from the channel.
+    /*!
+     * When the source is ready to produce an event,
+     * this method will call the `parse` method and deal with
+     * errors if needed and possible.
      */
-    virtual EventRef parse() = 0;
+    EventRef fetch();
+
+    //! Attempt to handle a error during parsing.
+    virtual void rescue(std::exception_ptr ex);
+
+    //! Returns a Promise that is resolved/rejected when the drain is closed.
+    // TODO(stefano): Promise whenClosed() const;
   };
   typedef std::shared_ptr<EventSource> EventSourceRef;
+
+
+  //! Store Source and Drain references by id and fd.
+  template<typename Ref>
+  class RefStore {
+   protected:
+    std::map<std::string, Ref> by_id;
+    std::map<int, Ref> by_fd;
+
+   public:
+    //! Adds a Drain or Source reference to the store.
+    void add(Ref ref);
+
+    //! Returns the reference with the given fd/id.
+    Ref  get(int fd) const;
+    Ref  get(std::string id) const;
+
+    //! Removes the reference with the given fd/id.
+    void remove(int fd);
+    void remove(std::string id);
+  };
 
 
   //! Manages event sources and drains.
@@ -177,25 +219,18 @@ namespace model {
    */
   class LoopManager {
    protected:
-    std::map<std::string, EventDrainRef>  drains;
-    std::map<std::string, EventSourceRef> sources;
+    RefStore<EventDrainRef>  drains;
+    RefStore<EventSourceRef> sources;
 
    public:
     virtual ~LoopManager();
 
     //! Returns a pointer to the requested event source.
     template<typename EventSrc>
-    EventSrc* get(std::string id) {
-      if (this->sources.find(id) == this->sources.end()) {
-        throw sf::core::exception::EventSourceNotFound(id);
-      }
-      EventSourceRef ref = this->sources.at(id);
-      EventSrc* source = dynamic_cast<EventSrc*>(ref.get());
-      if (source == nullptr) {
-        throw sf::core::exception::IncorrectSourceType(id);
-      }
-      return source;
-    }
+    EventSrc* downcast(std::string id) const;
+
+    //! Adds an event drain to the manager.
+    virtual void add(EventDrainRef drain) = 0;
 
     //! Adds an event source to the manager.
     virtual void add(EventSourceRef source) = 0;
@@ -221,8 +256,22 @@ namespace model {
   };
   typedef std::shared_ptr<LoopManager> LoopManagerRef;
 
+
+  //! TODO(stefano)
+  class BoundDrain : public EventDrain {
+    // TODO(stefano): void bind(EventSourceRef source);
+  };
+
+
+  //! TODO(stefano)
+  class BoundSource : public EventSource {
+    // TODO(stefano): void bind(EventDrainRef drain);
+  };
+
 }  // namespace model
 }  // namespace core
 }  // namespace sf
+
+#include "core/model/event.inc.h"
 
 #endif  // CORE_MODEL_EVENT_H_

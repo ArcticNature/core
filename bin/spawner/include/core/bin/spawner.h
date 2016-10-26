@@ -33,12 +33,14 @@ namespace bin {
     sf::core::model::EventRef process(
         sf::core::protocol::daemon_spanwer::Message message
     );
+    sf::core::model::EventRef parse();
 
    public:
     static std::string Connect(std::string path);
-
-    SpawnerToDaemon(int fd, std::string id, std::string drain_id);
-    sf::core::model::EventRef parse();
+    SpawnerToDaemon(
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
+    );
   };
 
 
@@ -47,7 +49,8 @@ namespace bin {
    protected:
     sf::core::model::EventDrainRef clientDrain(int fd, std::string id);
     sf::core::model::EventSourceRef clientSource(
-        int fd, std::string id, std::string drain_id
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
     );
 
    public:

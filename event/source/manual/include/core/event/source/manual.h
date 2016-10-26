@@ -16,14 +16,15 @@ namespace event {
     std::queue<sf::core::model::EventRef> internal_event_queue;
     int internal_queue_fd;
 
+    sf::core::model::EventRef parse();
+
    public:
     ManualSource();
     ~ManualSource();
-
-    int getFD();
-    sf::core::model::EventRef parse();
+    int fd();
 
     //! Appends a new event to the queue of events to process.
+    void enqueue(sf::core::model::EventRef event);
     void enqueueEvent(sf::core::model::EventRef event);
   };
 

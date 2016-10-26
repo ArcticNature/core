@@ -20,6 +20,7 @@ using sf::core::context::Context;
 using sf::core::context::Static;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::LogInfo;
 
@@ -38,7 +39,7 @@ class ClientIntroduceEvent : public Event {
 
  public:
   ClientIntroduceEvent(
-      std::string correlation, std::string drain
+      std::string correlation, EventDrainRef drain
   ) : Event(correlation, drain) {
     // NOOP.
   }
@@ -60,7 +61,7 @@ class ClientIntroduceEvent : public Event {
     intro->set_node_name(node_name);
 
     // Send response to client.
-    int drain = Static::drains()->get(this->drain_id)->getFD();
+    int drain = this->drain()->fd();
     MessageIO<Message>::send(drain, response);
   }
 };
@@ -68,7 +69,7 @@ uint64_t ClientIntroduceEvent::clients_count = 0;
 
 
 //! Event factory for Introduce requests.
-EventRef client_introduce(Message message, std::string drain) {
+EventRef client_introduce(Message message, EventDrainRef drain) {
   return EventRef(
       new ClientIntroduceEvent(message.correlation_id(), drain)
   );

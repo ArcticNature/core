@@ -18,13 +18,13 @@ namespace event {
    */
   class FdDrain : public sf::core::model::EventDrain {
    protected:
-    int fd;
+    int _fd;
 
    public:
     FdDrain(int fd, std::string id);
     ~FdDrain();
-
-    int getFD();
+    int fd();
+    bool flush();
   };
 
 }  // namespace event

@@ -32,21 +32,19 @@ using sf::core::utility::MessageIO;
 
 class ManagerFdDrain : public FdDrain {
  public:
-  ManagerFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->fd, message);
+  ManagerFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
 
 class ManagerFdSource : public FdSource {
  public:
-  ManagerFdSource(int fd, std::string id, std::string drain_id) : FdSource(
-      fd, id, drain_id
-  ) {}
+  ManagerFdSource(int fd, std::string id, EventDrainRef drain) : FdSource(
+      fd, id, drain
+  ) {
+    // Noop.
+  }
 
   EventRef parse() {
     if (!this->checkFD()) {
@@ -59,7 +57,9 @@ class ManagerFdSource : public FdSource {
 
 DaemonToManagerSource::DaemonToManagerSource(std::string path) : UnixSource(
     path, "daemon-to-manager"
-) {}
+) {
+  // Noop.
+}
 
 
 EventDrainRef DaemonToManagerSource::clientDrain(int fd, std::string id) {
@@ -69,15 +69,14 @@ EventDrainRef DaemonToManagerSource::clientDrain(int fd, std::string id) {
   LogInfo info = {{"drain-id", drain_id}};
   DEBUGV(Context::Logger(), "Created manager drain ${drain-id}", info);
 
-  Static::drains()->add(drain);
   Static::options()->setString("manager-drain", drain_id);
   return drain;
 }
 
 EventSourceRef DaemonToManagerSource::clientSource(
-    int fd, std::string id, std::string drain_id
+    int fd, std::string id, EventDrainRef drain
 ) {
   LogInfo info = {{"source-id", id}};
   DEBUGV(Context::Logger(), "Creating manager source ${source-id}", info);
-  return EventSourceRef(new ManagerFdSource(fd, id, drain_id));
+  return EventSourceRef(new ManagerFdSource(fd, id, drain));
 }

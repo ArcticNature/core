@@ -32,12 +32,8 @@ using sf::core::utility::MessageIO;
 
 class ManagerFdDrain : public FdDrain {
  public:
-  ManagerFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->fd, message);
+  ManagerFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
@@ -45,8 +41,10 @@ class ManagerFdDrain : public FdDrain {
 class ManagerFdSource : public FdSource {
  public:
   ManagerFdSource(
-      int fd, std::string id, std::string drain_id
-  ) : FdSource(fd, id, drain_id) {}
+      int fd, std::string id, EventDrainRef drain
+  ) : FdSource(fd, id, drain) {
+    // Noop.
+  }
 
   EventRef parse() {
     if (!this->checkFD()) {
@@ -69,15 +67,14 @@ EventDrainRef SpawnerToManagerSource::clientDrain(int fd, std::string id) {
   LogInfo info = {{"drain-id", drain_id}};
   DEBUGV(Context::Logger(), "Created manager drain ${drain-id}", info);
 
-  Static::drains()->add(drain);
   Static::options()->setString("manager-drain", drain_id);
   return drain;
 }
 
 EventSourceRef SpawnerToManagerSource::clientSource(
-    int fd, std::string id, std::string drain_id
+    int fd, std::string id, EventDrainRef drain
 ) {
   LogInfo info = {{"source-id", id}};
   DEBUGV(Context::Logger(), "Creating manager source ${source-id}", info);
-  return EventSourceRef(new ManagerFdSource(fd, id, drain_id));
+  return EventSourceRef(new ManagerFdSource(fd, id, drain));
 }

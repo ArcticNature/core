@@ -39,12 +39,8 @@ using sf::core::utility::string::toString;
 
 class ManagerToSpawnerFdDrain : public FdDrain {
  public:
-  ManagerToSpawnerFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->getFD(), message);
+  ManagerToSpawnerFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
@@ -64,8 +60,10 @@ std::pair<std::string, std::string> ManagerToSpawner::Connect(
 
 
 ManagerToSpawner::ManagerToSpawner(
-    int fd, std::string id, std::string drain
-) : UnixClient(fd, id, drain) {}
+    int fd, std::string id, EventDrainRef drain
+) : UnixClient(fd, id, drain) {
+  // Noop.
+}
 
 EventRef ManagerToSpawner::parse() {
   if (!this->checkFD()) {
@@ -73,7 +71,7 @@ EventRef ManagerToSpawner::parse() {
   }
 
   Message message;
-  bool valid = MessageIO<Message>::parse(this->getFD(), &message);
+  bool valid = MessageIO<Message>::parse(this->fd(), &message);
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(

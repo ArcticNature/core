@@ -49,9 +49,8 @@ TEST_F(NodeConfigIntentTest, ScheduledSourceIsCreated) {
 TEST_F(NodeConfigIntentTest, ScheduledSourceIsCreatedAndPopulated) {
   EventSourceRef source(new ScheduledSource(4));
   Context::LoopManager()->add(source);
-  ScheduledSource* scheduler = Context::LoopManager()->get<
-      ScheduledSource
-  >("scheduler");
+  ScheduledSource* scheduler =
+    Context::LoopManager()->downcast<ScheduledSource>("scheduler");
 
   ScheduledClosure closure;
   closure.keep_on_reconfigure = true;

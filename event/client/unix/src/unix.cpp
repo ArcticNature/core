@@ -15,7 +15,7 @@ using sf::core::event::UnixClient;
 using sf::core::model::EventDrainRef;
 
 
-UnixClient::UnixClient(int fd, std::string id, std::string drain)
+UnixClient::UnixClient(int fd, std::string id, EventDrainRef drain)
   : FdSource(fd, id + "-unix-client", drain) {
   // NOOP.
 }

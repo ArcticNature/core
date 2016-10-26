@@ -21,6 +21,7 @@ using sf::core::event::ManualSource;
 
 using sf::core::lifecycle::EventLifecycle;
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::LogInfo;
 
@@ -37,7 +38,7 @@ class ClientIntroduceResponse : public Event {
 
  public:
   ClientIntroduceResponse(
-      std::string correlation, std::string drain,
+      std::string correlation, EventDrainRef drain,
       std::string client_id, std::string node_name
   ) : Event(correlation, drain) {
     this->client_id = client_id;
@@ -61,16 +62,15 @@ class ClientIntroduceResponse : public Event {
     Static::options()->setString("process-name", client_id);
 
     // Enqueue async readline enable.
-    ManualSource* manual = Context::LoopManager()->get<
-      ManualSource
-    >("manual");
+    ManualSource* manual =
+      Context::LoopManager()->downcast<ManualSource>("manual");
     EventRef async = EventLifecycle::make<EnableReadline>();
     manual->enqueueEvent(async);
   }
 };
 
 //! Event factory for Introduce responses.
-EventRef client_introduce(Message message, std::string drain) {
+EventRef client_introduce(Message message, EventDrainRef drain) {
   ClientIntroduce intro = message.GetExtension(ClientIntroduce::msg);
   return EventLifecycle::make<ClientIntroduceResponse>(
       message.correlation_id(), drain,

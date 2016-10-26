@@ -24,6 +24,8 @@
     "core.lifecycle.client",
     "core.lifecycle.event",
     "core.lifecycle.process",
+
+    "core.model.event",
     "core.model.logger",
 
     "core.protocol.public",

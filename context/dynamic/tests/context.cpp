@@ -10,10 +10,11 @@ using sf::core::context::ContextRef;
 using sf::core::exception::ContextUninitialised;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
+using sf::core::model::EventSourceRef;
 using sf::core::model::LoopManager;
 using sf::core::model::LoopManagerRef;
-using sf::core::model::EventSourceRef;
 
 using sf::core::model::Logger;
 using sf::core::model::LoggerRef;
@@ -52,6 +53,7 @@ class NoopLogger : public Logger {
 
 class NoopLoopManager : public LoopManager {
   public:
+   void add(EventDrainRef drain) {}
    void add(EventSourceRef source) {}
    void removeDrain(std::string id) {}
    void removeSource(std::string id) {}

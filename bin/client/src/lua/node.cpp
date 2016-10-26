@@ -6,6 +6,7 @@
 
 #include "core/context/client.h"
 #include "core/context/context.h"
+#include "core/context/static.h"
 #include "core/event/source/manual.h"
 #include "core/lifecycle/event.h"
 #include "core/model/event.h"
@@ -19,8 +20,11 @@ using sf::core::bin::NodeStatusRequest;
 
 using sf::core::context::Client;
 using sf::core::context::Context;
+using sf::core::context::Static;
 using sf::core::event::ManualSource;
+
 using sf::core::lifecycle::EventLifecycle;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 
 using sf::core::utility::Lua;
@@ -30,12 +34,14 @@ using sf::core::utility::lua_proxy_delete;
 
 void NodeLuaBinding::status(Lua* lua, int callback_ref, bool details) {
   // Create the reqest event.
+  EventDrainRef drain = Static::drains()->get(Client::server()->id());
   EventRef request = EventLifecycle::make<NodeStatusRequest>(
-    callback_ref, details, Client::server()->id()
+    callback_ref, details, drain
   );
 
   // Enqueue it for handling.
-  ManualSource* manual = Context::LoopManager()->get<ManualSource>("manual");
+  ManualSource* manual =
+    Context::LoopManager()->downcast<ManualSource>("manual");
   manual->enqueueEvent(request);
 }
 

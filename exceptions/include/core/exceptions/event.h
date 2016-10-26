@@ -8,6 +8,12 @@ namespace sf {
 namespace core {
 namespace exception {
 
+  //! Thrown when a drain is added twice.
+  MSG_EXCEPTION(SfException, DuplicateEventDrain);
+
+  //! Thrown when a source is added twice.
+  MSG_EXCEPTION(SfException, DuplicateEventSource);
+
   //! Thrown when a non-existent drain is looked up.
   MSG_EXCEPTION(SfException, EventDrainNotFound);
 

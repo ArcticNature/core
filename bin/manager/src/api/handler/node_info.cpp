@@ -21,6 +21,7 @@ using sf::core::cluster::NodeVersion;
 using sf::core::context::Static;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::RepositoryVersionId;
 using sf::core::lifecycle::EventLifecycle;
@@ -57,7 +58,7 @@ class NodeInfoEvent : public Event {
 
  public:
   NodeInfoEvent(
-      bool details, std::string correlation, std::string drain
+      bool details, std::string correlation, EventDrainRef drain
   ) : Event(correlation, drain) {
     this->details = details;
   }
@@ -101,12 +102,12 @@ class NodeInfoEvent : public Event {
     }
 
     // Send response to drain.
-    int fd = Static::drains()->get(this->drain())->getFD();
+    int fd = this->drain()->fd();
     MessageIO<Message>::send(fd, message);
   }
 };
 
-EventRef node_info_request(Message message, std::string drain) {
+EventRef node_info_request(Message message, EventDrainRef drain) {
   return EventLifecycle::make<NodeInfoEvent>(
       message.GetExtension(NodeInfoRequest::msg).details(),
       message.correlation_id(), drain

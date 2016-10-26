@@ -57,9 +57,12 @@ namespace event {
     int timer_fd;
     ScheduledClosureList closures;
 
+    sf::core::model::EventRef parse();
+
    public:
     explicit ScheduledSource(int tick);
     ~ScheduledSource();
+    int fd();
 
     //! Returns a list of scored callbacks.
     /*!
@@ -71,8 +74,6 @@ namespace event {
     void registerCallback(unsigned int score, ScheduledClosure closure);
     void registerCallback(unsigned int score, scheduled_callback callback);
 
-    int getFD();
-    sf::core::model::EventRef parse();
   };
 
 }  // namespace event

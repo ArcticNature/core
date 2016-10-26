@@ -41,7 +41,8 @@ namespace event {
     static FileDescriptorState checkFdState(int fd);
 
    protected:
-    const std::string drain_id;
+    const sf::core::model::EventDrainRef drain;
+    bool _closed;
 
     //! Checks the source's file descriptor for closure or error.
     /*!
@@ -95,7 +96,7 @@ namespace event {
     void safeCleanUp(bool self = false);
 
    public:
-    ConnectedSource(std::string id, std::string drain);
+    ConnectedSource(std::string id, sf::core::model::EventDrainRef drain);
   };
 
 }  // namespace event

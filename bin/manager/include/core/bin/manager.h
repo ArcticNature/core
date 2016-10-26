@@ -39,7 +39,10 @@ namespace bin {
    public:
     static std::pair<std::string, std::string> Connect(std::string path);
 
-    ManagerToDaemon(int fd, std::string id, std::string drain);
+    ManagerToDaemon(
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
+    );
     sf::core::model::EventRef parse();
   };
 
@@ -49,12 +52,15 @@ namespace bin {
     sf::core::model::EventRef process(
         sf::core::protocol::manager_spawner::Message message
     );
+    sf::core::model::EventRef parse();
 
    public:
     static std::pair<std::string, std::string> Connect(std::string path);
 
-    ManagerToSpawner(int fd, std::string id, std::string drain);
-    sf::core::model::EventRef parse();
+    ManagerToSpawner(
+        int fd, std::string id,
+        sf::core::model::EventDrainRef drain
+    );
   };
 
 }  // namespace bin

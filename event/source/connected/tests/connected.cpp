@@ -42,18 +42,18 @@ using sf::core::posix::User;
 
 class TestSource : public ConnectedSource {
  protected:
-  int fd;
+  int _fd;
 
   void onclosed() {
     ConnectedSource::onclose();
-    this->fd = -1;
+    this->_fd = -1;
   }
 
  public:
   TestSource(
-      int fd, std::string id, std::string drain
+      int fd, std::string id, EventDrainRef drain
   ) : ConnectedSource(id, drain) {
-    this->fd = fd;
+    this->_fd = fd;
   }
 
   ~TestSource() {
@@ -61,11 +61,11 @@ class TestSource : public ConnectedSource {
   }
 
   void disconnect() {
-    Static::posix()->close(this->fd);
+    Static::posix()->close(this->_fd);
   }
 
-  int getFD() {
-    return fd;
+  int fd() {
+    return this->_fd;
   }
 
   EventRef parse() {
@@ -88,13 +88,15 @@ class ConnectedUnixSource : public UnixSource {
      return this->drain;
    }
 
-   EventSourceRef clientSource(int fd, std::string id, std::string drain_id) {
-     this->source = EventSourceRef(new TestSource(fd, id, drain_id));
+   EventSourceRef clientSource(int fd, std::string id, EventDrainRef drain) {
+     this->source = EventSourceRef(new TestSource(fd, id, drain));
      return this->source;
    }
 
  public:
-   ConnectedUnixSource(std::string path) : UnixSource(path, "test") {}
+   ConnectedUnixSource(std::string path) : UnixSource(path, "test") {
+     // Noop.
+   }
 
    EventDrainRef getClientDrain() {
      EXPECT_NE(nullptr, this->drain.get());
@@ -122,21 +124,26 @@ class ConnectedSourceTest : public ::testing::Test {
     Static::initialise(new User());
     Context::Instance()->initialise(LoopManagerRef(new TestEpollManager()));
 
-    // Start listening for connections.
-    ConnectedUnixSource* listen = new ConnectedUnixSource(SOCKET_PATH);
-    Context::LoopManager()->add(EventSourceRef(listen));
+    try {
+      // Start listening for connections.
+      ConnectedUnixSource* listen = new ConnectedUnixSource(SOCKET_PATH);
+      Context::LoopManager()->add(EventSourceRef(listen));
 
-    // Connect to the server.
-    EventSourceRef client(new TestUnixClient(SOCKET_PATH));
-    Context::LoopManager()->add(client);
-    Context::LoopManager()->wait(1);
+      // Connect to the server.
+      EventSourceRef client(new TestUnixClient(SOCKET_PATH));
+      Context::LoopManager()->add(client);
+      Context::LoopManager()->wait(1);
 
-    // Keep references to useful bits.
-    this->server    = listen->getClientSource();
-    this->server_fd = this->server->getFD();
-    this->client    = client;
-    this->client_fd = client->getFD();
-    this->server_drain = listen->getClientDrain();
+      // Keep references to useful bits.
+      this->server    = listen->getClientSource();
+      this->server_fd = this->server->fd();
+      this->client    = client;
+      this->client_fd = client->fd();
+      this->server_drain = listen->getClientDrain();
+    } catch (...) {
+      Static::destroy();
+      throw;
+    }
   }
 
   ~ConnectedSourceTest() {

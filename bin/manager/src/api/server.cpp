@@ -6,12 +6,15 @@
 #include "core/bin/manager/api/source.h"
 
 #include "core/context/context.h"
+#include "core/context/static.h"
 #include "core/model/logger.h"
 
 using sf::core::bin::ApiFdDrain;
 using sf::core::bin::ApiFdSource;
 using sf::core::bin::UnixServer;
+
 using sf::core::context::Context;
+using sf::core::context::Static;
 
 using sf::core::event::UnixSource;
 using sf::core::model::EventDrainRef;
@@ -31,12 +34,12 @@ EventDrainRef UnixServer::clientDrain(int fd, std::string id) {
 }
 
 EventSourceRef UnixServer::clientSource(
-    int fd, std::string id, std::string drain_id
+    int fd, std::string id, EventDrainRef drain
 ) {
-  EventSourceRef source(new ApiFdSource(fd, id, drain_id));
+  EventSourceRef source(new ApiFdSource(fd, id, drain));
   std::string    source_id = source->id();
   LogInfo info = {
-    {"drain-id",  drain_id},
+    {"drain-id",  drain->id()},
     {"source-id", source_id}
   };
   DEBUGV(

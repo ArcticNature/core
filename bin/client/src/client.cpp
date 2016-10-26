@@ -30,6 +30,7 @@ using sf::core::exception::CorruptedData;
 
 using sf::core::lifecycle::ClientLifecycle;
 using sf::core::lifecycle::EventLifecycle;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 
@@ -41,12 +42,8 @@ using sf::core::utility::MessageIO;
 
 class ApiFdDrain : public FdDrain {
  public:
-  ApiFdDrain(int fd, std::string id) : FdDrain(fd, id) {}
-
-  void sendAck() {
-    Message message;
-    message.set_code(Message::Ack);
-    MessageIO<Message>::send(this->getFD(), message);
+  ApiFdDrain(int fd, std::string id) : FdDrain(fd, id) {
+    // Noop.
   }
 };
 
@@ -57,8 +54,8 @@ class ApiClient : public UnixClient {
     return UnixClient::Connect<ApiClient, ApiFdDrain>(path, "api").second;
   }
 
-  ApiClient(int fd, std::string id, std::string drain_id)
-    : UnixClient(fd, id, drain_id) {
+  ApiClient(int fd, std::string id, EventDrainRef drain)
+    : UnixClient(fd, id, drain) {
     // NOOP.
   }
 
@@ -68,7 +65,7 @@ class ApiClient : public UnixClient {
     }
 
     // Parse event.
-    int fd = this->getFD();
+    int fd = this->fd();
     Message message;
     bool parsed = MessageIO<Message>::parse(fd, &message);
     if (!parsed) {
@@ -78,7 +75,7 @@ class ApiClient : public UnixClient {
     // Create event.
     std::string event_name = "Res::" + Message_Code_Name(message.code());
     ApiEventFactory factory = ApiHandlerRegistry::Get(event_name);
-    EventRef event = factory(message, this->drain_id);
+    EventRef event = factory(message, this->drain);
 
     // Initialise event and return.
     EventLifecycle::Init(event);
@@ -94,7 +91,7 @@ void Client::connectToServer() {
 }
 
 void Client::introduceToServer() {
-  int server = sf::core::context::Client::server()->getFD();
+  int server = sf::core::context::Client::server()->fd();
   Message introduce;
   introduce.set_code(Message::Introduce);
   MessageIO<Message>::send(server, introduce);

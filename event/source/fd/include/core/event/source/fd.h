@@ -17,14 +17,13 @@ namespace event {
    */
   class FdSource : public ConnectedSource {
    protected:
-    int fd;
+    int  _fd;
     void disconnect();
 
    public:
-    FdSource(int fd, std::string id, std::string drain);
+    FdSource(int fd, std::string id, sf::core::model::EventDrainRef drain);
     ~FdSource();
-
-    int getFD();
+    int fd();
   };
 
 }  // namespace event

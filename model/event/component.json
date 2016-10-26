@@ -3,7 +3,9 @@
   "type": "c++",
 
   "deps": [
-    "core.exceptions"
+    "core.exceptions",
+    "core.utility.lookup-table",
+    "core.utility.string"
   ],
 
   "targets": {
