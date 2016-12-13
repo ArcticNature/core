@@ -2,14 +2,29 @@
 #include <gtest/gtest.h>
 
 #include "core/context/context.h"
+#include "core/context/static.h"
 #include "core/exceptions/base.h"
+#include "core/exceptions/event.h"
+
+#include "core/interface/lifecycle.h"
+#include "core/model/event.h"
 #include "core/model/logger.h"
 
 using sf::core::context::Context;
 using sf::core::context::ContextRef;
+using sf::core::context::Static;
+
 using sf::core::exception::ContextUninitialised;
+using sf::core::exception::DuplicateEventDrain;
+
+using sf::core::interface::Lifecycle;
+using sf::core::interface::LifecycleHandlerRef;
+using sf::core::lifecycle::EVENT_DRAIN_ENQUEUE;
+using sf::core::lifecycle::DrainEnqueueArg;
+using sf::core::lifecycle::FlushEventDrain;
 
 using sf::core::model::Event;
+using sf::core::model::EventDrain;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
@@ -53,7 +68,15 @@ class NoopLogger : public Logger {
 
 class NoopLoopManager : public LoopManager {
   public:
-   void add(EventDrainRef drain) {}
+   std::map<std::string, EventDrainRef> drains_map;
+
+   void add(EventDrainRef drain) {
+     if (this->drains_map.find(drain->id()) != this->drains_map.end()) {
+       throw DuplicateEventDrain(drain->id());
+     }
+     this->drains_map[drain->id()] = drain;
+   }
+
    void add(EventSourceRef source) {}
    void removeDrain(std::string id) {}
    void removeSource(std::string id) {}
@@ -84,4 +107,73 @@ TEST_F(ContextTest, SetSourceManager) {
   LoopManagerRef manager(new NoopLoopManager());
   this->context->initialise(manager);
   ASSERT_EQ(manager, Context::LoopManager());
+}
+
+
+class FlushDrainTest : public ::testing::Test {
+ protected:
+  ContextRef context;
+  NoopLoopManager* manager;
+
+ public:
+  FlushDrainTest() {
+    this->manager = new NoopLoopManager();
+    this->context = Context::Instance();
+    this->context->initialise(LoopManagerRef(this->manager));
+
+    Lifecycle::reset();
+    Lifecycle::on(
+        EVENT_DRAIN_ENQUEUE,
+        LifecycleHandlerRef(new FlushEventDrain())
+    );
+  }
+
+  ~FlushDrainTest() {
+    Context::Destroy();
+    Logger::destroyFallback();
+    Static::destroy();
+  }
+};
+
+
+class StubDrain : public EventDrain {
+ public:
+  StubDrain() : EventDrain("stub-drain") {
+    // Noop
+  }
+
+  int fd() {
+    return 0;
+  }
+
+  bool flush() {
+    return false;
+  }
+};
+
+
+TEST_F(FlushDrainTest, AddDrain) {
+  EventDrainRef drain(new StubDrain());
+  DrainEnqueueArg arg(drain->id());
+  Static::drains()->add(drain->id(), drain);
+  Lifecycle::trigger(EVENT_DRAIN_ENQUEUE, &arg);
+  ASSERT_TRUE(arg.added());
+  ASSERT_EQ(1, this->manager->drains_map.size());
+}
+
+TEST_F(FlushDrainTest, DrainNotFound) {
+  DrainEnqueueArg arg("not-a-drain");
+  Lifecycle::trigger(EVENT_DRAIN_ENQUEUE, &arg);
+  ASSERT_FALSE(arg.added());
+  ASSERT_EQ(0, this->manager->drains_map.size());
+}
+
+TEST_F(FlushDrainTest, SkipExistingDrain) {
+  EventDrainRef drain(new StubDrain());
+  DrainEnqueueArg arg(drain->id());
+  Static::drains()->add(drain->id(), drain);
+  Context::LoopManager()->add(drain);
+  Lifecycle::trigger(EVENT_DRAIN_ENQUEUE, &arg);
+  ASSERT_FALSE(arg.added());
+  ASSERT_EQ(1, this->manager->drains_map.size());
 }

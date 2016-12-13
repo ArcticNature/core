@@ -4,6 +4,7 @@
 
   "deps": [
     "core.exceptions",
+    "core.interface.lifecycle",
     "core.utility.lookup-table",
     "core.utility.string"
   ],

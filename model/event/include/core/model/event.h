@@ -9,6 +9,7 @@
 
 #include "core/exceptions/base.h"
 #include "core/exceptions/event.h"
+#include "core/interface/lifecycle.h"
 #include "core/utility/lookup-table.h"
 
 
@@ -269,6 +270,40 @@ namespace model {
   };
 
 }  // namespace model
+}  // namespace core
+}  // namespace sf
+
+namespace sf {
+namespace core {
+namespace lifecycle {
+
+  const std::string EVENT_DRAIN_ENQUEUE = "event::drain::enqueue";
+
+  //! Arguments to `event::drain::enqueue`.
+  class DrainEnqueueArg : public sf::core::interface::BaseLifecycleArg {
+   protected:
+    bool _added;
+    std::string _drain;
+
+   public:
+    explicit DrainEnqueueArg(std::string drain);
+
+    //! Marks the drain as added to the loop manager.
+    void add();
+
+    //! Checks if the drain was added to the loop manager.
+    bool added() const;
+
+    //! Return the event drain where data was enqueued.
+    std::string drain() const;
+  };
+
+
+  //! Lifecycle handler for `event::drain:enqueue`.
+  typedef sf::core::interface::LifecycleHandler<DrainEnqueueArg>
+    DrainEnqueueHandler;
+
+}  // namespace lifecycle
 }  // namespace core
 }  // namespace sf
 

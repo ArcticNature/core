@@ -50,4 +50,24 @@ namespace context {
 }  // namespace core
 }  // namespace sf
 
+
+namespace sf {
+namespace core {
+namespace lifecycle {
+
+  //! Handles EVENT_DRAIN_ENQUEUE events.
+  /*!
+   * This event handler fetches the EventDrainRef for the
+   * event drain to add to the loop manager and adds it for
+   * flushing during the run loop.
+   */
+  class FlushEventDrain : public DrainEnqueueHandler {
+    public:
+      void handle(std::string event, DrainEnqueueArg* argument);
+  };
+
+}  // namespace lifecycle
+}  // namespace core
+}  // namespace sf
+
 #endif  // CORE_CONTEXT_CONTEXT_H_
