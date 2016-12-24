@@ -16,8 +16,6 @@
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
-#include "core/protocols/test/t_message.pb.h"
-#include "core/utility/protobuf.h"
 #include "core/utility/string.h"
 
 
@@ -29,7 +27,6 @@ using sf::core::event::MockDrain;
 using sf::core::event::TestEvent;
 using sf::core::event::TestEpollManager;
 using sf::core::event::TestFdDrain;
-using sf::core::event::TestFdSource;
 using sf::core::event::TestUnixClient;
 
 using sf::core::exception::ErrNoException;
@@ -38,13 +35,12 @@ using sf::core::exception::ItemNotFound;
 
 using sf::core::model::Event;
 using sf::core::model::EventDrain;
+using sf::core::model::EventDrainBufferRef;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
 
-using sf::core::protocol::test::Message;
-using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
 
 
@@ -89,7 +85,18 @@ int MockDrain::fd() {
 }
 
 bool MockDrain::flush() {
-  return true;
+  if (this->buffer.empty()) {
+    return true;
+  }
+
+  // Flush the top of the buffer.
+  EventDrainBufferRef item = this->buffer[0];
+  this->buffer.erase(this->buffer.begin());
+
+  uint32_t size;
+  char* data = item->remaining(&size);
+  Static::posix()->write(this->fd(), data, size);
+  return this->buffer.empty();
 }
 
 int MockDrain::readFD() {
@@ -129,7 +136,7 @@ void TestEpollManager::add(EventDrainRef drain) {
 
 void TestEpollManager::add(EventSourceRef source) {
   struct epoll_event event;
-  int fd = source->fd();
+  int fd = this->fdFor(source);
   event.data.fd = fd;
   event.events  = EPOLLIN | EPOLLRDHUP | EPOLLPRI | EPOLLERR | EPOLLHUP;
 
@@ -151,7 +158,7 @@ void TestEpollManager::removeSource(std::string id) {
   }
 
   try {
-    int fd = source->fd();
+    int fd = this->fdFor(source);
     Static::posix()->epoll_control(this->epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
   } catch (ErrNoException& ex) {
     if (ex.getCode() != EBADF) {
@@ -203,31 +210,6 @@ void TestUnixClient::openSocket() {
       this->socket_fd, (struct sockaddr*)&remote,
       sizeof(sockaddr_un)
   );
-}
-
-
-TestFdSource::TestFdSource(int fd, std::string id) : EventSource("fd-" + id) {
-  this->_fd = fd;
-}
-
-TestFdSource::~TestFdSource() {
-  Static::posix()->shutdown(this->_fd, SHUT_RD);
-  Static::posix()->close(this->_fd);
-}
-
-int TestFdSource::fd() {
-  return this->_fd;
-}
-
-EventRef TestFdSource::parse() {
-  Message message;
-  bool valid = MessageIO<Message>::parse(this->_fd, &message);
-  if (valid && message.code() == Message::Test) {
-    return EventRef(new TestEvent(
-          "abc", EventDrainRef(new NullDrain())
-    ));
-  }
-  return EventRef();
 }
 
 

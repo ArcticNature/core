@@ -29,6 +29,8 @@ namespace event {
 
   class TestEvent : public sf::core::model::Event {
    public:
+    std::string payload;
+
     TestEvent();
     TestEvent(
         std::string correlation,
@@ -57,18 +59,6 @@ namespace event {
   class TestFdDrain : public sf::core::event::FdDrain {
    public:
     TestFdDrain(int fd, std::string id);
-  };
-
-
-  class TestFdSource : public sf::core::model::EventSource {
-   protected:
-    int _fd;
-    sf::core::model::EventRef parse();
-
-   public:
-    TestFdSource(int fd, std::string id);
-    ~TestFdSource();
-    int fd();
   };
 
 

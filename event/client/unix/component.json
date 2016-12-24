@@ -14,6 +14,7 @@
     "test":    {
       "deps": [
         "core.event.source.unix",
+        "core.event.test-source",
         "core.event.testing",
         "core.posix.user"
       ],

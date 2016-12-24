@@ -47,7 +47,7 @@ namespace interface {
     int tick;
 
    public:
-    ScheduledSourceIntent(int tick);
+    explicit ScheduledSourceIntent(int tick);
 
     std::vector<std::string> depends() const;
     std::string provides() const;

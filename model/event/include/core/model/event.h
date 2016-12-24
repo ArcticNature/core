@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "core/exceptions/base.h"
 #include "core/exceptions/event.h"
@@ -18,7 +19,31 @@ namespace core {
 namespace model {
 
   class EventDrain;
+  class EventSource;
+  class LoopManager;
   typedef std::shared_ptr<EventDrain> EventDrainRef;
+  typedef std::shared_ptr<EventSource> EventSourceRef;
+
+
+  //! Store Source and Drain references by id and fd.
+  template<typename Ref>
+  class RefStore {
+   protected:
+    std::map<std::string, Ref> by_id;
+    std::map<int, Ref> by_fd;
+
+   public:
+    //! Adds a Drain or Source reference to the store.
+    void add(Ref ref);
+
+    //! Returns the reference with the given fd/id.
+    Ref get(int fd) const;
+    Ref get(std::string id) const;
+
+    //! Removes the reference with the given fd/id.
+    void remove(int fd);
+    void remove(std::string id);
+  };
 
 
   //! Base event definition.
@@ -63,6 +88,47 @@ namespace model {
   typedef std::shared_ptr<Event> EventRef;
 
 
+  //! Memory buffer for data to send to a drain.
+  /*!
+   * The buffer is created with a given size that cannot be changed.
+   * The memory can be accessed at different offsets for write purpuses.
+   * The memory is accessed from the last not-consumed offset.
+   * As data is written to the drain the buffer is consumed.
+   *
+   * Pseudo-code for buffer creation:
+   *
+   *    Message msg = ...; // Create and fill the message.
+   *    uint32_t msg_size = msg.ByteSize();
+   *    uint32_t size = sizeof(uint32_t) + msg_size;
+   *    EventDrainBufferRef buffer(new EventDrainBuffer(size));
+   *    write_length(buffer->data(0), msg_size);
+   *    write_message(buffer->data(sizeof(uint32_t)), msg);
+   *    drain->enqueue(buffer);
+   *
+   * Pseudo-code to drain the buffer:
+   *
+   *    EventDrainBufferRef buffer = queue[0];
+   *    uint32_t size = 0;
+   *    uint32_t written = write(fd, buffer->remaining(&size), size);
+   *    buffer->consume(written);
+   */
+  class EventDrainBuffer {
+   protected:
+     char* buffer;
+     uint32_t consumed;
+     uint32_t size;
+
+   public:
+    explicit EventDrainBuffer(uint32_t size);
+    ~EventDrainBuffer();
+
+    void  consume(uint32_t amount);
+    void* data(uint32_t offset);
+    bool  empty() const;
+    char* remaining(uint32_t* left) const;
+  };
+  typedef std::shared_ptr<EventDrainBuffer> EventDrainBufferRef;
+
   //! Handle the output of an event handling.
   /**
    * When events are handled in the system there may be a need to
@@ -74,9 +140,15 @@ namespace model {
    * The source decides the drain for the event.
    */
   class EventDrain {
+    friend LoopManager;
+    friend RefStore<EventDrainRef>;
+
    protected:
     const std::string drain_id;
-    std::vector<std::string> buffer;
+    std::vector<EventDrainBufferRef> buffer;
+
+    //! \returns The writable file descriptor to send data to.
+    virtual int fd() = 0;
 
    public:
     explicit EventDrain(std::string id);
@@ -92,15 +164,11 @@ namespace model {
      * When sending ProtBuf messages use SerializeToString:
      * https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message_lite#MessageLite.SerializeToString.details
      */
-    virtual void enqueue(const std::string& chunk);
-
-    //! \returns The writable file descriptor to send data to.
-    virtual int fd() = 0;
+    virtual void enqueue(EventDrainBufferRef chunk);
 
     //! Flushes the internal buffer.
     /*!
-     * Uses the internal `send` operator to perform the write.
-     *
+     * Triggers the implementation dependent write operation.
      * \returns true if the buffer is empty after the operation.
      */
     virtual bool flush() = 0;
@@ -149,6 +217,9 @@ namespace model {
    * to each generated Event.
    */
   class EventSource {
+    friend LoopManager;
+    friend RefStore<EventSourceRef>;
+
    protected:
     const std::string source_id;
 
@@ -160,15 +231,15 @@ namespace model {
      */
     virtual EventRef parse() = 0;
 
+    //! \returns the file descriptor to wait for events on.
+    virtual int fd() = 0;
+
    public:
     explicit EventSource(std::string id);
     virtual ~EventSource();
 
     //! \returns the ID of the event source.
     std::string id() const;
-
-    //! \returns the file descriptor to wait for events on.
-    virtual int fd() = 0;
 
     //! Fetches an event from the channel.
     /*!
@@ -183,28 +254,6 @@ namespace model {
 
     //! Returns a Promise that is resolved/rejected when the drain is closed.
     // TODO(stefano): Promise whenClosed() const;
-  };
-  typedef std::shared_ptr<EventSource> EventSourceRef;
-
-
-  //! Store Source and Drain references by id and fd.
-  template<typename Ref>
-  class RefStore {
-   protected:
-    std::map<std::string, Ref> by_id;
-    std::map<int, Ref> by_fd;
-
-   public:
-    //! Adds a Drain or Source reference to the store.
-    void add(Ref ref);
-
-    //! Returns the reference with the given fd/id.
-    Ref  get(int fd) const;
-    Ref  get(std::string id) const;
-
-    //! Removes the reference with the given fd/id.
-    void remove(int fd);
-    void remove(std::string id);
   };
 
 
@@ -222,6 +271,17 @@ namespace model {
    protected:
     RefStore<EventDrainRef>  drains;
     RefStore<EventSourceRef> sources;
+
+    //! Extract sources/drains fd for sub-classes.
+    int fdFor(EventDrainRef drain) const;
+    int fdFor(EventSourceRef source) const;
+
+    //! Process an event on a drain.
+    /*!
+     * Flushes a drain and removes it from the manager
+     * if there is nothing to flush.
+     */
+    void processDrain(int fd);
 
    public:
     virtual ~LoopManager();

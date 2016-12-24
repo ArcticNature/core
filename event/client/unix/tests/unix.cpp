@@ -13,6 +13,7 @@
 #include "core/model/event.h"
 #include "core/posix/user.h"
 
+#include "core/event/test-source.h"
 #include "core/event/testing.h"
 #include "core/protocols/test/t_message.pb.h"
 #include "core/utility/protobuf.h"
@@ -95,7 +96,9 @@ class UnixClientTest : public ::testing::Test {
    bool sendTestMessage(EventDrainRef drain) {
      Message message;
      message.set_code(Message::Test);
-     return MessageIO<Message>::send(drain->fd(), message);
+     bool result = MessageIO<Message>::send(drain, message);
+     drain->flush();
+     return result;
    }
 
  public:

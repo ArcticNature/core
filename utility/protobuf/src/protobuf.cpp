@@ -3,6 +3,7 @@
 
 #include <arpa/inet.h>
 
+#include "core/model/event.h"
 #include "core/exceptions/base.h"
 #include "core/context/static.h"
 
@@ -11,14 +12,15 @@ using sf::core::exception::CorruptedData;
 using sf::core::exception::ChannelEmpty;
 
 using sf::core::context::Static;
+using sf::core::model::EventDrainBufferRef;
 using sf::core::utility::LengthIO;
 
 
-uint32_t LengthIO::read(int fd) {
+uint32_t LengthIO::decode(int fd) {
   uint32_t value = 0;
-  size_t   read = Static::posix()->read(fd, &value, sizeof(uint32_t));
+  size_t   read = Static::posix()->read(fd, &value, UINT32_SIZE);
 
-  if (read != sizeof(uint32_t)) {
+  if (read != UINT32_SIZE) {
     throw CorruptedData("Invalid message length read.");
   }
   if (read == 0) {
@@ -28,7 +30,8 @@ uint32_t LengthIO::read(int fd) {
   return ntohl(value);
 }
 
-void LengthIO::write(int fd, uint32_t length) {
+void LengthIO::encode(EventDrainBufferRef buffer, uint32_t length) {
   length = htonl(length);
-  Static::posix()->write(fd, &length, sizeof(uint32_t));
+  uint32_t* start = static_cast<uint32_t*>(buffer->data(0));
+  *start = length;
 }

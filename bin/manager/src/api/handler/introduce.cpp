@@ -61,7 +61,7 @@ class ClientIntroduceEvent : public Event {
     intro->set_node_name(node_name);
 
     // Send response to client.
-    int drain = this->drain()->fd();
+    EventDrainRef drain = this->drain();
     MessageIO<Message>::send(drain, response);
   }
 };

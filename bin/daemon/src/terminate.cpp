@@ -80,7 +80,7 @@ void TerminateDaemon::stopManager() {
   ManagerMessage message;
   message.set_code(ManagerMessage::Shutdown);
 
-  int drain = this->context->managerDrain()->fd();
+  EventDrainRef drain = this->context->managerDrain();
   MessageIO<ManagerMessage>::send(drain, message);
 }
 
@@ -90,7 +90,7 @@ void TerminateDaemon::stopSpawner() {
   SpwanerMessage message;
   message.set_code(SpwanerMessage::Shutdown);
 
-  int drain = this->context->spawnerDrain()->fd();
+  EventDrainRef drain = this->context->spawnerDrain();
   MessageIO<SpwanerMessage>::send(drain, message);
 }
 

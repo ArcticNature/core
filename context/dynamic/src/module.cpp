@@ -1,4 +1,6 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
+#include <string>
+
 #include "core/context/context.h"
 #include "core/context/static.h"
 

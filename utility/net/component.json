@@ -1,0 +1,18 @@
+{
+  "name": "core.utility.net",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+    "core.context.static"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    {
+      "deps": ["core.posix.user"],
+      "type": "lib"
+    }
+  }
+}

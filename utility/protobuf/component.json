@@ -4,7 +4,8 @@
 
   "deps": [
     "core.compile-time",
-    "core.context.static"
+    "core.context.static",
+    "core.model.event"
   ],
 
   "targets": {
@@ -12,6 +13,7 @@
     "release": { "type": "lib" },
     "test":    {
       "deps": [
+        "core.event.testing",
         "core.posix.user",
         "core.protocol.test"
       ],

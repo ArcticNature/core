@@ -223,7 +223,7 @@ namespace utility {
       }
       void* pointer = lua_touserdata(state, full_idx);
       return reinterpret_cast<type*>(pointer);
-    };
+    }
   };
 
 }  // namespace utility

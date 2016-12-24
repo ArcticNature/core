@@ -89,6 +89,7 @@ TEST_F(NodeStatusRequestTest, SendsRequest) {
   EventRef event = this->make(this->mock);
   Message  message;
   event->handle();
+  this->mock->flush();
   bool parsed = MessageIO<Message>::parse(
       this->mock_drain->readFD(), &message
   );

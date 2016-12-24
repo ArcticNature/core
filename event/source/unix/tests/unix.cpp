@@ -21,6 +21,7 @@
 #include "core/utility/protobuf.h"
 
 #include "core/event/testing.h"
+#include "core/event/test-source.h"
 
 
 #define SOCKET_FILE "out/build/test/unix.socket"
@@ -83,6 +84,7 @@ class TestUnixSource : public UnixSource {
 class UnixSourceTest : public ::testing::Test {
  protected:
   int client_fd;
+  EventDrainRef client;
 
   bool fileExists(std::string path) {
     struct stat stat_info;
@@ -103,6 +105,7 @@ class UnixSourceTest : public ::testing::Test {
         sizeof(sockaddr_un)
     );
 
+    this->client = EventDrainRef(new FdDrain(this->client_fd, "test"));
     EXPECT_EQ(0, result);
   }
 
@@ -120,9 +123,7 @@ class UnixSourceTest : public ::testing::Test {
   }
 
   ~UnixSourceTest() {
-    if (this->client_fd != -1) {
-      Static::posix()->close(this->client_fd);
-    }
+    this->client.reset();
     Context::Destroy();
     Static::destroy();
   }
@@ -184,7 +185,8 @@ TEST_F(UnixSourceTest, ClientToServer) {
   // Send message throug the client.
   Message message;
   message.set_code(Message::Test);
-  bool sent = MessageIO<Message>::send(this->client_fd, message);
+  bool sent = MessageIO<Message>::send(this->client, message);
+  this->client->flush();
   ASSERT_TRUE(sent);
 
   // Check that the message is parsed from the source.
@@ -209,7 +211,8 @@ TEST_F(UnixSourceTest, ServerToClient) {
 
   Message message;
   message.set_code(Message::Test);
-  bool sent = MessageIO<Message>::send(drain->fd(), message);
+  bool sent = MessageIO<Message>::send(drain, message);
+  drain->flush();
   ASSERT_TRUE(sent);
 
   // Check that the message is read from the client.

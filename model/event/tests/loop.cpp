@@ -124,6 +124,14 @@ TEST(RefStore, RemoveByIdMissing) {
 
 class TestLoop : public LoopManager {
  public:
+  int fdFor(EventDrainRef drain) const {
+    return LoopManager::fdFor(drain);
+  }
+
+  int fdFor(EventSourceRef source) const {
+    return LoopManager::fdFor(source);
+  }
+
   void add(EventDrainRef drain) {
     this->drains.add(drain);
   }
@@ -185,7 +193,16 @@ TEST(LoopManager, DowncastFail) {
   );
 }
 
+TEST(LoopManager, GetDrainFd) {
+  TestLoop loop;
+  EventDrainRef drain(new TestDrain());
+  int fd = loop.fdFor(drain);
+  ASSERT_EQ(-1, fd);
+}
 
-// TODO(stefano):
-//  - Test null drain can be enqueued.
-//  - Test null drain can flush to -1.
+TEST(LoopManager, GetSourceFd) {
+  TestLoop loop;
+  EventSourceRef source(new TestSource());
+  int fd = loop.fdFor(source);
+  ASSERT_EQ(-1, fd);
+}

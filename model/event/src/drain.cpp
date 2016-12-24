@@ -2,16 +2,63 @@
 #include <exception>
 #include <string>
 
+#include "core/exceptions/base.h"
 #include "core/interface/lifecycle.h"
 #include "core/model/event.h"
 
 
+using sf::core::exception::CorruptedData;
 using sf::core::interface::Lifecycle;
 
 using sf::core::lifecycle::EVENT_DRAIN_ENQUEUE;
 using sf::core::lifecycle::DrainEnqueueArg;
 
 using sf::core::model::EventDrain;
+using sf::core::model::EventDrainBuffer;
+using sf::core::model::EventDrainBufferRef;
+
+
+EventDrainBuffer::EventDrainBuffer(uint32_t size) {
+  this->buffer = new char[size];
+  this->size = size;
+  this->consumed = 0;
+}
+
+EventDrainBuffer::~EventDrainBuffer() {
+  if (this->buffer) {
+    delete [] this->buffer;
+  }
+}
+
+void EventDrainBuffer::consume(uint32_t amount) {
+  this->consumed += amount;
+  if (this->consumed > this->size) {
+    this->consumed = this->size;
+  }
+}
+
+void* EventDrainBuffer::data(uint32_t offset) {
+  if (offset >= this->size) {
+    throw CorruptedData("Unable to access data after the end of the buffer");
+  }
+  return this->buffer + offset;
+}
+
+bool EventDrainBuffer::empty() const {
+  return this->consumed >= this->size;
+}
+
+char* EventDrainBuffer::remaining(uint32_t* left) const {
+  char* start = this->buffer;
+  uint32_t offset = this->consumed;
+  if (offset >= this->size) {
+    throw CorruptedData("Unable to access data after the end of the buffer");
+  }
+  if (left) {
+    *left = this->size - offset;
+  }
+  return start + offset;
+}
 
 
 DrainEnqueueArg::DrainEnqueueArg(std::string drain) {
@@ -40,7 +87,7 @@ EventDrain::~EventDrain() {
   // NOOP.
 }
 
-void EventDrain::enqueue(const std::string& chunk) {
+void EventDrain::enqueue(EventDrainBufferRef chunk) {
   this->buffer.push_back(chunk);
   DrainEnqueueArg arg(this->id());
   Lifecycle::trigger(EVENT_DRAIN_ENQUEUE, &arg);

@@ -5,7 +5,8 @@
 #include "core/bin/manager/api/source.h"
 #include "core/context/static.h"
 
-#include  "core/event/drain/null.h"
+#include "core/event/drain/null.h"
+#include "core/event/testing.h"
 #include "core/exceptions/base.h"
 
 #include "core/model/event.h"
@@ -18,6 +19,7 @@ using sf::core::bin::ApiFdSource;
 using sf::core::context::Static;
 
 using sf::core::event::NullDrain;
+using sf::core::event::TestFdDrain;
 using sf::core::exception::CorruptedData;
 using sf::core::exception::FactoryNotFound;
 
@@ -35,6 +37,7 @@ class ApiSourceTest : public ::testing::Test {
   int write_fd;
 
   ApiFdSource* api;
+  EventDrainRef drain;
 
  public:
   ApiSourceTest() {
@@ -48,11 +51,12 @@ class ApiSourceTest : public ::testing::Test {
     this->api = new ApiFdSource(
         this->read_fd, "test", EventDrainRef(new NullDrain())
     );
+    this->drain = EventDrainRef(new TestFdDrain(this->write_fd, "test"));
   }
 
   ~ApiSourceTest() {
     delete this->api;
-    Static::posix()->close(this->write_fd);
+    this->drain.reset();
     Static::destroy();
   }
 
@@ -61,7 +65,8 @@ class ApiSourceTest : public ::testing::Test {
   }
 
   void write(Message message) {
-    MessageIO<Message>::send(this->write_fd, message);
+    MessageIO<Message>::send(this->drain, message);
+    this->drain->flush();
   }
 };
 

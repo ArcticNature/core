@@ -63,5 +63,5 @@ void NodeStatusRequest::handle() {
   info->set_details(this->details);
 
   // Send status request.
-  MessageIO<Message>::send(this->drain()->fd(), message);
+  MessageIO<Message>::send(this->drain(), message);
 }

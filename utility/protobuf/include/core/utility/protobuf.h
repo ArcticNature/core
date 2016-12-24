@@ -3,6 +3,9 @@
 #define CORE_UTILITY_PROTOBUF_H_
 
 #include <stdint.h>
+#include "core/model/event.h"
+
+#define UINT32_SIZE sizeof(uint32_t)
 
 
 namespace sf {
@@ -13,10 +16,12 @@ namespace utility {
   class LengthIO {
    public:
     //! Reads a message length from the file descriptor.
-    static uint32_t read(int fd);
+    static uint32_t decode(int fd);
 
-    //! Writes a message length to the file descriptor.
-    static void write(int fd, uint32_t length);
+    //! Writes a message length to a drain buffer.
+    static void encode(
+        sf::core::model::EventDrainBufferRef buffer, uint32_t length
+    );
   };
 
 
@@ -35,15 +40,15 @@ namespace utility {
      */
     static bool parse(int fd, Message* message);
 
-    //! Serialises and sends a message to a file descriptor.
+    //! Serialises and sends a message to a drain.
     /*!
      * The message length is written in front of the message itself.
      *
-     * \param fd      The file descriptor that should receive the message.
+     * \param drain   Event drain to send the message to.
      * \param message The message to send.
      * \returns The result of the serialisation process.
      */
-    static bool send(int fd, Message message);
+    static bool send(sf::core::model::EventDrainRef drain, Message message);
   };
 
 }  // namespace utility

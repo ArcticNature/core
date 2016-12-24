@@ -6,7 +6,8 @@
     "core.context.dynamic",
     "core.context.static",
     "core.interface.posix",
-    "core.model.event"
+    "core.model.event",
+    "core.utility.net"
   ],
 
   "targets": {

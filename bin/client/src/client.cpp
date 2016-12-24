@@ -91,7 +91,7 @@ void Client::connectToServer() {
 }
 
 void Client::introduceToServer() {
-  int server = sf::core::context::Client::server()->fd();
+  EventDrainRef server = sf::core::context::Client::server();
   Message introduce;
   introduce.set_code(Message::Introduce);
   MessageIO<Message>::send(server, introduce);

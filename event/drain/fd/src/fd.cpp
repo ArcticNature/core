@@ -14,6 +14,7 @@ using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::event::FdDrain;
 using sf::core::model::EventDrain;
+using sf::core::model::EventDrainBufferRef;
 using sf::core::model::LogInfo;
 
 
@@ -25,7 +26,11 @@ FdDrain::~FdDrain() {
   LogInfo info = {{"drain-id", this->id()}};
   INFOV(Context::Logger(), "Closing drain ${drain-id}", info);
 
-  Static::posix()->shutdown(this->_fd, SHUT_WR);
+  try {
+    Static::posix()->shutdown(this->_fd, SHUT_WR);
+  } catch(...) {
+    // Noop.
+  }
   Static::posix()->close(this->_fd);
 }
 
@@ -34,5 +39,16 @@ int FdDrain::fd() {
 }
 
 bool FdDrain::flush() {
-  return true;
+  if (this->buffer.empty()) {
+    return true;
+  }
+
+  // Flush the top of the buffer.
+  EventDrainBufferRef item = this->buffer[0];
+  this->buffer.erase(this->buffer.begin());
+
+  uint32_t size;
+  char* data = item->remaining(&size);
+  Static::posix()->write(this->fd(), data, size);
+  return this->buffer.empty();
 }

@@ -15,6 +15,7 @@
       "deps": [
         "core.event.drain.fd",
         "core.event.testing",
+        "core.event.test-source",
         "core.posix.user",
         "core.protocol.test",
         "core.utility.protobuf"

@@ -2,6 +2,8 @@
 #ifndef CORE_CONTEXT_CONTEXT_H_
 #define CORE_CONTEXT_CONTEXT_H_
 
+#include <string>
+
 #include "core/compile-time/options.h"
 #include "core/model/event.h"
 #include "core/model/logger.h"
@@ -62,8 +64,8 @@ namespace lifecycle {
    * flushing during the run loop.
    */
   class FlushEventDrain : public DrainEnqueueHandler {
-    public:
-      void handle(std::string event, DrainEnqueueArg* argument);
+   public:
+    void handle(std::string event, DrainEnqueueArg* argument);
   };
 
 }  // namespace lifecycle

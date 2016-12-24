@@ -11,57 +11,29 @@
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
+#include "core/utility/net.h"
 #include "core/utility/string.h"
-
 
 using sf::core::context::Context;
 using sf::core::context::Static;
 
 using sf::core::exception::ErrNoException;
 using sf::core::exception::SfException;
-
 using sf::core::event::ConnectedSource;
-using sf::core::event::FileDescriptorState;
 
 using sf::core::model::EventSource;
 using sf::core::model::LogInfo;
-
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventSource;
+
+using sf::core::utility::FileDescriptorState;
+using sf::core::utility::checkFdState;
 using sf::core::utility::string::toString;
-
-
-FileDescriptorState ConnectedSource::checkFdState(int fd) {
-  try {
-    char ch;
-    int  read = Static::posix()->read(fd, &ch, 0);
-
-    if (read == 0) {
-      ssize_t size = Static::posix()->recv(
-          fd, &ch, 1, MSG_DONTWAIT | MSG_PEEK
-      );
-      if (size == 0) {
-        return FileDescriptorState::CLOSED;
-      }
-      return FileDescriptorState::OK;
-    }
-
-    return FileDescriptorState::UNKOWN;
-
-  } catch (ErrNoException& ex) {
-    switch (ex.getCode()) {
-      case EAGAIN:   return FileDescriptorState::OK;
-      case EBADF:    return FileDescriptorState::CLOSED;
-      case ENOTSOCK: return FileDescriptorState::NOT_SOCKET;
-    }
-    return FileDescriptorState::UNKOWN;
-  }
-}
 
 
 bool ConnectedSource::checkFD() {
   int fd = this->fd();
-  FileDescriptorState state = ConnectedSource::checkFdState(fd);
+  FileDescriptorState state = checkFdState(fd);
   switch (state) {
     case FileDescriptorState::CLOSED:
       this->onclose();

@@ -46,7 +46,7 @@ NodeConfigIntent::NodeConfigIntent(std::string id) : _id(id) {
 std::vector<std::string> NodeConfigIntent::after() const {
   std::vector<std::string> none;
   return none;
-};
+}
 
 const std::string NodeConfigIntent::id() const {
   return this->_id;

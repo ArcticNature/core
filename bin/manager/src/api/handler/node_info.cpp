@@ -102,8 +102,8 @@ class NodeInfoEvent : public Event {
     }
 
     // Send response to drain.
-    int fd = this->drain()->fd();
-    MessageIO<Message>::send(fd, message);
+    EventDrainRef drain = this->drain();
+    MessageIO<Message>::send(drain, message);
   }
 };
 
