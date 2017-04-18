@@ -7,6 +7,7 @@
 
 using sf::core::model::Event;
 using sf::core::model::EventDrainRef;
+using sf::core::model::ReThrowEvent;
 
 
 Event::Event(std::string correlation, EventDrainRef drain) {
@@ -43,4 +44,16 @@ std::string Event::id() const {
 
 void Event::rescue(std::exception_ptr ex) {
   std::rethrow_exception(ex);
+}
+
+
+ReThrowEvent::ReThrowEvent(
+    std::exception_ptr ex, std::string correlation,
+    EventDrainRef drain
+) : Event(correlation, drain) {
+  this->exception = ex;
+}
+
+void ReThrowEvent::handle() {
+  std::rethrow_exception(this->exception);
 }

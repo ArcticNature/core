@@ -1,0 +1,15 @@
+{
+  "name": "core.promise",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+    "dependencies.poolqueue"
+  ],
+
+  "targets": {
+    "debug": { "type": "lib" },
+    "release": { "type": "lib" },
+    "test": { "type": "lib" }
+  }
+}

@@ -3,8 +3,10 @@
 
 #include <memory>
 
+#include "core/promise.h"
 #include "core/exceptions/base.h"
 
+using sf::core::PromiseKeeper;
 using sf::core::context::Static;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::DuplicateInjection;
@@ -15,6 +17,10 @@ using sf::core::model::EventDrainManager;
 using sf::core::model::EventDrainManagerRef;
 using sf::core::model::Options;
 using sf::core::model::RepositoryRef;
+
+
+// Static attributes.
+PromiseKeeper Static::promises;
 
 
 // Static variables to store injected instances.
@@ -88,6 +94,7 @@ RepositoryRef Static::repository() {
 
 
 void Static::destroy() {
+  Static::promises.clear();
   drains_ref  = EventDrainManagerRef();
   repo_ref    = RepositoryRef();
   options_ref = std::shared_ptr<Options>();

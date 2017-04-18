@@ -36,6 +36,7 @@ using sf::core::exception::ProcessNotFound;
 using sf::core::exception::ServiceNotFound;
 using sf::core::exception::SocketException;
 using sf::core::exception::StopException;
+using sf::core::exception::TimeoutError;
 using sf::core::exception::TypeError;
 using sf::core::exception::UnrecognisedEvent;
 using sf::core::exception::UnsupportedMode;
@@ -61,9 +62,7 @@ int AbortException::getCode() const {
 }
 
 
-SfException::SfException(std::string message) {
-  this->message = message;
-
+SfException::SfException(std::string message) : std::runtime_error(message) {
   // Get stack trace.
   void*  buffer[50];
   size_t total   = backtrace(buffer, 50);
@@ -97,18 +96,13 @@ std::vector<std::string> SfException::stackTrace() const {
   return std::vector<std::string>(this->trace);
 }
 
-const char* SfException::what() const throw() {
-  return this->message.c_str();
-}
 
-
-ErrNoException::ErrNoException(std::string message) : SfException(message) {
-  std::stringstream formatter;
-  this->error_number = errno;
-
-  formatter << this->message << " " << strerror(this->error_number);
-  formatter << " (" << this->error_number << ").";
-  this->message = formatter.str();
+ErrNoException::ErrNoException(std::string message) :
+  error_number(errno),
+  SfException(
+      message + " " + strerror(errno) + " (" + std::to_string(errno) + ")."
+  ) {
+  // Noop.
 }
 
 int ErrNoException::getCode() const {
@@ -179,6 +173,9 @@ MSG_DEFINITION_PREFIX(
 NO_ARG_DEFINITION(
     SfException, StopException, -26,
     "Handling of the event stopped."
+);
+NO_ARG_DEFINITION(
+    SfException, TimeoutError, -36, "Operation did not complete in time"
 );
 NO_ARG_DEFINITION(
     SfException, UnsupportedMode, -4,

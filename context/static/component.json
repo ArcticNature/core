@@ -8,7 +8,8 @@
     "core.interface.posix",
     "core.model.cli-parser",
     "core.model.event",
-    "core.model.repository"
+    "core.model.repository",
+    "core.promise"
   ],
 
   "targets": {

@@ -4,18 +4,14 @@
 #include <sys/socket.h>
 #include <string>
 
-#include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/model/event.h"
-#include "core/model/logger.h"
 
 
-using sf::core::context::Context;
 using sf::core::context::Static;
 using sf::core::event::FdDrain;
 using sf::core::model::EventDrain;
 using sf::core::model::EventDrainBufferRef;
-using sf::core::model::LogInfo;
 
 
 FdDrain::FdDrain(int fd, std::string id) : EventDrain(id + "-fd") {
@@ -23,9 +19,6 @@ FdDrain::FdDrain(int fd, std::string id) : EventDrain(id + "-fd") {
 }
 
 FdDrain::~FdDrain() {
-  LogInfo info = {{"drain-id", this->id()}};
-  INFOV(Context::Logger(), "Closing drain ${drain-id}", info);
-
   try {
     Static::posix()->shutdown(this->_fd, SHUT_WR);
   } catch(...) {

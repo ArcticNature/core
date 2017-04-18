@@ -48,6 +48,9 @@ namespace context {
     sf::core::model::LoopManagerRef loopManager();
   };
 
+  void CatchPromises();
+  void ResetPromiseHandler();
+
 }  // namespace context
 }  // namespace core
 }  // namespace sf

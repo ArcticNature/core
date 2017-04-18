@@ -5,6 +5,7 @@
 #include <exception>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -185,9 +186,6 @@ namespace model {
      * but these are not caught.
      */
     virtual void rescue(std::exception_ptr ex);
-
-    //! Returns a Promise that is resolved/rejected when the drain is closed.
-    // TODO(stefano): Promise whenClosed() const;
   };
 
 
@@ -251,9 +249,6 @@ namespace model {
 
     //! Attempt to handle a error during parsing.
     virtual void rescue(std::exception_ptr ex);
-
-    //! Returns a Promise that is resolved/rejected when the drain is closed.
-    // TODO(stefano): Promise whenClosed() const;
   };
 
 
@@ -318,15 +313,17 @@ namespace model {
   typedef std::shared_ptr<LoopManager> LoopManagerRef;
 
 
-  //! TODO(stefano)
-  class BoundDrain : public EventDrain {
-    // TODO(stefano): void bind(EventSourceRef source);
-  };
+  //! Event that rethrows an std::exception_ptr when handled.
+  class ReThrowEvent : public Event {
+   protected:
+    std::exception_ptr exception;
 
-
-  //! TODO(stefano)
-  class BoundSource : public EventSource {
-    // TODO(stefano): void bind(EventDrainRef drain);
+   public:
+    ReThrowEvent(
+        std::exception_ptr ex, std::string correlation,
+        EventDrainRef drain
+    );
+    void handle();
   };
 
 }  // namespace model

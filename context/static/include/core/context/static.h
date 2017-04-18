@@ -4,6 +4,7 @@
 
 #include "core/interface/posix.h"
 
+#include "core/promise.h"
 #include "core/model/cli-parser.h"
 #include "core/model/event.h"
 #include "core/model/options.h"
@@ -15,13 +16,17 @@ namespace core {
 namespace context {
 
   //! Static context for the Daemon, Manager, and Spawner processes.
-  /**
+  /*!
    * The static context provides access to the following:
    *
    *  * Process wide Posix implementation to use.
    */
   class Static {
    public:
+    //! Keep promeses around.
+    static sf::core::PromiseKeeper promises;
+
+    //! Access drains in the system.
     static sf::core::model::EventDrainManager* drains();
 
     //! Cleans up all the allocated resources.
@@ -31,7 +36,7 @@ namespace context {
     static sf::core::interface::Posix* posix();
 
     //! Initialise the context at process start.
-    /*
+    /*!
      * @param posix The posix implementation to inject in the process.
      */
     static void initialise(sf::core::interface::Posix* posix);

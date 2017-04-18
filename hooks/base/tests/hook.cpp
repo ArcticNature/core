@@ -6,6 +6,8 @@
 #include "core/hook.h"
 
 using sf::core::hook::Hook;
+using sf::core::hook::ErrorHook;
+using sf::core::hook::SignalHook;
 
 
 class TestHook : public Hook<int, int> {
@@ -88,4 +90,33 @@ TEST_F(HookTest, ExceptionsAreRethrown) {
   Hook<int, int> hook(true);
   hook.attach(cb);
   ASSERT_THROW(hook.trigger(1, 2), std::runtime_error);
+}
+
+
+TEST(ErrorHook, Trigger) {
+  ErrorHook hook;
+  std::string message;
+  std::exception_ptr error = make_exception_ptr(std::runtime_error("test"));
+
+  hook.attach([&message](std::exception_ptr error) {
+      try {
+        std::rethrow_exception(error);
+      } catch (std::exception& ex) {
+        message = ex.what();
+      }
+      return;
+  });
+  hook.trigger(error);
+  ASSERT_EQ("test", message);
+}
+
+TEST(SignalHook, Trigger) {
+  int call_count = 0;
+  SignalHook hook;
+  hook.attach([&call_count]() {
+      call_count += 1;
+      return;
+  });
+  hook.trigger();
+  ASSERT_EQ(1, call_count);
 }

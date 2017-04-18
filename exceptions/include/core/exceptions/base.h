@@ -15,6 +15,7 @@
  */
 
 #include <exception>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -69,10 +70,8 @@ namespace exception {
    * If different contexts throwing the same exception would benefit from
    * different codes than different exceptions should be defined.
    */
-  class SfException : virtual public std::exception {
+  class SfException : public std::runtime_error {
    protected:
-    std::string message;  //!< Store the user friendly error message.
-
     //! Backtrace of when the exception was thrown.
     std::vector<std::string> trace;
 
@@ -88,8 +87,6 @@ namespace exception {
     virtual int getCode() const = 0;
     virtual std::string getTrace() const;
     virtual std::vector<std::string> stackTrace() const;
-
-    virtual const char* what() const throw();
   };
 
   //! Abort the execution of the process due to an exception.
@@ -192,6 +189,9 @@ namespace exception {
 
   //! Thrown when the handling of an event needs to be interrupted.
   NO_ARG_EXCEPTION(SfException, StopException);
+
+  //! Thrown when a timeout expires.
+  NO_ARG_EXCEPTION(SfException, TimeoutError);
 
   //! Thrown when an invalid type is passed to an argument.
   MSG_EXCEPTION(SfException, TypeError);

@@ -9,6 +9,7 @@
 
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
+using sf::core::model::ReThrowEvent;
 
 using sf::testing::FailEvent;
 using sf::testing::NoopEvent;
@@ -58,4 +59,12 @@ TEST(Event, ReThrowsByDefault) {
   }
 
   ASSERT_THROW(event.rescue(ex), std::exception);
+}
+
+
+TEST(ReThrowEvent, HandleThrows) {
+  std::exception_ptr ex = std::make_exception_ptr(std::runtime_error("test"));
+  EventDrainRef drain(new TestDrain());
+  ReThrowEvent  event(ex, "", drain);
+  ASSERT_THROW(event.handle(), std::runtime_error);
 }

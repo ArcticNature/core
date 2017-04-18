@@ -2,6 +2,7 @@
 #ifndef CORE_HOOK_H_
 #define CORE_HOOK_H_
 
+#include <exception>
 #include <functional>
 #include <vector>
 
@@ -10,7 +11,7 @@ namespace sf {
 namespace core {
 namespace hook {
 
-  //! Collection of callbacks registed to extend functionality.
+  //! Represents an event, signal, or extention point.
   template<typename ...HookArgs>
   class Hook {
    protected:
@@ -32,6 +33,12 @@ namespace hook {
     //! Invokes the callbacks forwarding all passed arguments.
     void trigger(HookArgs...);
   };
+
+  //! Hook used to allow extensible handling of exceptions.
+  typedef Hook<std::exception_ptr> ErrorHook;
+
+  //! Hook used to react to something happening in the system.
+  typedef Hook<> SignalHook;
 
 }  // namespace hook
 }  // namespace core

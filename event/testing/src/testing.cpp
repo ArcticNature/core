@@ -6,7 +6,6 @@
 #include <sys/un.h>
 #include <string>
 
-#include "core/context/context.h"
 #include "core/context/static.h"
 
 #include "core/event/drain/fd.h"
@@ -14,12 +13,9 @@
 #include "core/exceptions/event.h"
 
 #include "core/model/event.h"
-#include "core/model/logger.h"
-
 #include "core/utility/string.h"
 
 
-using sf::core::context::Context;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
@@ -39,7 +35,6 @@ using sf::core::model::EventDrainBufferRef;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
-using sf::core::model::LogInfo;
 
 using sf::core::utility::string::toString;
 
@@ -176,15 +171,12 @@ EventRef TestEpollManager::wait(int timeout) {
 
   int fd = event.data.fd;
   if (code == 0) {
-    DEBUG(Context::Logger(), "Epoll wait timeout");
     return EventRef();
   }
 
   try {
     return this->sources.get(fd)->fetch();
   } catch (EventSourceNotFound&) {
-    LogInfo vars = {{"source", toString(fd)}};
-    ERRORV(Context::Logger(), "Unable to find source for FD ${source}.", vars);
     return EventRef();
   }
 }

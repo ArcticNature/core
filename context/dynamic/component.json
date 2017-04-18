@@ -4,6 +4,7 @@
 
   "deps": [
     "core.compile-time",
+    "core.event.source.manual",
     "core.model.event",
     "core.model.logger"
   ],
@@ -11,6 +12,9 @@
   "targets": {
     "debug":   { "type": "lib" },
     "release": { "type": "lib" },
-    "test":    { "type": "lib" }
+    "test":    {
+      "deps": ["core.event.testing"],
+      "type": "lib"
+    }
   }
 }
