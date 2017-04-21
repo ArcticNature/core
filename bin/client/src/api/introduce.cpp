@@ -57,9 +57,9 @@ class ClientIntroduceResponse : public Event {
     );
 
     // Set client id and node name.
-    Static::options()->setString("client-id", client_id);
-    Static::options()->setString("node-name", node_name);
-    Static::options()->setString("process-name", client_id);
+    Static::options()->setString("client-id", this->client_id);
+    Static::options()->setString("node-name", this->node_name);
+    Static::options()->setString("process-name", this->client_id);
 
     // Enqueue async readline enable.
     ManualSource* manual =

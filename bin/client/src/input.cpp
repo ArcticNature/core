@@ -106,8 +106,7 @@ EventRef EnableReadline::parse(std::string line) {
   line_num += 1;
 
   // Create the event to execute the line.
-  EventRef exec(new ExecuteString(line, line_num));
-  EventLifecycle::Init(exec);
+  EventRef exec = EventLifecycle::make<ExecuteString>(line, line_num);
   return exec;
 }
 

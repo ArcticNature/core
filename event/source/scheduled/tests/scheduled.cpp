@@ -4,6 +4,7 @@
 
 #include "core/context/context.h"
 #include "core/context/static.h"
+#include "core/exceptions/base.h"
 
 #include "core/event/source/manual.h"
 #include "core/event/source/scheduled.h"
@@ -13,13 +14,18 @@
 #include "core/event/testing.h"
 #include "core/posix/user.h"
 
+
+using poolqueue::Promise;
+
 using sf::core::context::Context;
 using sf::core::context::Static;
+using sf::core::exception::ItemNotFound;
 
 using sf::core::event::ManualSource;
 using sf::core::event::ScheduledClosure;
 using sf::core::event::ScheduledClosureList;
 using sf::core::event::ScheduledSource;
+using sf::core::event::TickPromises;
 
 using sf::core::model::Event;
 using sf::core::model::EventRef;
@@ -128,4 +134,26 @@ TEST_F(ScheduledSourceTest, ListKeptCallbacks) {
   ASSERT_EQ(&test_callback, callbacks[0].value.callback);
   ASSERT_EQ(&test_callback, callbacks[1].value.callback);
   ASSERT_EQ(&test_callback, callbacks[2].value.callback);
+}
+
+TEST_F(ScheduledSourceTest, TickPromises) {
+  bool killed = false;
+  Promise promise;
+  promise.except([&killed](const std::exception_ptr& e) {
+      killed = true;
+      return nullptr;
+  });
+
+  // Add a promise with a TTL of 1.
+  Static::promises.keep("p", promise, 1);
+
+  // Wait for tick and then check manual source.
+  this->wait(1);
+  EventRef event = this->wait(0);
+  ASSERT_NE(nullptr, event.get());
+
+  // Handle ticker and check promise is gone.
+  event->handle();
+  ASSERT_THROW(Static::promises.pop("p"), ItemNotFound);
+  ASSERT_TRUE(killed);
 }

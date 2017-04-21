@@ -106,7 +106,7 @@ class NodeInfo : public Event {
       }
     }
 
-    // Call funCtion stored in context.
+    // Call function stored in context.
     NSClientContextRef context = NodeStatusContext::pop(this->correlation());
     lua.registry()->dereference(context->callback_ref);
     response.pushMe();

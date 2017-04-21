@@ -73,7 +73,14 @@ namespace event {
 
     void registerCallback(unsigned int score, ScheduledClosure closure);
     void registerCallback(unsigned int score, scheduled_callback callback);
+  };
 
+
+  //! Event that ticks the static promise keeper.
+  class TickPromises : public sf::core::model::Event {
+   public:
+    TickPromises();
+    void handle();
   };
 
 }  // namespace event

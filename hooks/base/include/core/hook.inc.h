@@ -2,6 +2,9 @@
 #ifndef CORE_HOOK_INC_H_
 #define CORE_HOOK_INC_H_
 
+#include <vector>
+
+
 namespace sf {
 namespace core {
 namespace hook {

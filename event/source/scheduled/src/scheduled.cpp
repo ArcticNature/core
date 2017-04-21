@@ -20,7 +20,10 @@ using sf::core::event::ManualSource;
 using sf::core::event::ScheduledClosure;
 using sf::core::event::ScheduledClosureList;
 using sf::core::event::ScheduledSource;
+using sf::core::event::TickPromises;
 
+using sf::core::model::Event;
+using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSource;
 using sf::core::model::LogInfo;
@@ -105,6 +108,8 @@ EventRef ScheduledSource::parse() {
     }
   }
 
+  EventRef ticker = std::make_shared<TickPromises>();
+  manual->enqueueEvent(ticker);
   return maybe_return;
 }
 
@@ -125,4 +130,13 @@ void ScheduledSource::registerCallback(
   ScheduledClosure closure;
   closure.callback = callback;
   this->registerCallback(score, closure);
+}
+
+
+TickPromises::TickPromises() : Event("", EventDrainRef()) {
+  // Noop.
+}
+
+void TickPromises::handle() {
+  Static::promises.tick();
 }
