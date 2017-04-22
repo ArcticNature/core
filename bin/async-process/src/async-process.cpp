@@ -12,6 +12,7 @@
 
 using sf::core::bin::AsyncPorcess;
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::exception::AbortException;
@@ -26,8 +27,11 @@ using sf::core::model::LoopManagerRef;
 using sf::core::registry::LoopManager;
 
 
+static ProxyLogger logger("core.bin.async-process");
+
+
 void AsyncPorcess::disableSIGINT() {
-  INFO(Context::Logger(), "Disabling SIGINT.");
+  INFO(logger, "Disabling SIGINT.");
 
   sigset_t mask;
   Static::posix()->sigemptyset(&mask);
@@ -55,7 +59,7 @@ void AsyncPorcess::handleLoopError(
       {"trace", ex.getTrace()},
       {"drain_error", drain ? "yes" : "no" }
     };
-    ERRORV(Context::Logger(), "Error during run loop. ${error}", vars);
+    ERRORV(logger, "Error during run loop. ${error}", vars);
   }
 }
 
@@ -94,7 +98,7 @@ void AsyncPorcess::loop() {
 }
 
 void AsyncPorcess::registerDefaultSourceManager() {
-  DEBUG(Context::Logger(), "Configuring default event source manager.");
+  DEBUG(logger, "Configuring default event source manager.");
 
   LoopManagerRef manager;
   std::string manager_name = DEAFULT_EVENT_SOURCE_MANAGER;
@@ -105,7 +109,7 @@ void AsyncPorcess::registerDefaultSourceManager() {
 
 
 void AsyncPorcess::run() {
-  INFO(Context::Logger(), "Starting run loop.");
+  INFO(logger, "Starting run loop.");
   this->loop();
-  INFO(Context::Logger(), "Terminating cleanly.");
+  INFO(logger, "Terminating cleanly.");
 }

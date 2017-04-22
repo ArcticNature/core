@@ -22,6 +22,7 @@ using sf::core::cluster::NodeStatusCode;
 using sf::core::cluster::NodeStatusDetail;
 
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::exception::AbortException;
@@ -32,6 +33,9 @@ using sf::core::model::Event;
 using sf::core::model::EventDrainRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
+
+
+static ProxyLogger logger("core.bin.manager.event.config");
 
 
 LoadConfiguration::LoadConfiguration(
@@ -49,7 +53,7 @@ void LoadConfiguration::handle() {
     {"requested", this->version}
   };
   INFOV(
-      Context::Logger(),
+      logger,
       "Loading configuration '${requested}' (currently at '${current}').",
       info
   );
@@ -64,10 +68,7 @@ void LoadConfiguration::handle() {
 
   // Update status again.
   info = {{"requested", Node::me()->configVersion().effective()}};
-  INFOV(
-      Context::Logger(), "Configuration '${requested}' loaded).",
-      info
-  );
+  INFOV(logger, "Configuration '${requested}' loaded).", info);
   Node::me()->status()->set("configuration", NodeStatusDetail(
       NodeStatusCode::CONFIG_OK,
       "Applied configuration version '" + this->version + "'"

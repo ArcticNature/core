@@ -16,6 +16,7 @@
 
 using sf::core::bin::EnableReadline;
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 using sf::core::event::ManualSource;
 
@@ -28,6 +29,9 @@ using sf::core::model::LogInfo;
 using sf::core::protocol::public_api::ClientIntroduce;
 using sf::core::protocol::public_api::Message;
 using sf::core::registry::ApiHandlerRegistry;
+
+
+static ProxyLogger logger("core.bin.client.api.introduce");
 
 
 //! Event to handle clients introduction responses.
@@ -50,11 +54,7 @@ class ClientIntroduceResponse : public Event {
       {"client_id", this->client_id},
       {"node_name", this->node_name}
     };
-    DEBUGV(
-        Context::Logger(),
-        "Received id ${client_id} from node ${node_name}.",
-        info
-    );
+    DEBUGV(logger, "Received id ${client_id} from node ${node_name}.", info);
 
     // Set client id and node name.
     Static::options()->setString("client-id", this->client_id);

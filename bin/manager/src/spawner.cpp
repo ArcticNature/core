@@ -20,7 +20,7 @@
 
 
 using sf::core::bin::ManagerToSpawner;
-using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
@@ -35,6 +35,9 @@ using sf::core::model::LogInfo;
 using sf::core::protocol::manager_spawner::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+static ProxyLogger logger("core.bin.manager.spawner");
 
 
 class ManagerToSpawnerFdDrain : public FdDrain {
@@ -75,7 +78,7 @@ EventRef ManagerToSpawner::parse() {
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(
-        Context::Logger(), "Source ${source-id} received invalid event.",
+        logger, "Source ${source-id} received invalid event.",
         info
     );
     return EventRef();
@@ -93,8 +96,9 @@ EventRef ManagerToSpawner::parse() {
     {"event-name", Message::Code_Name(message.code())}
   };
   ERRORV(
-      Context::Logger(),
-      "Source ${source-id} received unkown event ${event-name}.", info
+      logger,
+      "Source ${source-id} received unkown event ${event-name}.",
+      info
   );
   return EventRef();
 }

@@ -21,6 +21,7 @@ using sf::core::bin::Daemon;
 
 using sf::core::cluster::Node;
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::exception::CleanExit;
@@ -33,6 +34,9 @@ using sf::core::model::LogInfo;
 
 using sf::core::posix::Restricted;
 using sf::core::registry::CLIParsers;
+
+
+static ProxyLogger logger("core.bin.daemon.main");
 
 
 int main(int argc, char** argv) {
@@ -70,7 +74,7 @@ int main(int argc, char** argv) {
       {"trace", ex.getTrace()}
     };
     ERRORV(
-        Context::Logger(),
+        logger,
         "Daemon terminating due to an error: ${error}", vars
     );
 

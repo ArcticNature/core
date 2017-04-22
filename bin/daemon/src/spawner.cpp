@@ -14,7 +14,7 @@
 
 
 using sf::core::bin::DaemonToSpawnerSource;
-using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
@@ -28,6 +28,9 @@ using sf::core::model::LogInfo;
 
 using sf::core::protocol::daemon_spanwer::Message;
 using sf::core::utility::MessageIO;
+
+
+static ProxyLogger logger("core.bin.daemon.spawner");
 
 
 class SpawnerFdDrain : public FdDrain {
@@ -65,7 +68,7 @@ EventDrainRef DaemonToSpawnerSource::clientDrain(int fd, std::string id) {
   std::string   drain_id = drain->id();
 
   LogInfo info = {{"drain-id", drain_id}};
-  DEBUGV(Context::Logger(), "Created spawner drain ${drain-id}", info);
+  DEBUGV(logger, "Created spawner drain ${drain-id}", info);
 
   Static::options()->setString("spawner-drain", drain_id);
   return drain;
@@ -75,6 +78,6 @@ EventSourceRef DaemonToSpawnerSource::clientSource(
     int fd, std::string id, EventDrainRef drain
 ) {
   LogInfo info = {{"source-id", id}};
-  DEBUGV(Context::Logger(), "Creating spawner source ${source-id}", info);
+  DEBUGV(logger, "Creating spawner source ${source-id}", info);
   return EventSourceRef(new SpawnerFdSource(fd, id, drain));
 }

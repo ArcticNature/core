@@ -1,0 +1,15 @@
+{
+  "name": "core.interface.metadata.store",
+  "type": "c++",
+
+  "deps": [
+    "dependencies.json",
+    "dependencies.poolqueue"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test":    {"type": "lib"}
+  }
+}

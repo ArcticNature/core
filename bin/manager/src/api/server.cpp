@@ -13,7 +13,7 @@ using sf::core::bin::ApiFdDrain;
 using sf::core::bin::ApiFdSource;
 using sf::core::bin::UnixServer;
 
-using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::UnixSource;
@@ -22,12 +22,15 @@ using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
 
 
+static ProxyLogger logger("core.bin.manager.api.server");
+
+
 EventDrainRef UnixServer::clientDrain(int fd, std::string id) {
   EventDrainRef drain(new ApiFdDrain(fd, id));
   std::string   drain_id = drain->id();
   LogInfo info = {{"drain-id", drain_id}};
   DEBUGV(
-      Context::Logger(),
+      logger,
       "Created drain ${drain-id} for unix connection.", info
   );
   return drain;
@@ -43,7 +46,7 @@ EventSourceRef UnixServer::clientSource(
     {"source-id", source_id}
   };
   DEBUGV(
-      Context::Logger(),
+      logger,
       "Created source ${source-id} for unix connection.", info
   );
   return source;

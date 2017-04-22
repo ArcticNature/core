@@ -3,6 +3,7 @@
 
 #include "core/bin/daemon.h"
 #include "core/context/daemon.h"
+#include "core/context/context.h"
 #include "core/context/static.h"
 
 #include "core/event/drain/null.h"
@@ -19,6 +20,7 @@
 
 
 using sf::core::bin::TerminateDaemon;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::NullDrain;
@@ -27,11 +29,13 @@ using sf::core::exception::SfException;
 
 using sf::core::model::Event;
 using sf::core::model::EventDrainRef;
-using sf::core::model::Logger;
 using sf::core::model::LogInfo;
 
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+static ProxyLogger logger("core.bin.daemon.terminate");
 
 
 typedef sf::core::protocol::daemon_manager::Message ManagerMessage;
@@ -49,7 +53,7 @@ void signalProcess(pid_t pid, int signal) {
     info["message"] = ex.what();
     info["trace"]   = ex.getTrace();
     ERRORV(
-        Logger::fallback(),
+        logger,
         "Failed to send signal ${signal} to pid ${pid}: ${message}",
         info
     );
@@ -58,16 +62,16 @@ void signalProcess(pid_t pid, int signal) {
 
 
 void TerminateDaemon::rudeStop() {
-  WARNING(Logger::fallback(), "Forced termination of daemon.");
+  WARNING(logger, "Forced termination of daemon.");
   pid_t manager = this->context->managerPid();
   pid_t spawner = this->context->spawnerPid();
 
   if (manager != -1) {
-    INFO(Logger::fallback(), "Sigkilling manager.");
+    INFO(logger, "Sigkilling manager.");
     signalProcess(manager, SIGKILL);
   }
   if (spawner != -1) {
-    INFO(Logger::fallback(), "Sigkilling spawner.");
+    INFO(logger, "Sigkilling spawner.");
     signalProcess(spawner, SIGKILL);
   }
 
@@ -75,7 +79,7 @@ void TerminateDaemon::rudeStop() {
 }
 
 void TerminateDaemon::stopManager() {
-  WARNING(Logger::fallback(), "Stopping manager.");
+  WARNING(logger, "Stopping manager.");
 
   ManagerMessage message;
   message.set_code(ManagerMessage::Shutdown);
@@ -85,7 +89,7 @@ void TerminateDaemon::stopManager() {
 }
 
 void TerminateDaemon::stopSpawner() {
-  WARNING(Logger::fallback(), "Stopping spawner.");
+  WARNING(logger, "Stopping spawner.");
 
   SpwanerMessage message;
   message.set_code(SpwanerMessage::Shutdown);

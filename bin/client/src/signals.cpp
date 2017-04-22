@@ -17,6 +17,7 @@
 
 using sf::core::bin::Client;
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 using sf::core::event::SignalSource;
 
@@ -24,6 +25,9 @@ using sf::core::exception::CleanExit;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LoopManagerRef;
+
+
+static ProxyLogger logger("core.bin.cilent.signals");
 
 
 class ClientSignalSource : public SignalSource {
@@ -36,7 +40,7 @@ class ClientSignalSource : public SignalSource {
     Static::posix()->sigaddset(&mask, SIGTERM);
 
 #if TRAP_SIGINT
-    DEBUG(Context::Logger(), "Trapping SIGINT too.");
+    DEBUG(logger, "Trapping SIGINT too.");
     Static::posix()->sigaddset(&mask, SIGINT);
 #endif
 
@@ -44,7 +48,7 @@ class ClientSignalSource : public SignalSource {
   }
 
   EventRef handleStop() {
-    INFO(Context::Logger(), "Terminating client ...");
+    INFO(logger, "Terminating client ...");
     throw CleanExit();
   }
 

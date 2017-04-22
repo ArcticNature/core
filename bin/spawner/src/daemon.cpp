@@ -19,7 +19,7 @@
 
 
 using sf::core::bin::SpawnerToDaemon;
-using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
@@ -34,6 +34,9 @@ using sf::core::model::LogInfo;
 using sf::core::protocol::daemon_spanwer::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+static ProxyLogger logger("core.bin.spawner.daemon");
 
 
 class SpawnerToDaemonFdDrain : public FdDrain { public:
@@ -75,7 +78,7 @@ EventRef SpawnerToDaemon::parse() {
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(
-        Context::Logger(), "Source ${source-id} received invalid event.",
+        logger, "Source ${source-id} received invalid event.",
         info
     );
     return EventRef();
@@ -93,8 +96,9 @@ EventRef SpawnerToDaemon::parse() {
     {"event-name", Message::Code_Name(message.code())}
   };
   ERRORV(
-      Context::Logger(),
-      "Source ${source-id} received unkown event ${event-name}.", info
+      logger,
+      "Source ${source-id} received unkown event ${event-name}.",
+      info
   );
   return EventRef();
 }

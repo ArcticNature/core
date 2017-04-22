@@ -1,5 +1,5 @@
 {
   "debug": 1,
-  "default-log-format": "${<log-group>} ${level} ${<now>} ${file} -> ${function} -> L${line} ==> ${message}",
+  "default-log-format": "[${<component>}/${<log-group>}] [${level}] [${<now>}] [${file} -> ${function} -> L${line}] ==> ${message}",
   "trap-sigint": 1
 }

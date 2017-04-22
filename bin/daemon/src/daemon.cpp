@@ -22,6 +22,7 @@ using sf::core::bin::DaemonToManagerSource;
 using sf::core::bin::DaemonToSpawnerSource;
 
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 using sf::core::exception::ProcessNotFound;
 
@@ -38,8 +39,11 @@ using sf::core::utility::SubProcessRef;
 using sf::core::utility::processDirectory;
 
 
+static ProxyLogger logger("core.bin.daemon.daemon");
+
+
 void Daemon::cleanEnvironment() {
-  DEBUG(Context::Logger(), "Resetting environment.");
+  DEBUG(logger, "Resetting environment.");
   CLIParser*  parser = Static::parser();
   std::string stderr = parser->getString("stderr");
   std::string stdin  = parser->getString("stdin");
@@ -53,13 +57,13 @@ void Daemon::cleanEnvironment() {
 }
 
 void Daemon::daemonise() {
-  INFO(Context::Logger(), "Forking into daemon mode.");
+  INFO(logger, "Forking into daemon mode.");
   this->maskSigHup();
   this->detatchFromParentProcess();
 }
 
 void Daemon::dropUser() {
-  INFO(Context::Logger(), "Dropping privileges.");
+  INFO(logger, "Dropping privileges.");
 
   CLIParser*  parser = Static::parser();
   std::string group  = parser->getString("group");
@@ -67,7 +71,7 @@ void Daemon::dropUser() {
 
   LogInfo info = { {"group", group}, {"user", user} };
   DEBUGV(
-      Context::Logger(),
+      logger,
       "Dropping privileges to user ${user} and group ${group}.",
       info
   );
@@ -140,14 +144,14 @@ void Daemon::forkSpawner() {
 
 
 void Daemon::configureEvents() {
-  DEBUG(Context::Logger(), "Setting up event subsystem.");
+  DEBUG(logger, "Setting up event subsystem.");
   this->registerDefaultSourceManager();
   LoopManagerRef loop = Context::LoopManager();
   loop->add(EventSourceRef(new DaemonSignalSource()));
 }
 
 void Daemon::disableSignals() {
-  DEBUG(Context::Logger(), "Disabling signals.");
+  DEBUG(logger, "Disabling signals.");
 
   sigset_t mask;
   sigemptyset(&mask);
@@ -156,7 +160,7 @@ void Daemon::disableSignals() {
   sigaddset(&mask, SIGUSR2);
 
 #if TRAP_SIGINT
-  DEBUG(Context::Logger(), "Trapping SIGINT too.");
+  DEBUG(logger, "Trapping SIGINT too.");
   sigaddset(&mask, SIGINT);
 #endif
 
@@ -223,7 +227,7 @@ std::string Daemon::findSpawner() {
 
 
 void Daemon::initialise() {
-  INFO(Context::Logger(), "Initialising daemon.");
+  INFO(logger, "Initialising daemon.");
 
   // Prepare for process.
   CLIParser* parser = Static::parser();

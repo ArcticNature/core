@@ -23,6 +23,7 @@ using sf::core::bin::Client;
 
 using sf::core::cluster::Node;
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::ReadlineEventSource;
@@ -36,6 +37,9 @@ using sf::core::model::LogInfo;
 
 using sf::core::posix::User;
 using sf::core::registry::CLIParsers;
+
+
+static ProxyLogger logger("core.bin.cilent.main");
 
 
 int main(int argc, char** argv) {
@@ -72,7 +76,7 @@ int main(int argc, char** argv) {
       {"trace", ex.getTrace()}
     };
     ERRORV(
-        Context::Logger(),
+        logger,
         "Client terminating due to an error: ${error}", vars
     );
 

@@ -20,7 +20,7 @@
 
 
 using sf::core::bin::ManagerToDaemon;
-using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
@@ -35,6 +35,9 @@ using sf::core::model::LogInfo;
 using sf::core::protocol::daemon_manager::Message;
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+static ProxyLogger logger("core.bin.manager.daemon");
 
 
 class ManagerToDaemonFdDrain : public FdDrain {
@@ -80,7 +83,7 @@ EventRef ManagerToDaemon::parse() {
   if (!valid) {
     LogInfo info = {{"source-id",  this->id()}};
     ERRORV(
-        Context::Logger(), "Source ${source-id} received invalid event.",
+        logger, "Source ${source-id} received invalid event.",
         info
     );
     return EventRef();
@@ -98,7 +101,7 @@ EventRef ManagerToDaemon::parse() {
     {"event-name", Message::Code_Name(message.code())}
   };
   ERRORV(
-      Context::Logger(),
+      logger,
       "Source ${source-id} received unkown event ${event-name}.",
       info
   );

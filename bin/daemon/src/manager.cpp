@@ -15,6 +15,7 @@
 
 using sf::core::bin::DaemonToManagerSource;
 using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::FdDrain;
@@ -28,6 +29,9 @@ using sf::core::model::LogInfo;
 
 using sf::core::protocol::daemon_manager::Message;
 using sf::core::utility::MessageIO;
+
+
+static ProxyLogger logger("core.bin.daemon.manager");
 
 
 class ManagerFdDrain : public FdDrain {
@@ -67,7 +71,7 @@ EventDrainRef DaemonToManagerSource::clientDrain(int fd, std::string id) {
   std::string   drain_id = drain->id();
 
   LogInfo info = {{"drain-id", drain_id}};
-  DEBUGV(Context::Logger(), "Created manager drain ${drain-id}", info);
+  DEBUGV(logger, "Created manager drain ${drain-id}", info);
 
   Static::options()->setString("manager-drain", drain_id);
   return drain;
@@ -77,6 +81,6 @@ EventSourceRef DaemonToManagerSource::clientSource(
     int fd, std::string id, EventDrainRef drain
 ) {
   LogInfo info = {{"source-id", id}};
-  DEBUGV(Context::Logger(), "Creating manager source ${source-id}", info);
+  DEBUGV(logger, "Creating manager source ${source-id}", info);
   return EventSourceRef(new ManagerFdSource(fd, id, drain));
 }

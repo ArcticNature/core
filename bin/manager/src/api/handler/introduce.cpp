@@ -16,7 +16,7 @@
 #include "core/utility/string.h"
 
 using sf::core::cluster::Node;
-using sf::core::context::Context;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::model::Event;
@@ -30,6 +30,9 @@ using sf::core::registry::ApiHandlerRegistry;
 
 using sf::core::utility::MessageIO;
 using sf::core::utility::string::toString;
+
+
+static ProxyLogger logger("core.bin.manager.api.handler.introduce");
 
 
 //! Event to handle clients introduction requests.
@@ -51,7 +54,7 @@ class ClientIntroduceEvent : public Event {
     std::string pid = toString(Static::posix()->getpid());
     std::string client_id = num + "@" + node_name + "!" + pid;
     LogInfo info = {{"client_id", client_id}};
-    DEBUGV(Context::Logger(), "Welcoming new client: '${client_id}'", info);
+    DEBUGV(logger, "Welcoming new client: '${client_id}'", info);
 
     // Build client response.
     Message response;

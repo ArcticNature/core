@@ -3,6 +3,7 @@
 
 #include "core/bin/daemon.h"
 #include "core/context/daemon.h"
+#include "core/context/context.h"
 #include "core/context/static.h"
 
 #include "core/event/drain/null.h"
@@ -15,13 +16,16 @@ using sf::core::bin::TerminateDaemon;
 
 using sf::core::context::Daemon;
 using sf::core::context::DaemonRef;
+using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
 using sf::core::event::NullDrain;
 
 using sf::core::model::Event;
 using sf::core::model::EventDrainRef;
-using sf::core::model::Logger;
+
+
+static ProxyLogger logger("core.bin.daemon.sigchild");
 
 
 bool SigChild::checkChild(pid_t pid) {
@@ -55,12 +59,12 @@ void SigChild::handle() {
 
   if (manager != -1 && this->checkChild(manager)) {
     context->clearManager();
-    ERROR(Logger::fallback(), "Manager terminated, exiting!");
+    ERROR(logger, "Manager terminated, exiting!");
   }
 
   if (spawner != -1 && this->checkChild(spawner)) {
     context->clearSpawner();
-    ERROR(Logger::fallback(), "Spawner terminated, exiting!");
+    ERROR(logger, "Spawner terminated, exiting!");
   }
 
   // Kick off system shutdown.

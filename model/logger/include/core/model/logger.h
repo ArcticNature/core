@@ -109,7 +109,7 @@ namespace model {
 #define LOG(logger, level, message) {           \
   sf::core::model::LogInfo _log_varaibles;       \
   LOG_ADD_VARS(_log_varaibles);                 \
-  logger->log(level, message, _log_varaibles);  \
+  (logger)->log(level, message, _log_varaibles);  \
 }
 
 #define LLERROR   sf::core::model::LogLevel::LL_ERROR
@@ -123,7 +123,7 @@ namespace model {
 #define DEBUG(logger, message)   LOG(logger, LLDEBUG,   message)
 
 #define LOGV(logger, level, message, variables) \
-  logger->log(level, message, LOG_ADD_VARS(variables))
+  (logger)->log(level, message, LOG_ADD_VARS(variables))
 
 #define ERRORV(log, msg, vars)   LOGV(log, LLERROR,   msg, vars)
 #define WARNINGV(log, msg, vars) LOGV(log, LLWARNING, msg, vars)

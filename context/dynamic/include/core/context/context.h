@@ -48,9 +48,50 @@ namespace context {
     sf::core::model::LoopManagerRef loopManager();
   };
 
+
+  //! Install and remove global promise handling hook.
   void CatchPromises();
   void ResetPromiseHandler();
 
+
+  //! Proxy log requests to the context logger and add useful variables.
+  /*
+   * A decorator Logger that can be used as a static file variable which
+   * proxies logging request to the current context while also adding the
+   * following information to the LogInfo map:
+   *
+   *   * `component`: A string passed to the proxy constructor.
+   */
+  class ProxyLogger : public sf::core::model::Logger {
+   protected:
+    std::string component_;
+
+   public:
+    explicit ProxyLogger(std::string component);
+
+    //! Provided for compatibility with logging macros.
+    /*!
+     * The logging macros where introduced prior to the
+     * idea of the `ProxyLogger` and were designed for
+     * `LoggerRef`s.
+     *
+     * To allow `ProxyLogger` and `LoggerRef`s to
+     * both use the same macros, `ProxyLogger` overrides
+     * the `->` operator to return a pointer to itself.
+     *
+     * This feature **should NOT** be use anywere outside
+     * the logging macros and will be removed as soon as
+     * it is no longer needed.
+     */
+    ProxyLogger* operator->();
+
+    //! Decorating log call.
+    virtual void log(
+        const sf::core::model::LogLevel level,
+        const std::string message,
+        sf::core::model::LogInfo variables
+    );
+  };
 }  // namespace context
 }  // namespace core
 }  // namespace sf
