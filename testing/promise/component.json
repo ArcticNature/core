@@ -1,0 +1,13 @@
+{
+  "name": "core.testing.promise",
+  "type": "c++",
+
+  "deps": [
+    "dependencies.poolqueue"
+  ],
+
+  "targets": {
+    "test": { "type": "lib" }
+  }
+}
+
