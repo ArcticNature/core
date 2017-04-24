@@ -7,6 +7,7 @@
 #include "core/exceptions/event.h"
 
 #include "core/interface/lifecycle.h"
+#include "core/interface/metadata/store.h"
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
@@ -19,6 +20,9 @@ using sf::core::exception::DuplicateEventDrain;
 
 using sf::core::interface::Lifecycle;
 using sf::core::interface::LifecycleHandlerRef;
+using sf::core::interface::MetaDataStoreRef;
+using sf::core::interface::NoMetadataStore;
+
 using sf::core::lifecycle::EVENT_DRAIN_ENQUEUE;
 using sf::core::lifecycle::DrainEnqueueArg;
 using sf::core::lifecycle::FlushEventDrain;
@@ -87,6 +91,7 @@ class NoopLoopManager : public LoopManager {
 TEST_F(ContextTest, Defaults) {
   ASSERT_EQ(Logger::fallback(), Context::Logger());
   ASSERT_THROW(Context::LoopManager(), ContextUninitialised);
+  ASSERT_THROW(Context::Metadata(), ContextUninitialised);
 }
 
 TEST_F(ContextTest, ReplaceActiveContext) {
@@ -101,6 +106,12 @@ TEST_F(ContextTest, SetLogger) {
   LoggerRef logger(new NoopLogger());
   this->context->initialise(logger);
   ASSERT_EQ(logger, Context::Logger());
+}
+
+TEST_F(ContextTest, SetMetadata) {
+  MetaDataStoreRef metadata = std::make_shared<NoMetadataStore>();
+  this->context->initialise(metadata);
+  ASSERT_EQ(metadata, Context::Metadata());
 }
 
 TEST_F(ContextTest, SetSourceManager) {

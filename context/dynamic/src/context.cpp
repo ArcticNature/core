@@ -2,11 +2,14 @@
 #include "core/context/context.h"
 
 #include "core/exceptions/base.h"
+#include "core/interface/metadata/store.h"
 #include "core/model/logger.h"
 
 using sf::core::context::Context;
 using sf::core::context::ContextRef;
+
 using sf::core::exception::ContextUninitialised;
+using sf::core::interface::MetaDataStoreRef;
 
 using sf::core::model::Logger;
 using sf::core::model::LoggerRef;
@@ -39,13 +42,22 @@ LoopManagerRef Context::LoopManager() {
   return Context::Instance()->loopManager();
 }
 
+MetaDataStoreRef Context::Metadata() {
+  ContextRef context = Context::Instance();
+  if (!context->metadata_) {
+    throw ContextUninitialised("Metadata not initialised.");
+  }
+  return context->metadata_;
+}
+
 
 Context::Context() {
   this->_logger = Logger::fallback();
 }
 
 Context::~Context() {
-  this->loop_manager = LoopManagerRef();
+  this->metadata_.reset();
+  this->loop_manager.reset();
 }
 
 void Context::initialise(LoggerRef logger) {
@@ -54,6 +66,10 @@ void Context::initialise(LoggerRef logger) {
 
 void Context::initialise(LoopManagerRef manager) {
   this->loop_manager = manager;
+}
+
+void Context::initialise(MetaDataStoreRef metadata) {
+  this->metadata_ = metadata;
 }
 
 LoopManagerRef Context::loopManager() {

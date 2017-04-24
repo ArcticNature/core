@@ -5,6 +5,7 @@
   "deps": [
     "core.compile-time",
     "core.event.source.manual",
+    "core.interface.metadata.store",
     "core.model.event",
     "core.model.logger"
   ],

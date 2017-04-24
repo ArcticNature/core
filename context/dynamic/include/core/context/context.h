@@ -5,6 +5,7 @@
 #include <string>
 
 #include "core/compile-time/options.h"
+#include "core/interface/metadata/store.h"
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
@@ -22,6 +23,7 @@ namespace context {
     static ContextRef _instance;
 
    public:
+    static sf::core::interface::MetaDataStoreRef Metadata();
     static sf::core::model::LoggerRef Logger();
     static sf::core::model::LoopManagerRef LoopManager();
 
@@ -33,6 +35,7 @@ namespace context {
     static void Destroy();
 
    protected:
+    sf::core::interface::MetaDataStoreRef metadata_;
     sf::core::model::LoggerRef _logger;
     sf::core::model::LoopManagerRef loop_manager;
 
@@ -40,6 +43,7 @@ namespace context {
     Context();
     ~Context();
 
+    void initialise(sf::core::interface::MetaDataStoreRef metadata);
     void initialise(sf::core::model::LoggerRef logger);
     void initialise(sf::core::model::LoopManagerRef manager);
 
