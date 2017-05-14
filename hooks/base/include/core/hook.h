@@ -6,6 +6,8 @@
 #include <functional>
 #include <vector>
 
+#include "core/compile-time/options.h"
+
 
 namespace sf {
 namespace core {
@@ -32,6 +34,11 @@ namespace hook {
 
     //! Invokes the callbacks forwarding all passed arguments.
     void trigger(HookArgs...);
+
+#if TEST_BUILD
+    //! Removes all registered callbacks.
+    void clear();
+#endif  // TEST_BUILD
   };
 
   //! Hook used to allow extensible handling of exceptions.

@@ -50,6 +50,7 @@ namespace context {
     // Instance version of fetch methods.
     // Needed by node configuration to manipulate new context.
     sf::core::model::LoopManagerRef loopManager();
+    sf::core::interface::MetaDataStoreRef metadata();
   };
 
 

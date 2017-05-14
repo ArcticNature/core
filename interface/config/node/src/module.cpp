@@ -36,7 +36,8 @@ using sf::core::utility::LuaTable;
 
 const std::vector<std::string> CORE_ATTRIBUTES = {
   "event_manager",
-  "logger"
+  "logger",
+  "metadata"
 };
 
 

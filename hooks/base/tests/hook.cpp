@@ -37,6 +37,15 @@ TEST_F(HookTest, AttachTwice) {
   ASSERT_EQ(2, this->hook.countCallbacks());
 }
 
+TEST_F(HookTest, Clear) {
+  auto cb1 = [](int a, int b) { return; };
+  auto cb2 = [](int a, int b) { return; };
+  this->hook.attach(cb1);
+  this->hook.attach(cb2);
+  this->hook.clear();
+  ASSERT_EQ(0, this->hook.countCallbacks());
+}
+
 TEST_F(HookTest, Detach) {
   auto cb = [](int a, int b) { return; };
   this->hook.attach(cb);

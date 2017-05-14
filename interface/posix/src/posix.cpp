@@ -2,6 +2,7 @@
 #include "core/interface/posix.h"
 
 #include <fcntl.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/eventfd.h>
@@ -38,6 +39,10 @@ int Posix::setenv(const char* name, const char* value, int overwrite) {
 
 
 // Files.
+char* Posix::dirname(char* path) {
+  return ::dirname(path);
+}
+
 int Posix::lstat(const char* path, struct stat* buf) {
   return ::lstat(path, buf);
 }

@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include "core/compile-time/options.h"
+
 
 namespace sf {
 namespace core {
@@ -18,6 +20,13 @@ namespace hook {
   void Hook<HookArgs...>::attach(Hook<HookArgs...>::CBType callback) {
     this->callbacks_.push_back(callback);
   }
+
+#if TEST_BUILD
+  template<typename ...HookArgs>
+  void Hook<HookArgs...>::clear() {
+    this->callbacks_.clear();
+  }
+#endif  // TEST_BUILD
 
   template<typename ...HookArgs>
   void Hook<HookArgs...>::detach(Hook<HookArgs...>::CBType callback) {

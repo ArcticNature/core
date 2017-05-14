@@ -1,0 +1,10 @@
+{
+  "name": "core.testing.hooks",
+  "type": "c++",
+
+  "deps": ["core.hooks.base"],
+
+  "targets": {
+    "test": {"type": "lib"}
+  }
+}

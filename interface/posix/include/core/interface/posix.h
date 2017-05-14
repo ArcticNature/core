@@ -41,8 +41,9 @@ namespace interface {
     virtual int   setenv(const char* name, const char* value, int overwrite);
 
     // Files.
-    virtual int lstat(const char* path, struct stat* buf);
-    virtual int stat(const char* path, struct stat* buf);
+    virtual char* dirname(char* path);
+    virtual int   lstat(const char* path, struct stat* buf);
+    virtual int   stat(const char* path, struct stat* buf);
     virtual ssize_t readlink(const char* path, char* buf, size_t size);
     virtual int unlink(const char* path);
 

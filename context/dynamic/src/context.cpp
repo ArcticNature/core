@@ -43,11 +43,7 @@ LoopManagerRef Context::LoopManager() {
 }
 
 MetaDataStoreRef Context::Metadata() {
-  ContextRef context = Context::Instance();
-  if (!context->metadata_) {
-    throw ContextUninitialised("Metadata not initialised.");
-  }
-  return context->metadata_;
+  return Context::Instance()->metadata();
 }
 
 
@@ -73,8 +69,15 @@ void Context::initialise(MetaDataStoreRef metadata) {
 }
 
 LoopManagerRef Context::loopManager() {
-  if (this->loop_manager.get() == nullptr) {
+  if (!this->loop_manager) {
     throw ContextUninitialised("Loop manager not initialised.");
   }
   return this->loop_manager;
+}
+
+MetaDataStoreRef Context::metadata() {
+  if (!this->metadata_) {
+    throw ContextUninitialised("Metadata not initialised.");
+  }
+  return this->metadata_;
 }

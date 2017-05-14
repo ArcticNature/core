@@ -2,6 +2,8 @@
   "name": "core.hooks.base",
   "type": "c++",
 
+  "deps": ["core.compile-time"],
+
   "targets": {
     "debug": { "type": "lib" },
     "release": { "type": "lib" },

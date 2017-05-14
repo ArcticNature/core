@@ -69,7 +69,7 @@ namespace test {
   };
 
 
-  //! Test case for node configuraation environment.
+  //! Test case for node configuration environment.
   class NodeConfigEventsFrom : public ::testing::Test {
    protected:
     std::shared_ptr<TestIntentLoader> loader;

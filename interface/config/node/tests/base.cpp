@@ -202,6 +202,8 @@ void TestLoader::registerIntents() {
   test.fromStack("event_tcp_default");
   type.wrap(this->lua, new EventUnixIntent());
   test.fromStack("event_unix");
+  type.wrap(this->lua, new MockIntent("core.metadata", "core.metadata"));
+  test.fromStack("localdata");
   type.wrap(this->lua, new NullIntent());
   test.fromStack("null");
 }
@@ -235,6 +237,7 @@ void TestLoader::collectIntents() {
     "event_tcp",
     "event_manager",
     "event_unix",
+    "localdata",
     "null"
   };
 
@@ -266,6 +269,7 @@ void TestLoader::initLua() {
   this->registerIntents();
   this->lua.doString("intents = {}");
   this->lua.doString("intents.null = test.null");
+  this->lua.doString("intents.localdata = test.localdata");
 
   std::vector<std::string>::iterator it;
   for (it = this->lines.begin(); it != this->lines.end(); it++) {
@@ -284,7 +288,9 @@ void TestLoader::loadToSort() {
 TestIntentLoader::TestIntentLoader() : NodeConfigLoader(
     "refs/heads/master"
 ) {
-  // NOOP.
+  this->addIntent(std::make_shared<MockIntent>(
+      "core.metadata", "core.metadata"
+  ));
 }
 
 void TestIntentLoader::addIntent(NodeConfigIntentRef intent) {

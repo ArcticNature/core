@@ -11,6 +11,7 @@
 #include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/exceptions/configuration.h"
+#include "core/interface/config/node/hooks.h"
 
 #include "core/model/logger.h"
 #include "core/model/repository.h"
@@ -232,12 +233,14 @@ void NodeConfigLoader::verify() {
 
   // Check that required options are provided.
   this->requireProvider("event.manager");
+  this->requireProvider("core.metadata");
 }
 
 
 void NodeConfigLoader::collectIntents() {
   NodeConfigLifecycleArg arg(this, &this->lua);
   Lifecycle::trigger("config::node::collect", &arg);
+  sf::core::hook::NodeConfig::Collect.trigger(this->lua, this);
 }
 
 void NodeConfigLoader::initLua() {
@@ -252,6 +255,7 @@ void NodeConfigLoader::initLua() {
   // Dynamic configuration done by handlers.
   NodeConfigLifecycleArg arg(this, &this->lua);
   Lifecycle::trigger("config::node::init-lua", &arg);
+  sf::core::hook::NodeConfig::LuaInit.trigger(this->lua);
 }
 
 void NodeConfigLoader::initLuaFunctions() {
@@ -268,6 +272,7 @@ void NodeConfigLoader::initLuaTables() {
     "core",
     "event_managers",
     "loggers",
+    "metastores",
     "sources"
   };
 

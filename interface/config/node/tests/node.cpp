@@ -57,9 +57,8 @@ TEST_F(NodeConfigLoaderTest, ProcessesFiles) {
 
 TEST_F(NodeConfigLoaderTest, IntentsAreCollected) {
   this->loader->load();
-  Lua* lua = this->loader->getLua();
-  // Null + EventManager
-  ASSERT_EQ(2, this->loader->getIntents().size());
+  // Null + EventManager + CoreMeta
+  ASSERT_EQ(3, this->loader->getIntents().size());
 }
 
 TEST_F(NodeConfigLoaderTest, CheckNewContext) {
@@ -81,6 +80,7 @@ TEST_F(NodeConfigIntentsOrderTest, NullIntent) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "core.metadata",
       "null"
   });
 }
@@ -93,6 +93,7 @@ TEST_F(NodeConfigIntentsOrderTest, SimpleDepends) {
   ASSERT_ORDER({
       "event.manager",
       "event.tcp",
+      "core.metadata",
       "null"
   });
 }
@@ -116,6 +117,7 @@ TEST_F(NodeConfigIntentsOrderTest, TcpUnixDepends) {
       "event.manager",
       "event.tcp",
       "event.unix",
+      "core.metadata",
       "null"
   });
 }
@@ -127,6 +129,7 @@ TEST_F(NodeConfigIntentsOrderTest, MissingDepends) {
   ASSERT_ORDER({
       "event.manager",
       "event.tcp",
+      "core.metadata",
       "null"
   });
 }
@@ -139,6 +142,7 @@ TEST_F(NodeConfigIntentsOrderTest, OptionalMissing) {
   ASSERT_ORDER({
       "event.manager",
       "event.tcp.default",
+      "core.metadata",
       "null"
   });
 }
@@ -152,6 +156,7 @@ TEST_F(NodeConfigIntentsOrderTest, OptionalSorted) {
       "event.manager",
       "event.tcp",
       "event.tcp.default",
+      "core.metadata",
       "null"
   });
 }
