@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <gtest/gtest.h>
 
+#include "core/cluster/cluster.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/exceptions/base.h"
@@ -10,6 +11,10 @@
 #include "core/interface/metadata/store.h"
 #include "core/model/event.h"
 #include "core/model/logger.h"
+
+
+using sf::core::cluster::Cluster;
+using sf::core::cluster::ClusterRaw;
 
 using sf::core::context::Context;
 using sf::core::context::ContextRef;
@@ -90,6 +95,7 @@ class NoopLoopManager : public LoopManager {
 
 TEST_F(ContextTest, Defaults) {
   ASSERT_EQ(Logger::fallback(), Context::Logger());
+  ASSERT_THROW(Context::Cluster(), ContextUninitialised);
   ASSERT_THROW(Context::LoopManager(), ContextUninitialised);
   ASSERT_THROW(Context::Metadata(), ContextUninitialised);
 }
@@ -100,6 +106,13 @@ TEST_F(ContextTest, ReplaceActiveContext) {
 
   Context::Initialise(context);
   ASSERT_EQ(context, Context::Instance());
+}
+
+TEST_F(ContextTest, SetCluster) {
+  MetaDataStoreRef metadata = std::make_shared<NoMetadataStore>();
+  Cluster cluster = std::make_shared<ClusterRaw>(metadata);
+  this->context->initialise(cluster);
+  ASSERT_EQ(cluster, Context::Cluster());
 }
 
 TEST_F(ContextTest, SetLogger) {

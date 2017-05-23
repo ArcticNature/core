@@ -1,0 +1,20 @@
+{
+  "name": "core.cluster.interface",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+    "core.interface.metadata.store"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test": {
+      "deps": [
+        "core.testing.metadata"
+      ],
+      "type": "lib"
+    }
+  }
+}

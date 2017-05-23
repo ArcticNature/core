@@ -1,0 +1,13 @@
+{
+  "name": "core.testing.metadata",
+  "type": "c++",
+
+  "deps": [
+    "core.interface.metadata.store"
+  ],
+
+  "targets": {
+    "test": { "type": "lib" }
+  }
+}
+

@@ -190,6 +190,8 @@ void TestLoader::registerIntents() {
   LuaTable test = this->lua.stack()->newTable();
   this->lua.globals()->fromStack("test");
 
+  type.wrap(this->lua, new MockIntent("cluster.metadata", "cluster.metadata"));
+  test.fromStack("clusterdata");
   type.wrap(this->lua, new Cycle1Intent());
   test.fromStack("cycle1");
   type.wrap(this->lua, new Cycle2Intent());
@@ -231,6 +233,7 @@ std::string TestLoader::getEffective() {
 void TestLoader::collectIntents() {
   std::vector<std::string>::iterator it;
   std::vector<std::string> intents = {
+    "clusterdata",
     "cycle1",
     "cycle2",
     "event_tcp_default",
@@ -262,14 +265,16 @@ void TestLoader::initLua() {
   type.initType(this->lua);
 
   this->init_count += 1;
-  this->lua.doString("core = {}");
+  this->lua.doString("cluster = {}");
   this->lua.doString("connector = {}");
+  this->lua.doString("core = {}");
   this->lua.doString("core.events_from = function(src) return false; end");
 
   this->registerIntents();
   this->lua.doString("intents = {}");
   this->lua.doString("intents.null = test.null");
   this->lua.doString("intents.localdata = test.localdata");
+  this->lua.doString("intents.clusterdata = test.clusterdata");
 
   std::vector<std::string>::iterator it;
   for (it = this->lines.begin(); it != this->lines.end(); it++) {
@@ -286,10 +291,13 @@ void TestLoader::loadToSort() {
 
 
 TestIntentLoader::TestIntentLoader() : NodeConfigLoader(
-    "refs/heads/master"
+    "refs/heads/test-fixture"
 ) {
   this->addIntent(std::make_shared<MockIntent>(
       "core.metadata", "core.metadata"
+  ));
+  this->addIntent(std::make_shared<MockIntent>(
+      "cluster.metadata", "cluster.metadata"
   ));
 }
 

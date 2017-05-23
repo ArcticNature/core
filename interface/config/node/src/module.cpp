@@ -34,6 +34,10 @@ using sf::core::utility::LuaStack;
 using sf::core::utility::LuaTable;
 
 
+const std::vector<std::string> CLUSTER_ATTRIBUTES = {
+  "metadata"
+};
+
 const std::vector<std::string> CORE_ATTRIBUTES = {
   "event_manager",
   "logger",
@@ -43,6 +47,40 @@ const std::vector<std::string> CORE_ATTRIBUTES = {
 
 class NodeLuaCollect : public NodeConfigLifecycleHandler {
  protected:
+  void collectClusterIntents(NodeConfigLoader* loader, Lua* lua) {
+    // Collect known `cluster.*` intents.
+    std::vector<std::string>::const_iterator attr;
+    LuaTable cluster = lua->globals()->toTable("cluster");
+    NodeConfigIntentLuaProxy lua_intents(*lua);
+
+    for (attr = CLUSTER_ATTRIBUTES.begin();
+         attr != CLUSTER_ATTRIBUTES.end(); attr++) {
+      cluster.toStack(*attr);
+
+      // If value is a function call it without arguments.
+      if (lua->stack()->type() == LUA_TFUNCTION) {
+        LogInfo info = {{"attribute", *attr}};
+        DEBUGV(
+            Context::Logger(),
+            "Resolving function in 'cluster.${attribute}' ...", info
+        );
+        lua->call(0, 1);
+      }
+
+      // Skip if not the correct type.
+      if (!lua_intents.typeOf(-1)) {
+        lua->stack()->remove(-1);
+        LogInfo info = {{"attribute", *attr}};
+        DEBUGV(
+            Context::Logger(),
+            "Skipping 'cluster.${attribute}' due to incorrect type.", info
+        );
+        continue;
+      }
+      loader->addIntent(lua_intents.get());
+    }
+  }
+
   void collectCoreIntents(NodeConfigLoader* loader, Lua* lua) {
     // Collect known `core.*` intents.
     std::vector<std::string>::const_iterator attr;
@@ -100,6 +138,7 @@ class NodeLuaCollect : public NodeConfigLifecycleHandler {
     NodeConfigLoader* loader = arg->loader();
     Lua* lua = arg->lua();
     this->collectCoreIntents(loader, lua);
+    this->collectClusterIntents(loader, lua);
     this->collectDefaults(loader);
 
     DEBUG(Context::Logger(), "Node configuration intents collected!");

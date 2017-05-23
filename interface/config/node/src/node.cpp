@@ -234,6 +234,7 @@ void NodeConfigLoader::verify() {
   // Check that required options are provided.
   this->requireProvider("event.manager");
   this->requireProvider("core.metadata");
+  this->requireProvider("cluster.metadata");
 }
 
 
@@ -268,6 +269,7 @@ void NodeConfigLoader::initLuaFunctions() {
 void NodeConfigLoader::initLuaTables() {
   std::vector<std::string>::iterator it;
   std::vector<std::string> tables = {
+    "cluster",
     "connectors",
     "core",
     "event_managers",

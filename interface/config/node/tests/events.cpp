@@ -55,5 +55,5 @@ TEST_F(NodeConfigEventsFrom, AddIntent) {
   lua->call(1, 1);
   bool result = lua->stack()->toBoolean();
   ASSERT_TRUE(result);
-  ASSERT_EQ(2, this->loader->getMocks().size());
+  ASSERT_EQ(3, this->loader->getMocks().size());
 }

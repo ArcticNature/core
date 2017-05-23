@@ -3,6 +3,7 @@
   "type": "c++",
 
   "deps": [
+    "core.cluster.interface",
     "core.compile-time",
     "core.event.source.manual",
     "core.interface.metadata.store",

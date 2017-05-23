@@ -27,11 +27,15 @@ using sf::core::test::NodeConfigIntentsOrderTest;
 
 
 TEST_F(NodeConfigLoaderTest, InitLua) {
-  this->loader->load();
   Lua* lua = this->loader->getLua();
+  this->loader->load();
+  ASSERT_EQ(1, this->loader->init_count);
+
   lua->doString("return core");
   ASSERT_EQ(LUA_TTABLE, lua->stack()->type());
-  ASSERT_EQ(1, this->loader->init_count);
+
+  lua->doString("return cluster");
+  ASSERT_EQ(LUA_TTABLE, lua->stack()->type());
 }
 
 TEST_F(NodeConfigLoaderTest, InitLuaOnce) {
@@ -57,8 +61,8 @@ TEST_F(NodeConfigLoaderTest, ProcessesFiles) {
 
 TEST_F(NodeConfigLoaderTest, IntentsAreCollected) {
   this->loader->load();
-  // Null + EventManager + CoreMeta
-  ASSERT_EQ(3, this->loader->getIntents().size());
+  // Null + EventManager + CoreMeta + ClusterMeta
+  ASSERT_EQ(4, this->loader->getIntents().size());
 }
 
 TEST_F(NodeConfigLoaderTest, CheckNewContext) {
@@ -80,6 +84,7 @@ TEST_F(NodeConfigIntentsOrderTest, NullIntent) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "cluster.metadata",
       "core.metadata",
       "null"
   });
@@ -92,6 +97,7 @@ TEST_F(NodeConfigIntentsOrderTest, SimpleDepends) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "cluster.metadata",
       "event.tcp",
       "core.metadata",
       "null"
@@ -115,6 +121,7 @@ TEST_F(NodeConfigIntentsOrderTest, TcpUnixDepends) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "cluster.metadata",
       "event.tcp",
       "event.unix",
       "core.metadata",
@@ -128,6 +135,7 @@ TEST_F(NodeConfigIntentsOrderTest, MissingDepends) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "cluster.metadata",
       "event.tcp",
       "core.metadata",
       "null"
@@ -141,6 +149,7 @@ TEST_F(NodeConfigIntentsOrderTest, OptionalMissing) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "cluster.metadata",
       "event.tcp.default",
       "core.metadata",
       "null"
@@ -154,6 +163,7 @@ TEST_F(NodeConfigIntentsOrderTest, OptionalSorted) {
   this->loader->loadToSort();
   ASSERT_ORDER({
       "event.manager",
+      "cluster.metadata",
       "event.tcp",
       "event.tcp.default",
       "core.metadata",
