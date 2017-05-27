@@ -23,6 +23,7 @@
     "core.protocol.manager_spawner",
 
     "core.registry.cli-parser",
+    "core.state.global",
     "core.utility.protobuf"
   ],
 

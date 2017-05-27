@@ -15,6 +15,7 @@
 
 #include "core/posix/restricted.h"
 #include "core/registry/cli-parser.h"
+#include "core/state/global.h"
 
 
 using sf::core::bin::Spawner;
@@ -34,6 +35,7 @@ using sf::core::model::LogInfo;
 
 using sf::core::posix::Restricted;
 using sf::core::registry::CLIParsers;
+using sf::core::state::GlobalState;
 
 
 static ProxyLogger logger("core.bin.spawner.main");
@@ -80,16 +82,14 @@ int main(int argc, char** argv) {
     );
 
     Process::Exit();
-    Cluster::Destroy();
-    Context::Destroy();
+    GlobalState::Destroy();
     Logger::destroyFallback();
     Static::destroy();
     return ex.getCode();
   }
 
   Process::Exit();
-  Cluster::Destroy();
-  Context::Destroy();
+  GlobalState::Destroy();
   Logger::destroyFallback();
   Static::destroy();
   return 0;

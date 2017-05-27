@@ -1,0 +1,20 @@
+{
+  "name": "core.state.global",
+  "type": "c++",
+
+  "deps": [
+    "core.cluster.interface",
+    "core.context.dynamic"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test": {
+      "deps": [
+        "core.testing.cluster"
+      ],
+      "type": "lib"
+    }
+  }
+}

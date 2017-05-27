@@ -29,6 +29,8 @@
 
     "core.registry.cli-parser",
     "core.registry.event.managers",
+    "core.state.global",
+
     "core.utility.daemoniser",
     "core.utility.process",
     "core.utility.protobuf"

@@ -29,6 +29,8 @@
     "core.registry.cli-parser",
     "core.registry.event.handler.api",
     "core.registry.repositories",
+
+    "core.state.global",
     "core.utility.protobuf"
   ],
 

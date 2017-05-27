@@ -28,12 +28,13 @@
     "core.model.event",
     "core.model.logger",
 
-    "core.protocol.public",
-    "core.registry.event.handler.api",
-    "core.utility.protobuf",
-
     "core.posix.user",
-    "core.registry.cli-parser"
+    "core.protocol.public",
+
+    "core.registry.cli-parser",
+    "core.registry.event.handler.api",
+    "core.state.global",
+    "core.utility.protobuf"
   ],
 
   "targets": {

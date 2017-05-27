@@ -15,6 +15,7 @@
 
 #include "core/posix/user.h"
 #include "core/registry/cli-parser.h"
+#include "core/state/global.h"
 
 
 using sf::core::bin::Manager;
@@ -34,6 +35,7 @@ using sf::core::model::LogInfo;
 
 using sf::core::posix::User;
 using sf::core::registry::CLIParsers;
+using sf::core::state::GlobalState;
 
 
 static ProxyLogger logger("core.bin.manager.main");
@@ -82,16 +84,14 @@ int main(int argc, char** argv) {
     );
 
     Process::Exit();
-    Cluster::Destroy();
-    Context::Destroy();
+    GlobalState::Destroy();
     Logger::destroyFallback();
     Static::destroy();
     return ex.getCode();
   }
 
   Process::Exit();
-  Cluster::Destroy();
-  Context::Destroy();
+  GlobalState::Destroy();
   Logger::destroyFallback();
   Static::destroy();
   return 0;
