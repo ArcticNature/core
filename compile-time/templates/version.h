@@ -7,7 +7,7 @@
 // Commit sha: {{__GIT_SHA__}}
 // Tainted: {{__GIT_TAINT__}}
 
-#define VERSION_NUMBER "0.1.1"
+#define VERSION_NUMBER "0.2.0"
 #define VERSION_SHA    "{{ __GIT_SHA__ 0 }}"
 #define VERSION_TAINT  "{{ __GIT_TAINT__ }}"
 

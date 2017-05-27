@@ -1,7 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <string>
 
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -15,7 +15,7 @@
 #include "core/utility/protobuf.h"
 #include "core/utility/string.h"
 
-using sf::core::cluster::Node;
+using sf::core::cluster::Cluster;
 using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
 
@@ -49,7 +49,7 @@ class ClientIntroduceEvent : public Event {
 
   void handle() {
     // Generate unique id for the client.
-    std::string node_name = Node::me()->name();
+    std::string node_name = Cluster::Instance()->myself()->name();
     std::string num = toString(ClientIntroduceEvent::clients_count++);
     std::string pid = toString(Static::posix()->getpid());
     std::string client_id = num + "@" + node_name + "!" + pid;

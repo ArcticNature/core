@@ -4,13 +4,20 @@
 #include <unistd.h>
 #include <string>
 
+#include "core/cluster/cluster.h"
 #include "core/compile-time/options.h"
+
 #include "core/context/context.h"
 #include "core/context/static.h"
+
+#include "core/interface/metadata/store.h"
 #include "core/registry/event/managers.h"
 
 
 using sf::core::bin::AsyncPorcess;
+using sf::core::cluster::Cluster;
+using sf::core::cluster::ClusterRaw;
+
 using sf::core::context::Context;
 using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
@@ -19,6 +26,9 @@ using sf::core::exception::AbortException;
 using sf::core::exception::CleanExit;
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::SfException;
+
+using sf::core::interface::MetaDataStore;
+using sf::core::interface::NoMetadataStore;
 
 using sf::core::model::EventRef;
 using sf::core::model::LogInfo;
@@ -29,6 +39,13 @@ using sf::core::registry::LoopManager;
 
 static ProxyLogger logger("core.bin.async-process");
 
+
+void AsyncPorcess::configureInitialCluster() {
+  Cluster cluster = std::make_shared<ClusterRaw>(
+    std::make_shared<NoMetadataStore>()
+  );
+  Cluster::Instance(cluster);
+}
 
 void AsyncPorcess::disableSIGINT() {
   INFO(logger, "Disabling SIGINT.");

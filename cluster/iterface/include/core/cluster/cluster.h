@@ -4,12 +4,30 @@
 
 #include <memory>
 
+#include "core/cluster/node.h"
 #include "core/interface/metadata/store.h"
 
 
 namespace sf {
 namespace core {
 namespace cluster {
+
+  // Forward declare.
+  class ClusterRaw;
+
+
+  //! Extended shared_ptr for nicer code.
+  class Cluster : public std::shared_ptr<ClusterRaw> {
+   public:
+    static Cluster Instance();
+    static void Instance(Cluster instance);
+    static void Destroy();
+
+   public:
+    // Inherit the base constructors.
+    using std::shared_ptr<ClusterRaw>::shared_ptr;
+  };
+
 
   //! Interface to cluster operations and attributes.
   class ClusterRaw : public std::enable_shared_from_this<ClusterRaw> {
@@ -24,8 +42,10 @@ namespace cluster {
 
     //! Returns the cluster metadata store.
     sf::core::interface::MetaDataStoreRef metadata() const;
+
+    //! Returns a node instance representing the local node.
+    Node myself();
   };
-  typedef std::shared_ptr<ClusterRaw> Cluster;
 
 }  // namespace cluster
 }  // namespace core

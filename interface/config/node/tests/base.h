@@ -11,6 +11,8 @@
 
 #include "core/context/context.h"
 #include "core/interface/config/node.h"
+#include "core/testing/cluster.h"
+
 
 namespace sf {
 namespace core {
@@ -70,7 +72,7 @@ namespace test {
 
 
   //! Test case for node configuration environment.
-  class NodeConfigEventsFrom : public ::testing::Test {
+  class NodeConfigEventsFrom : public sf::core::testing::ClusterTest {
    protected:
     std::shared_ptr<TestIntentLoader> loader;
 
@@ -79,7 +81,7 @@ namespace test {
   };
 
   //! Test case for node configuration loader tests.
-  class NodeConfigLoaderTest : public ::testing::Test {
+  class NodeConfigLoaderTest : public sf::core::testing::ClusterTest {
    protected:
     std::shared_ptr<TestLoader> loader;
 
@@ -88,7 +90,7 @@ namespace test {
   };
 
   //! Test case for node configuration intent tests.
-  class NodeConfigIntentTest : public ::testing::Test {
+  class NodeConfigIntentTest : public sf::core::testing::ClusterTest {
    protected:
     std::shared_ptr<TestIntentLoader> loader;
 

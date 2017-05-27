@@ -35,10 +35,6 @@ ContextRef Context::Instance() {
   return Context::_instance;
 }
 
-sf::core::cluster::Cluster Context::Cluster() {
-  return Context::Instance()->cluster();
-}
-
 LoggerRef Context::Logger() {
   return Context::Instance()->_logger;
 }
@@ -57,13 +53,8 @@ Context::Context() {
 }
 
 Context::~Context() {
-  this->cluster_.reset();
   this->metadata_.reset();
   this->loop_manager.reset();
-}
-
-void Context::initialise(sf::core::cluster::Cluster cluster) {
-  this->cluster_ = cluster;
 }
 
 void Context::initialise(LoggerRef logger) {
@@ -76,13 +67,6 @@ void Context::initialise(LoopManagerRef manager) {
 
 void Context::initialise(MetaDataStoreRef metadata) {
   this->metadata_ = metadata;
-}
-
-sf::core::cluster::Cluster Context::cluster() {
-  if (!this->cluster_) {
-    throw ContextUninitialised("Cluster not configured.");
-  }
-  return this->cluster_;
 }
 
 LoopManagerRef Context::loopManager() {

@@ -74,6 +74,9 @@ namespace interface {
     virtual void  free(void* ptr);
     virtual char* strncpy(char* dest, const char* src, size_t n);
 
+    // Network.
+    virtual int gethostname(char* name, size_t len);
+
     // Others.
     virtual unsigned int sleep(unsigned int seconds);
 

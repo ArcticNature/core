@@ -5,7 +5,7 @@
 
   "deps": [
     "core.bin.async-process",
-    "core.cluster.node",
+    "core.cluster.interface",
     "core.compile-time",
 
     "core.context.client",

@@ -3,8 +3,6 @@
   "type": "c++",
 
   "deps": [
-    "core.compile-time",
-    "core.context.static",
     "core.model.repository",
     "core.utility.status"
   ],
@@ -12,11 +10,6 @@
   "targets": {
     "debug":   { "type": "lib" },
     "release": { "type": "lib" },
-    "test": {
-      "deps": [
-        "core.model.cli-parser"
-      ],
-      "type": "lib"
-    }
+    "test":    { "type": "lib" }
   }
 }

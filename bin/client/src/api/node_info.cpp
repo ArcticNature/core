@@ -44,7 +44,6 @@ class NodeInfo : public Event {
       const NodeInfoResponse::SystemStatus& status
   ) {
     table->set("colour", StatusColour_Name(status.colour()));
-    table->set("code", status.code());
     table->set("reason", status.reason());
   }
 

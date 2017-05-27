@@ -31,7 +31,6 @@ message NodeInfoResponse {
 
   message SystemStatus {
     required StatusColour colour = 1;
-    required int64  code   = 2;
     required string reason = 3;
   }
 

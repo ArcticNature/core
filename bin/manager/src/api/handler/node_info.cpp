@@ -1,6 +1,7 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <string>
 
+#include "core/cluster/cluster.h"
 #include "core/cluster/node.h"
 #include "core/context/static.h"
 
@@ -12,12 +13,13 @@
 #include "core/protocols/public/p_node_info.pb.h"
 
 #include "core/registry/event/handler/api.h"
+#include "core/utility/status.h"
 #include "core/utility/protobuf.h"
 
+using sf::core::cluster::Cluster;
 using sf::core::cluster::Node;
-using sf::core::cluster::NodeStatus;
-using sf::core::cluster::NodeStatusDetail;
 using sf::core::cluster::NodeVersion;
+
 using sf::core::context::Static;
 
 using sf::core::model::Event;
@@ -34,6 +36,10 @@ using sf::core::protocol::public_api::NodeInfoRequest;
 using sf::core::registry::ApiHandlerRegistry;
 using sf::core::utility::MessageIO;
 
+using sf::core::utility::SubsystemStatus;
+using sf::core::utility::Status;
+using sf::core::utility::StatusLight;
+
 
 static StatusColour ENUM_TO_PB[] = {
   StatusColour::Unkown,
@@ -48,12 +54,10 @@ class NodeInfoEvent : public Event {
   bool details;
 
   void statusToMessage(
-      NodeStatusDetail status,
-      NodeInfoResponse::SystemStatus* message
+      Status* status, NodeInfoResponse::SystemStatus* message
   ) {
-    message->set_colour(ENUM_TO_PB[status.colour() + 1]);
-    message->set_code(status.code());
-    message->set_reason(status.message());
+    message->set_colour(ENUM_TO_PB[status->colour() + 1]);
+    message->set_reason(status->message());
   }
 
  public:
@@ -64,10 +68,10 @@ class NodeInfoEvent : public Event {
   }
 
   void handle() {
-    Node* me = Node::me();
-    NodeStatus* node_status  = me->status();
-    NodeVersion node_version = me->version();
-    RepositoryVersionId config_version = me->configVersion();
+    Node myself = Cluster::Instance()->myself();
+    SubsystemStatus* node_status = myself->status();
+    NodeVersion node_version = myself->version();
+    RepositoryVersionId config_version = myself->configVersion();
 
     // Wrapper message.
     Message message;
@@ -79,7 +83,7 @@ class NodeInfoEvent : public Event {
     NodeInfoResponse::NodeInfo* info = res->mutable_node();
     NodeInfoResponse::NodeVersion* ver = info->mutable_version();
     NodeInfoResponse::ConfigVersion* config = info->mutable_config();
-    info->set_name(me->name());
+    info->set_name(myself->name());
     ver->set_commit(node_version.commit);
     ver->set_taint(node_version.taint);
     ver->set_version(node_version.version);
@@ -88,16 +92,15 @@ class NodeInfoEvent : public Event {
 
     // Node status info.
     this->statusToMessage(
-        node_status->reason(), res->mutable_overall()
+        node_status, res->mutable_overall()
     );
 
     // Node status details.
     if (this->details) {
-      NodeStatus::iterator it;
-      for (it = node_status->begin(); it != node_status->end(); it++) {
+      for (auto pair : *node_status) {
         NodeInfoResponse::SubSystem* sub = res->add_details();
-        sub->set_name(it->first);
-        this->statusToMessage(it->second, sub->mutable_status());
+        sub->set_name(pair.first);
+        this->statusToMessage(&pair.second, sub->mutable_status());
       }
     }
 

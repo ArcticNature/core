@@ -4,7 +4,6 @@
 
 #include <string>
 
-#include "core/cluster/cluster.h"
 #include "core/compile-time/options.h"
 #include "core/interface/metadata/store.h"
 #include "core/model/event.h"
@@ -24,7 +23,6 @@ namespace context {
     static ContextRef _instance;
 
    public:
-    static sf::core::cluster::Cluster Cluster();
     static sf::core::model::LoggerRef Logger();
     static sf::core::model::LoopManagerRef LoopManager();
     static sf::core::interface::MetaDataStoreRef Metadata();
@@ -40,7 +38,6 @@ namespace context {
     sf::core::model::LoggerRef _logger;
     sf::core::model::LoopManagerRef loop_manager;
 
-    sf::core::cluster::Cluster cluster_;
     sf::core::interface::MetaDataStoreRef metadata_;
 
    public:
@@ -48,13 +45,11 @@ namespace context {
     ~Context();
 
     //! Initialise the context.
-    void initialise(sf::core::cluster::Cluster cluster);
     void initialise(sf::core::model::LoggerRef logger);
     void initialise(sf::core::model::LoopManagerRef manager);
     void initialise(sf::core::interface::MetaDataStoreRef metadata);
 
     // Fetch configured instances.
-    sf::core::cluster::Cluster cluster();
     sf::core::model::LoopManagerRef loopManager();
     sf::core::interface::MetaDataStoreRef metadata();
   };

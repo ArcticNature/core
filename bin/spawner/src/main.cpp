@@ -3,7 +3,7 @@
 
 #include "core/bin/spawner.h"
 
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -19,7 +19,7 @@
 
 using sf::core::bin::Spawner;
 
-using sf::core::cluster::Node;
+using sf::core::cluster::Cluster;
 using sf::core::context::Context;
 using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
@@ -56,10 +56,13 @@ int main(int argc, char** argv) {
     CLIParser::spawnerOptions(parser);
     parser->parse(&argc, &argv);
     parser->handleVersionOption("snow-fox-spawner");
-    Static::options()->setString("process-name", Node::me()->name());
 
     // Run spawner.
     Spawner spawner;
+    spawner.configureInitialCluster();
+    Static::options()->setString(
+        "process-name", Cluster::Instance()->myself()->name()
+    );
     spawner.initialise();
     spawner.run();
 
@@ -77,6 +80,7 @@ int main(int argc, char** argv) {
     );
 
     Process::Exit();
+    Cluster::Destroy();
     Context::Destroy();
     Logger::destroyFallback();
     Static::destroy();
@@ -84,6 +88,7 @@ int main(int argc, char** argv) {
   }
 
   Process::Exit();
+  Cluster::Destroy();
   Context::Destroy();
   Logger::destroyFallback();
   Static::destroy();

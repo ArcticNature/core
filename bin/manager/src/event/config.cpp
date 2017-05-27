@@ -5,7 +5,7 @@
 #include <string>
 
 #include "core/bin/manager/api/server.h"
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 
@@ -14,12 +14,13 @@
 #include "core/model/event.h"
 #include "core/model/logger.h"
 
+#include "core/utility/status.h"
+
 using sf::core::bin::LoadConfiguration;
 using sf::core::bin::UnixServer;
 
+using sf::core::cluster::Cluster;
 using sf::core::cluster::Node;
-using sf::core::cluster::NodeStatusCode;
-using sf::core::cluster::NodeStatusDetail;
 
 using sf::core::context::Context;
 using sf::core::context::ProxyLogger;
@@ -34,6 +35,9 @@ using sf::core::model::EventDrainRef;
 using sf::core::model::EventSourceRef;
 using sf::core::model::LogInfo;
 
+using sf::core::utility::Status;
+using sf::core::utility::StatusLight;
+
 
 static ProxyLogger logger("core.bin.manager.event.config");
 
@@ -47,9 +51,10 @@ LoadConfiguration::LoadConfiguration(
 
 void LoadConfiguration::handle() {
   // Update status.
-  std::string current = Node::me()->configVersion().effective();
+  Node myself = Cluster::Instance()->myself();
+  std::string current = myself->configVersion().effective();
   LogInfo info = {
-    {"current",  Node::me()->configVersion().effective()},
+    {"current", myself->configVersion().effective()},
     {"requested", this->version}
   };
   INFOV(
@@ -57,8 +62,8 @@ void LoadConfiguration::handle() {
       "Loading configuration '${requested}' (currently at '${current}').",
       info
   );
-  Node::me()->status()->set("configuration", NodeStatusDetail(
-      NodeStatusCode::CONFIG_LOAD,
+  myself->status()->set("configuration", Status(
+      StatusLight::YELLOW,
       "Loading configuration version '" + this->version + "'"
   ));
 
@@ -67,12 +72,13 @@ void LoadConfiguration::handle() {
   conf.load();
 
   // Update status again.
-  info = {{"requested", Node::me()->configVersion().effective()}};
-  INFOV(logger, "Configuration '${requested}' loaded).", info);
-  Node::me()->status()->set("configuration", NodeStatusDetail(
-      NodeStatusCode::CONFIG_OK,
-      "Applied configuration version '" + this->version + "'"
+  std::string requested = myself->configVersion().effective();
+  myself->status()->set("configuration", Status(
+      StatusLight::GREEN,
+      "Applied configuration version '" + requested + "'"
   ));
+  info = {{"requested", requested}};
+  INFOV(logger, "Configuration '${requested}' loaded.", info);
 
   // TODO(stefano): remove this when config works.
   EventSourceRef server(new UnixServer("/tmp/snow-fox.socket"));

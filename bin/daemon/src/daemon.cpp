@@ -100,8 +100,10 @@ void Daemon::forkManager() {
   manager->appendArgument("--parser=gflags");
 
   // Cluster arguments.
-  manager->appendArgument("--node_name");
-  manager->appendArgument(parser->getString("node-name"));
+  if (parser->hasString("node-name")) {
+    manager->appendArgument("--node_name");
+    manager->appendArgument(parser->getString("node-name"));
+  }
 
   // Config arguments.
   manager->appendArgument("--repo_type");

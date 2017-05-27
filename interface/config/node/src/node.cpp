@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
 #include "core/exceptions/configuration.h"
@@ -17,7 +17,7 @@
 #include "core/model/repository.h"
 #include "core/utility/lua/proxy.h"
 
-using sf::core::cluster::Node;
+using sf::core::cluster::Cluster;
 using sf::core::context::Context;
 using sf::core::context::ContextRef;
 using sf::core::context::Static;
@@ -104,7 +104,7 @@ void NodeConfigLoader::initialise() {
 }
 
 std::vector<std::string> NodeConfigLoader::paths() const {
-  std::string node_name = Node::me()->name();
+  std::string node_name = Cluster::Instance()->myself()->name();
 
   std::vector<std::string> result;
   std::vector<std::string>::iterator it;
@@ -221,7 +221,7 @@ void NodeConfigLoader::sort() {
 void NodeConfigLoader::updateSystem() {
   Context::Initialise(this->new_context);
   RepositoryVersionId new_version(this->effective, this->symbolic);
-  Node::me()->configVersion(new_version);
+  Cluster::Instance()->myself()->configVersion(new_version);
 }
 
 void NodeConfigLoader::verify() {

@@ -4,106 +4,69 @@
 #include "core/utility/status.h"
 
 
-using sf::core::utility::StatusDetail;
+using sf::core::utility::Status;
 using sf::core::utility::StatusLight;
 using sf::core::utility::SubsystemStatus;
 
 
-enum TestCode {
-  UNKOWN = -1,
-  OK,
-  OK_TWO,
-  WARN,
-  LOAD,
-  ERROR,
-  FAULT,
-  END
-};
-
-
-class TestStatus : public StatusDetail<
-    TestCode, TestCode::OK, TestCode::WARN,
-    TestCode::ERROR, TestCode::END
-> {
- public:
-  TestStatus(TestCode code, std::string message) : StatusDetail(
-      code, message
-  ) {}
-};
-
-
-class TestSubsystem : public SubsystemStatus<TestStatus, TestCode> {
-};
-
-
-TEST(StatusDetail, Code) {
-  TestStatus status(TestCode::LOAD, "test");
-  ASSERT_EQ(TestCode::LOAD, status.code());
-}
-
-TEST(StatusDetail, ColourEnd) {
-  TestStatus status(TestCode::END, "test");
-  ASSERT_EQ(StatusLight::UNKOWN, status.colour());
-}
-
-TEST(StatusDetail, ColourGreen) {
-  TestStatus status(TestCode::OK, "test");
-  ASSERT_EQ(StatusLight::GREEN, status.colour());
-}
-
-TEST(StatusDetail, ColourRed) {
-  TestStatus status(TestCode::ERROR, "test");
-  ASSERT_EQ(StatusLight::RED, status.colour());
-}
-
-TEST(StatusDetail, ColourUnkown) {
-  TestStatus status(TestCode::UNKOWN, "test");
-  ASSERT_EQ(StatusLight::UNKOWN, status.colour());
-}
-
-TEST(StatusDetail, ColourYellow) {
-  TestStatus status(TestCode::WARN, "test");
+TEST(Status, Colour) {
+  Status status(StatusLight::YELLOW, "test");
   ASSERT_EQ(StatusLight::YELLOW, status.colour());
 }
 
-TEST(StatusDetail, Message) {
-  TestStatus status(TestCode::LOAD, "test");
+TEST(Status, Message) {
+  Status status(StatusLight::YELLOW, "test");
   ASSERT_EQ("test", status.message());
 }
 
 
 TEST(SubsystemStatus, Empty) {
-  TestSubsystem status;
+  SubsystemStatus status;
   ASSERT_EQ(StatusLight::UNKOWN, status.colour());
-  ASSERT_EQ(TestCode::UNKOWN, status.reason().code());
-  ASSERT_EQ("no subsystem available", status.reason().message());
+  ASSERT_EQ("No subsystem available", status.message());
 }
 
-TEST(SubsystemStatus, HasItem) {
-  TestSubsystem status;
-  status.set("test", TestStatus(TestCode::OK, "test"));
+TEST(SubsystemStatus, Green) {
+  SubsystemStatus status;
+  status.set("sub1", Status(StatusLight::GREEN, "test1"));
+  status.set("sub2", Status(StatusLight::GREEN, "test2"));
   ASSERT_EQ(StatusLight::GREEN, status.colour());
-  ASSERT_EQ(TestCode::OK, status.reason().code());
-  ASSERT_EQ("test", status.reason().message());
+  ASSERT_EQ("All subsystems are healthy", status.message());
 }
 
-TEST(SubsystemStatus, HasMultipleItems) {
-  TestSubsystem status;
-  status.set("warn", TestStatus(TestCode::WARN, "warn"));
-  status.set("error", TestStatus(TestCode::ERROR, "error"));
-  status.set("ok", TestStatus(TestCode::OK, "ok"));
-
-  ASSERT_EQ(StatusLight::RED, status.colour());
-  ASSERT_EQ(TestCode::ERROR, status.reason().code());
-  ASSERT_EQ("error", status.reason().message());
-}
-
-TEST(SubsystemStatus, UnkownWinsOverOk) {
-  TestSubsystem status;
-  status.set("unkown", TestStatus(TestCode::UNKOWN, "unkown"));
-  status.set("ok", TestStatus(TestCode::OK, "ok"));
-
+TEST(SubsystemStatus, GreenOrUnkown) {
+  SubsystemStatus status;
+  status.set("sub1", Status(StatusLight::GREEN, "test1"));
+  status.set("sub2", Status(StatusLight::UNKOWN, "test2"));
   ASSERT_EQ(StatusLight::UNKOWN, status.colour());
-  ASSERT_EQ(TestCode::UNKOWN, status.reason().code());
-  ASSERT_EQ("unkown", status.reason().message());
+  ASSERT_EQ("test2", status.message());
+}
+
+TEST(SubsystemStatus, Red) {
+  SubsystemStatus status;
+  status.set("sub1", Status(StatusLight::UNKOWN, "test1"));
+  status.set("sub2", Status(StatusLight::GREEN, "test2"));
+  status.set("sub3", Status(StatusLight::YELLOW, "test3"));
+  status.set("sub4", Status(StatusLight::RED, "test4"));
+  status.set("sub5", Status(StatusLight::RED, "test5"));
+  ASSERT_EQ(StatusLight::RED, status.colour());
+  ASSERT_EQ("test4", status.message());
+}
+
+TEST(SubsystemStatus, Yellow) {
+  SubsystemStatus status;
+  status.set("sub1", Status(StatusLight::UNKOWN, "test1"));
+  status.set("sub2", Status(StatusLight::GREEN, "test2"));
+  status.set("sub3", Status(StatusLight::YELLOW, "test3"));
+  status.set("sub4", Status(StatusLight::YELLOW, "test4"));
+  ASSERT_EQ(StatusLight::YELLOW, status.colour());
+  ASSERT_EQ("test3", status.message());
+}
+
+TEST(SubsystemStatus, Update) {
+  SubsystemStatus status;
+  status.set("subsys", Status(StatusLight::GREEN, "test1"));
+  status.set("subsys", Status(StatusLight::RED, "test2"));
+  ASSERT_EQ(StatusLight::RED, status.colour());
+  ASSERT_EQ("test2", status.message());
 }

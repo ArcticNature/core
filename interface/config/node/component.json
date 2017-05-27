@@ -3,8 +3,8 @@
   "type": "c++",
 
   "deps": [
+    "core.cluster.interface",
     "core.context.dynamic",
-    "core.cluster.node",
     "core.event.source.manual",
     "core.event.source.scheduled",
     "core.hooks.base",
@@ -19,6 +19,7 @@
     "test":    {
       "deps": [
         "core.event.testing",
+        "core.testing.cluster",
         "core.testing.hooks",
         "ext.repository.git"
       ],

@@ -3,6 +3,7 @@
   "type": "c++",
 
   "deps": [
+    "core.cluster.interface",
     "core.compile-time",
     "core.context.dynamic",
     "core.exceptions",

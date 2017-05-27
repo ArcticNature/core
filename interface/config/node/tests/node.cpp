@@ -1,8 +1,8 @@
 // Copyright 2016 Stefano Pogliani <stefano@spogliani.net>
 #include <gtest/gtest.h>
 
+#include "core/cluster/cluster.h"
 #include "core/context/context.h"
-#include "core/cluster/node.h"
 
 #include "core/exceptions/base.h"
 #include "core/exceptions/configuration.h"
@@ -12,9 +12,10 @@
 
 #include "./base.h"
 
+
+using sf::core::cluster::Cluster;
 using sf::core::context::Context;
 using sf::core::context::ContextRef;
-using sf::core::cluster::Node;
 
 using sf::core::exception::ContextUninitialised;
 using sf::core::exception::InvalidConfiguration;
@@ -74,7 +75,7 @@ TEST_F(NodeConfigLoaderTest, CheckNewContext) {
 
 TEST_F(NodeConfigLoaderTest, CheckNewVersion) {
   this->loader->load();
-  RepositoryVersionId version = Node::me()->configVersion();
+  RepositoryVersionId version = Cluster::Instance()->myself()->configVersion();
   ASSERT_EQ("refs/heads/test-fixture", version.symbolic());
   ASSERT_EQ(this->loader->getEffective(), version.effective());
 }

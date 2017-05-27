@@ -8,15 +8,8 @@
 // Tainted: {{__GIT_TAINT__}}
 
 
-// LUA related options.
-#define LUA_HEADER_FILE     <{{findFile
-    "/usr/include/lua.h"
-    "/usr/include/lua5.2/lua.h"
-}}>
-#define LUA_AUX_HEADER_FILE <{{findFile
-    "/usr/include/lauxlib.h"
-    "/usr/include/lua5.2/lauxlib.h"
-}}>
+// Constants.
+#define HOSTNAME_BUFFER_LEN 1024
 
 
 // Defaults.

@@ -3,6 +3,9 @@
   "type": "c++",
 
   "deps": [
+    "core.cluster.node",
+    "core.compile-time",
+    "core.context.static",
     "core.exceptions",
     "core.interface.metadata.store"
   ],
@@ -12,7 +15,8 @@
     "release": { "type": "lib" },
     "test": {
       "deps": [
-        "core.testing.metadata"
+        "core.testing.metadata",
+        "core.testing.static"
       ],
       "type": "lib"
     }

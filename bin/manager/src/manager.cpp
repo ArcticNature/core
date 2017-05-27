@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "core/bin/manager/event/config.h"
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 
 #include "core/context/context.h"
 #include "core/context/static.h"
@@ -15,15 +15,15 @@
 #include "core/model/cli-parser.h"
 #include "core/registry/repositories.h"
 
+#include "core/utility/status.h"
+
 
 using sf::core::bin::LoadConfiguration;
 using sf::core::bin::Manager;
 using sf::core::bin::ManagerToDaemon;
 using sf::core::bin::ManagerToSpawner;
 
-using sf::core::cluster::Node;
-using sf::core::cluster::NodeStatusCode;
-using sf::core::cluster::NodeStatusDetail;
+using sf::core::cluster::Cluster;
 
 using sf::core::context::Context;
 using sf::core::context::Static;
@@ -35,6 +35,9 @@ using sf::core::model::EventDrainRef;
 using sf::core::model::EventRef;
 using sf::core::model::EventSourceRef;
 using sf::core::registry::ReposRegistry;
+
+using sf::core::utility::Status;
+using sf::core::utility::StatusLight;
 
 
 void Manager::connectDaemon() {
@@ -76,8 +79,8 @@ void Manager::initialise() {
   );
 
   // Manager process subsystem ready.
-  Node::me()->status()->set("process", NodeStatusDetail(
-      NodeStatusCode::PROCESS_READY,
+  Cluster::Instance()->myself()->status()->set("node", Status(
+      StatusLight::GREEN,
       "Manager process successfully initialised"
   ));
 }

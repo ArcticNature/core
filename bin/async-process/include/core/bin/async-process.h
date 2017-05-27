@@ -36,6 +36,9 @@ namespace bin {
     void registerDefaultSourceManager();
 
    public:
+    //! Configures an initial (non-functional) cluster.
+    void configureInitialCluster();
+
     //! Runs the event loop for the process.
     void run();
   };

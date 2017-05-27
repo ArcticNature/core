@@ -3,7 +3,7 @@
 
 #include "core/bin/daemon.h"
 
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 #include "core/context/daemon.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
@@ -19,7 +19,7 @@
 
 using sf::core::bin::Daemon;
 
-using sf::core::cluster::Node;
+using sf::core::cluster::Cluster;
 using sf::core::context::Context;
 using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
@@ -58,10 +58,13 @@ int main(int argc, char** argv) {
     CLIParser::miscOptions(parser);
     parser->parse(&argc, &argv);
     parser->handleVersionOption("snow-fox");
-    Static::options()->setString("process-name", Node::me()->name());
 
     // Run daemon.
     Daemon daemon;
+    daemon.configureInitialCluster();
+    Static::options()->setString(
+        "process-name", Cluster::Instance()->myself()->name()
+    );
     daemon.initialise();
     daemon.run();
 
@@ -80,6 +83,7 @@ int main(int argc, char** argv) {
 
     Process::Exit();
     sf::core::context::Daemon::destroy();
+    Cluster::Destroy();
     Context::Destroy();
     Logger::destroyFallback();
     Static::destroy();
@@ -89,6 +93,7 @@ int main(int argc, char** argv) {
   int exit_code = sf::core::context::Daemon::instance()->exitCode();
   Process::Exit();
   sf::core::context::Daemon::destroy();
+  Cluster::Destroy();
   Context::Destroy();
   Logger::destroyFallback();
   Static::destroy();

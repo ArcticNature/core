@@ -1,0 +1,15 @@
+{
+  "name": "core.testing.cluster",
+  "type": "c++",
+
+  "deps": [
+    "core.cluster.interface",
+    "core.testing.metadata",
+    "core.testing.static"
+  ],
+
+  "targets": {
+    "test": { "type": "lib" }
+  }
+}
+

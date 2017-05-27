@@ -2,70 +2,56 @@
 #include <gtest/gtest.h>
 
 #include "core/cluster/node.h"
-#include "core/context/static.h"
 #include "core/model/repository.h"
 
 using sf::core::cluster::Node;
-using sf::core::cluster::NodeStatusCode;
-using sf::core::context::Static;
+using sf::core::cluster::NodeRaw;
+using sf::core::cluster::NodeVersion;
 
-using sf::core::model::CLIParser;
 using sf::core::model::RepositoryVersionId;
+using sf::core::utility::StatusLight;
+using sf::core::utility::SubsystemStatus;
 
 
-class NullParser : public CLIParser {
- protected:
-  void parseLogic(int* argc, char*** argv) {
-    return;
-  }
-};
-
-
-class NodeTest : public ::testing::Test {
- public:
-  NodeTest() {
-    Static::parser(new NullParser());
-  };
-
-  ~NodeTest() {
-    Node::reset();
-    Static::destroy();
-  };
-};
-
-
-TEST_F(NodeTest, DefaultName) {
-  ASSERT_EQ("node", Node::me()->name());
+TEST(Node, Name) {
+  NodeVersion version;
+  Node node = std::make_shared<NodeRaw>("node", version);
+  ASSERT_EQ("node", node->name());
 }
 
-TEST_F(NodeTest, NameFromCli) {
-  Static::parser()->setString("node-name", "test-node");
-  ASSERT_EQ("test-node", Node::me()->name());
+TEST(Node, Status) {
+  NodeVersion version;
+  Node node = std::make_shared<NodeRaw>("node", version);
+  SubsystemStatus* status = node->status();
+
+  ASSERT_EQ(StatusLight::UNKOWN, status->colour());
+  ASSERT_EQ("System initialising", status->message());
 }
 
-TEST_F(NodeTest, SingletonMe) {
-  Node* node1 = Node::me();
-  Node* node2 = Node::me();
-  ASSERT_EQ(node1, node2);
+TEST(Node, DefaultConfigVersion) {
+  NodeVersion version;
+  Node node = std::make_shared<NodeRaw>("node", version);
+  RepositoryVersionId config = node->configVersion();
+  ASSERT_EQ("<system-starting>", config.symbolic());
+  ASSERT_EQ("", config.effective());
 }
 
-TEST_F(NodeTest, Status) {
-  ASSERT_EQ(
-      NodeStatusCode::UNKOWN,
-      Node::me()->status()->reason().code()
-  );
+TEST(Node, UpdateConfigVersion) {
+  NodeVersion version;
+  Node node = std::make_shared<NodeRaw>("node", version);
+  RepositoryVersionId config("a", "b");
+  node->configVersion(config);
+  config = node->configVersion();
+  ASSERT_EQ("b", config.symbolic());
+  ASSERT_EQ("a", config.effective());
 }
 
-TEST_F(NodeTest, DefaultConfigVersion) {
-  RepositoryVersionId version = Node::me()->configVersion();
-  ASSERT_EQ("<system-starting>", version.symbolic());
-  ASSERT_EQ("", version.effective());
-}
+TEST(Node, Version) {
+  NodeVersion version{"a", "b", "c"};
+  Node node = std::make_shared<NodeRaw>("node", version);
 
-TEST_F(NodeTest, UpdateConfigVersion) {
-  RepositoryVersionId version("a", "b");
-  Node::me()->configVersion(version);
-  version = Node::me()->configVersion();
-  ASSERT_EQ("b", version.symbolic());
-  ASSERT_EQ("a", version.effective());
+  NodeVersion actual = node->version();
+  ASSERT_EQ(version.commit, actual.commit);
+  ASSERT_EQ(version.taint, actual.taint);
+  ASSERT_EQ(version.version, actual.version);
 }

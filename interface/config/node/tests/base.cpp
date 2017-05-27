@@ -14,9 +14,10 @@
 #include "core/model/event.h"
 #include "core/model/repository.h"
 
-#include "core/posix/user.h"
 #include "core/utility/lua.h"
 #include "core/utility/lua/table.h"
+
+#include "core/testing/cluster.h"
 
 #include "core/event/testing.h"
 #include "ext/repository/git.h"
@@ -38,7 +39,6 @@ using sf::core::model::EventSourceRef;
 using sf::core::model::LoopManagerRef;
 using sf::core::model::RepositoryRef;
 
-using sf::core::posix::User;
 using sf::core::utility::Lua;
 using sf::core::utility::LuaTable;
 
@@ -49,6 +49,8 @@ using sf::core::test::NodeConfigLoaderTest;
 using sf::core::test::NodeConfigIntentsOrderTest;
 using sf::core::test::TestIntentLoader;
 using sf::core::test::TestLoader;
+
+using sf::core::testing::ClusterTest;
 
 using sf::core::event::TestEpollManager;
 using sf::ext::repository::GitRepo;
@@ -325,9 +327,10 @@ std::vector<NodeConfigIntentRef> TestIntentLoader::getMocks() {
 }
 
 
-NodeConfigEventsFrom::NodeConfigEventsFrom() {
+NodeConfigEventsFrom::NodeConfigEventsFrom() : ClusterTest() {
   git_libgit2_init();
-  Static::parser(new TestParser());
+  Static::parser()->setString("repo-type", "test");
+  Static::parser()->setString("repo-path", "../config-example");
   Static::repository(RepositoryRef(new GitRepo("config-example/")));
   this->loader = std::shared_ptr<TestIntentLoader>(
       new TestIntentLoader()
@@ -335,15 +338,15 @@ NodeConfigEventsFrom::NodeConfigEventsFrom() {
 }
 
 NodeConfigEventsFrom::~NodeConfigEventsFrom() {
-  this->loader = std::shared_ptr<TestIntentLoader>();
-  Static::destroy();
+  this->loader.reset();
   git_libgit2_shutdown();
 }
 
 
-NodeConfigLoaderTest::NodeConfigLoaderTest() {
+NodeConfigLoaderTest::NodeConfigLoaderTest() : ClusterTest() {
   git_libgit2_init();
-  Static::parser(new TestParser());
+  Static::parser()->setString("repo-type", "test");
+  Static::parser()->setString("repo-path", "../config-example");
   Static::repository(RepositoryRef(new GitRepo("config-example/")));
   this->loader = std::shared_ptr<TestLoader>(
       new TestLoader("refs/heads/test-fixture")
@@ -354,16 +357,15 @@ NodeConfigLoaderTest::NodeConfigLoaderTest() {
 }
 
 NodeConfigLoaderTest::~NodeConfigLoaderTest() {
-  this->loader = std::shared_ptr<TestLoader>();
-  Static::destroy();
+  this->loader.reset();
   git_libgit2_shutdown();
 }
 
 
-NodeConfigIntentTest::NodeConfigIntentTest() {
+NodeConfigIntentTest::NodeConfigIntentTest() : ClusterTest() {
   git_libgit2_init();
-  Static::initialise(new User());
-  Static::parser(new TestParser());
+  Static::parser()->setString("repo-type", "test");
+  Static::parser()->setString("repo-path", "../config-example");
   Static::repository(RepositoryRef(new GitRepo("config-example/")));
 
   LoopManagerRef manager(new TestEpollManager());
@@ -378,7 +380,6 @@ NodeConfigIntentTest::NodeConfigIntentTest() {
 NodeConfigIntentTest::~NodeConfigIntentTest() {
   this->loader.reset();
   Context::Destroy();
-  Static::destroy();
   git_libgit2_shutdown();
 }
 

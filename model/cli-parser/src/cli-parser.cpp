@@ -23,9 +23,7 @@ using sf::core::model::cli::StringOption;
 
 
 void CLIParser::clusterOptions(CLIParser* parser) {
-  parser->addString(
-      "node-name", "unique name of the node", "node"
-  );
+  parser->addString("node-name", "unique name of the node", "<not-set>");
 }
 
 
@@ -259,13 +257,15 @@ bool StringOption::_validate() {
     this->parser->getString(this->_name);
     return true;
   } catch(VariableNotFound& ex) {
-    return false;
+    // TODO(stefano): properly support optional strings.
+    return this->_default == "<not-set>" && this->set_default;
   }
 }
 
 void StringOption::setDefault() {
   CLIOption::setDefault();
-  if (this->set_default) {
+  if (this->set_default && this->_default != "<not-set>") {
+    // TODO(stefano): properly support optional strings.
     this->parser->setString(this->_name, this->_default);
   }
 }

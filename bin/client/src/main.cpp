@@ -3,7 +3,7 @@
 
 #include "core/bin/client.h"
 
-#include "core/cluster/node.h"
+#include "core/cluster/cluster.h"
 #include "core/context/client.h"
 #include "core/context/context.h"
 #include "core/context/static.h"
@@ -21,7 +21,7 @@
 
 using sf::core::bin::Client;
 
-using sf::core::cluster::Node;
+using sf::core::cluster::Cluster;
 using sf::core::context::Context;
 using sf::core::context::ProxyLogger;
 using sf::core::context::Static;
@@ -60,10 +60,13 @@ int main(int argc, char** argv) {
     CLIParser::miscOptions(parser);
     parser->parse(&argc, &argv);
     parser->handleVersionOption("snow-fox-client");
-    Static::options()->setString("process-name", Node::me()->name());
 
     // Run client.
     Client client;
+    client.configureInitialCluster();
+    Static::options()->setString(
+        "process-name", Cluster::Instance()->myself()->name()
+    );
     client.initialise();
     client.run();
 
@@ -83,6 +86,7 @@ int main(int argc, char** argv) {
     Process::Exit();
     sf::core::context::Client::destroy();
     ReadlineEventSource::destroy();
+    Cluster::Destroy();
     Context::Destroy();
     Logger::destroyFallback();
     Static::destroy();
@@ -92,6 +96,7 @@ int main(int argc, char** argv) {
   Process::Exit();
   sf::core::context::Client::destroy();
   ReadlineEventSource::destroy();
+  Cluster::Destroy();
   Context::Destroy();
   Logger::destroyFallback();
   Static::destroy();

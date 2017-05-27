@@ -179,6 +179,15 @@ char* Posix::strncpy(char* dest, const char* src, size_t len) {
 }
 
 
+// Network.
+int Posix::gethostname(char* name, size_t len) {
+  CHECK_ZERO_ERRNO(
+      ::gethostname, "Unable to lookup hostname:", name, len
+  );
+  return 0;
+}
+
+
 // Others.
 unsigned int Posix::sleep(unsigned int seconds) {
   return ::sleep(seconds);

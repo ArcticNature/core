@@ -1,0 +1,14 @@
+{
+  "name": "core.testing.static",
+  "type": "c++",
+
+  "deps": [
+    "core.context.static",
+    "core.interface.posix",
+    "core.model.cli-parser"
+  ],
+
+  "targets": {
+    "test": { "type": "lib" }
+  }
+}
