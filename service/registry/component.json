@@ -1,0 +1,14 @@
+{
+  "name": "core.service.registry",
+  "type": "c++",
+
+  "deps": [
+    "core.service.base"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}

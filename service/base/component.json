@@ -1,0 +1,17 @@
+{
+  "name": "core.service.base",
+  "type": "c++",
+
+  "deps": [
+    "core.exceptions",
+
+    "dependencies.json",
+    "dependencies.poolqueue"
+  ],
+
+  "targets": {
+    "debug":   { "type": "lib" },
+    "release": { "type": "lib" },
+    "test":    { "type": "lib" }
+  }
+}
