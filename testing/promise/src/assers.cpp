@@ -8,7 +8,7 @@
 using poolqueue::Promise;
 
 
-void ASSERT_PROMISE_NO_THROW(Promise promise) {
+void EXPECT_PROMISE_NO_THROW(Promise promise) {
   promise.except([](const std::exception_ptr& exception) {
     try {
       std::rethrow_exception(exception);
@@ -17,4 +17,9 @@ void ASSERT_PROMISE_NO_THROW(Promise promise) {
     }
     return nullptr;
   });
+}
+
+void EXPECT_PROMISE_RESOLVED(Promise promise) {
+  EXPECT_TRUE(promise.settled());
+  EXPECT_PROMISE_NO_THROW(promise);
 }

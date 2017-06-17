@@ -4,6 +4,7 @@
 
   "deps": [
     "core.exceptions",
+    "dependencies.json",
     "dependencies.lua"
   ],
 

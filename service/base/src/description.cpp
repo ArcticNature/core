@@ -94,6 +94,11 @@ std::string ServiceDescription::group() const {
   return this->group_;
 }
 
+uint32_t ServiceDescription::port(std::string name) const {
+  // TODO(stefano): throw if the port is not set.
+  return this->ports_.at(name);
+}
+
 std::map<std::string, uint32_t> ServiceDescription::ports() const {
   return this->ports_;
 }

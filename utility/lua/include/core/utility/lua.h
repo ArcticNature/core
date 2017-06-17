@@ -78,6 +78,9 @@ namespace utility {
     //! Returns a proxy to manipulate the stack.
     LuaStack* stack();
 
+    //! Returns the human name of the given type ID.
+    std::string typeName(int type);
+
    public:
     //! Returns a pointer to the Lua wrapping the given state.
     static Lua* fetchFrom(lua_State* state);
@@ -97,6 +100,12 @@ namespace utility {
 
     //! Checks that the argument is a boolean and returns it.
     bool boolean(int number);
+
+    //! Checks the type of the numbered argument.
+    void checkType(int number, int type);
+
+    //! Pushes the numbered argument on top of the stack.
+    void push(int number);
 
     //! Returns a reference to the given argument.
     lua_Integer reference(int number);
@@ -218,12 +227,18 @@ namespace utility {
       if (this->state->stack()->type(full_idx) != LUA_TLIGHTUSERDATA) {
         throw sf::core::exception::LuaTypeError(
             "lightuserdata",
-            lua_typename(state, lua_type(state, idx))
+            lua_typename(state, lua_type(state, full_idx))
         );
       }
       void* pointer = lua_touserdata(state, full_idx);
       return reinterpret_cast<type*>(pointer);
     }
+
+    //! Pushes an upvalue onto the stack.
+    void push(int idx);
+
+    //! Returns a string stored in an upvalue.
+    std::string toString(int idx);
   };
 
 }  // namespace utility

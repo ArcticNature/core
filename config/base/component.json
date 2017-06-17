@@ -1,0 +1,22 @@
+{
+  "name": "core.config.base",
+  "type": "c++",
+
+  "deps": [
+    "dependencies.poolqueue",
+    "core.hooks.base",
+    "core.utility.lua"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test": {
+      "deps": [
+        "core.testing.hooks",
+        "core.testing.promise"
+      ],
+      "type": "lib"
+    }
+  }
+}

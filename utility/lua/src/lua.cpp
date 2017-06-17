@@ -127,6 +127,10 @@ LuaStack* Lua::stack() {
   return this->_stack.get();
 }
 
+std::string Lua::typeName(int type) {
+  return lua_typename(this->state.get(), type);
+}
+
 
 LuaArguments::LuaArguments(Lua* state) {
   this->state = state;
@@ -139,6 +143,15 @@ void LuaArguments::any(int number) {
 bool LuaArguments::boolean(int number) {
   luaL_checktype(this->state->state.get(), number, LUA_TBOOLEAN);
   return lua_toboolean(this->state->state.get(), number);
+}
+
+void LuaArguments::checkType(int number, int type) {
+  luaL_checktype(this->state->state.get(), number, type);
+}
+
+void LuaArguments::push(int number) {
+  auto state = this->state->state.get();
+  this->state->stack()->duplicate(number);
 }
 
 lua_Integer LuaArguments::reference(int number) {
@@ -353,4 +366,14 @@ LuaUpvalues LuaStack::upvalues() {
 
 LuaUpvalues::LuaUpvalues(Lua* state) {
   this->state = state;
+}
+
+void LuaUpvalues::push(int idx) {
+  int full_idx = lua_upvalueindex(idx);
+  this->state->stack()->duplicate(full_idx);
+}
+
+std::string LuaUpvalues::toString(int idx) {
+  int full_idx = lua_upvalueindex(idx);
+  return this->state->stack()->toString(full_idx);
 }

@@ -1,0 +1,22 @@
+{
+  "name": "core.config.service",
+  "type": "c++",
+
+  "deps": [
+    "core.config.base",
+    "core.service.base"
+  ],
+
+  "targets": {
+    "debug":   {"type": "lib"},
+    "release": {"type": "lib"},
+    "test": {
+      "deps": [
+        "core.testing.hooks",
+        "core.testing.promise"
+      ],
+      "type": "lib"
+    }
+  }
+}
+
