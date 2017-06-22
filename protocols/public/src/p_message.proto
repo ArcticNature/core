@@ -7,6 +7,7 @@ message Message {
     NodeInfoRequest  = 2;
     NodeInfoResponse = 3;
     Introduce = 4;
+    ServiceStart = 5;
   }
 
   required Code   code = 1;
@@ -18,6 +19,7 @@ message Message {
    *  - 50: NodeInfoRequest
    *  - 51: NodeInfoResponse
    *  - 52: ClientIntroduce
+   *  - 53: ServiceStart
    */
 }
 

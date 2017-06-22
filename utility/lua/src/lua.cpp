@@ -159,6 +159,11 @@ lua_Integer LuaArguments::reference(int number) {
   return this->state->registry()->referenceTop();
 }
 
+std::string LuaArguments::string(int number) {
+  luaL_checktype(this->state->state.get(), number, LUA_TSTRING);
+  return lua_tostring(this->state->state.get(), number);
+}
+
 LuaTable LuaArguments::table(int number) {
   Lua* lua = this->state;
   luaL_checktype(lua->state.get(), number, LUA_TTABLE);

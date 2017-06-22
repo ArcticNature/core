@@ -1,0 +1,13 @@
+import "p_message.proto";
+package sf.core.protocol.public_api;
+
+
+message ServiceStart {
+  required string service_id = 1;
+  required string version = 2;
+
+  extend Message {
+    optional ServiceStart msg = 53;
+  }
+}
+

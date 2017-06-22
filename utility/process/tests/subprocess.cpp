@@ -186,7 +186,7 @@ TEST_F(RealSubProcessTest, RedirectStdError) {
   std::ifstream file(err_path);
   std::string line;
   std::getline(file, line);
-  ASSERT_EQ("cat: not a real file: No such file or directory", line);
+  ASSERT_EQ("cat: 'not a real file': No such file or directory", line);
 }
 
 TEST_F(RealSubProcessTest, RedirectStdIn) {

@@ -14,6 +14,8 @@ using sf::core::bin::ClientLuaBinding;
 using sf::core::bin::ClientLuaType;
 using sf::core::bin::NodeLuaBinding;
 using sf::core::bin::NodeLuaType;
+using sf::core::bin::ServiceLuaBinding;
+using sf::core::bin::ServiceLuaType;
 
 using sf::core::context::Client;
 using sf::core::event::ReadlineEventSource;
@@ -60,6 +62,13 @@ class ClientLuaInitHandler : public BaseLifecycleHandler {
     client_type.initType(lua);
     client_type.bind(lua, client);
     lua.globals()->fromStack("client");
+
+    // Register global `service` object.
+    ServiceLuaBinding* service = new ServiceLuaBinding();
+    ServiceLuaType service_type;
+    service_type.initType(lua);
+    service_type.bind(lua, service);
+    lua.globals()->fromStack("service");
 
     // Register global `node` object.
     NodeLuaBinding* node = new NodeLuaBinding();

@@ -64,6 +64,32 @@ namespace bin {
     NodeLuaType();
   };
 
+
+  //! Service API for LUA environment.
+  class ServiceLuaBinding {
+   public:
+    void start(std::string service, std::string id);
+  };
+
+  //! Lua type of the service object.
+  class ServiceLuaType : public sf::core::utility::LuaTypeProxy {
+   protected:
+    static const struct luaL_Reg lib[];
+    static void deleteInstance(void* instance);
+
+    static int start(lua_State* state);
+
+   protected:
+    explicit ServiceLuaType(lua_State* state);
+
+    sf::core::utility::lua_proxy_delete deleter() const;
+    const luaL_Reg* library() const;
+    std::string typeId() const;
+
+   public:
+    ServiceLuaType();
+  };
+
 }  // namespace bin
 }  // namespace core
 }  // namespace sf

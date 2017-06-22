@@ -110,6 +110,9 @@ namespace utility {
     //! Returns a reference to the given argument.
     lua_Integer reference(int number);
 
+    //! Checks that the argument is a string and returns it.
+    std::string string(int number);
+
     //! Checks that the argument is a table and returns it.
     LuaTable table(int number);
   };
