@@ -163,6 +163,9 @@ namespace exception {
   //! Thrown when an impossible location in the code is reached.
   NO_ARG_EXCEPTION(SfException, ImpossiblePath);
 
+  //! Thrown when the user passes invalid arguments to a function/method.
+  MSG_EXCEPTION(SfException, InvalidArgument);
+
   //! Thrown by a command line parser when an invalid option is provided.
   MSG_EXCEPTION(SfException, InvalidCommandLine);
 
