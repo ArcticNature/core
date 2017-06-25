@@ -6,6 +6,8 @@
   "deps": [
     "core.bin.async-process",
     "core.cluster.interface",
+    "core.config.service",
+
     "core.context.dynamic",
     "core.context.static",
 

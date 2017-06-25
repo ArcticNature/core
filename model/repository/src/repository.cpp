@@ -59,10 +59,19 @@ std::string RepositoryVersion::findDefinitionFile(
     std::stringstream buffer;
     buffer << container << '/';
     buffer << join(parts, '/', idx);
-    buffer << ".service";
     std::string path = buffer.str();
-    if (this->exists(path)) {
-      return path;
+
+    // Look for lua files.
+    std::string lua_path = path + ".lua";
+    if (this->exists(lua_path)) {
+      return lua_path;
+    }
+
+    // TODO(stefano): Remove support for this extention.
+    // Look for legacy service file.
+    std::string service_path = path + ".service";
+    if (this->exists(service_path)) {
+      return service_path;
     }
   }
   throw ServiceNotFound("Unable to find definition for " + service);

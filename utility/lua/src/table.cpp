@@ -14,6 +14,7 @@
 using nlohmann::json;
 
 using sf::core::exception::LuaTypeError;
+using sf::core::exception::NotImplemented;
 using sf::core::exception::TypeError;
 
 using sf::core::utility::Lua;
@@ -124,9 +125,13 @@ void LuaTable::forEach(std::function<void(int key)> fn) {
     // Assert the stack is safe.
     int new_top = stack->size();
     if (new_top != top) {
-      throw std::runtime_error("TODO");
+      // TODO(stefano): LuaTable::forEach<int> stack check
+      throw NotImplemented("LuaTable::forEach<int> stack check");
     }
   }
+
+  // Pop left over key.
+  stack->remove(-1);
 }
 
 void LuaTable::forEach(std::function<void(std::string key)> fn) {
@@ -155,9 +160,13 @@ void LuaTable::forEach(std::function<void(std::string key)> fn) {
     // Assert the stack is safe.
     int new_top = stack->size();
     if (new_top != top) {
-      throw std::runtime_error("TODO");
+      // TODO(stefano): LuaTable::forEach<string> stack check
+      throw NotImplemented("LuaTable::forEach<string> stack check");
     }
   }
+
+  // Pop left over key.
+  stack->remove(-1);
 }
 
 void LuaTable::fromStack(std::string key, int index) {

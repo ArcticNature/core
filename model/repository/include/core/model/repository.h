@@ -106,6 +106,9 @@ namespace model {
         const std::string service, const std::string prefix = "services"
     );
 
+    //! Expose the contents of a file as string.
+    virtual std::string readFile(const std::string path) = 0;
+
     //! Expose a file as a managed pointer to an input stream.
     virtual IStreamRef streamFile(const std::string path) = 0;
   };

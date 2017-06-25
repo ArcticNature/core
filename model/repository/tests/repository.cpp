@@ -25,7 +25,11 @@ class TestVersion : public RepositoryVersion {
   bool exists(std::string path) {
     return this->FILES.find(path) != this->FILES.end();
   }
-  
+
+  std::string readFile(const std::string path) {
+    return "";
+  }
+
   IStreamRef streamFile(const std::string path) {
     return IStreamRef();
   }
