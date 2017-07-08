@@ -3,6 +3,7 @@ package sf.core.protocol.manager_spawner;
 message Message {
   enum Code {
     Ack = 1;
+    StartProcess = 2;
   }
 
   required Code   code = 1;
@@ -11,6 +12,6 @@ message Message {
 
   /*
    * Used extentions:
-   *  - 50: ?.
+   *  - 50: StartProcess.
    */
 }

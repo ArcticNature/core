@@ -3,6 +3,7 @@
 #define CORE_SERVICE_INSTANCE_H_
 
 
+#include <json.hpp>
 #include <string>
 
 #include "core/service/description.h"
@@ -46,6 +47,15 @@ namespace service {
    public:
     explicit ServiceInstance(ServiceDescription description);
     virtual ~ServiceInstance() = default;
+
+    //! Returns the description of this instance.
+    ServiceDescription description() const;
+
+    //! Returns the globally unique instance ID.
+    std::string globalId() const;
+
+    //! Convert this description to a json object.
+    nlohmann::json jsonify() const;
 
    protected:
     //! Description of the service instance.

@@ -54,6 +54,7 @@ void Manager::connectSpawner() {
   std::pair<std::string, std::string> spawner =
     ManagerToSpawner::Connect(spawner_path);
   Static::options()->setString("spawner-source-id", spawner.first);
+  Static::options()->setString("spawner-drain-id", spawner.second);
 }
 
 void Manager::defaultSources() {

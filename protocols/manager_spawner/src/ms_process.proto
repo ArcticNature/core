@@ -1,0 +1,20 @@
+import "ms_message.proto";
+package sf.core.protocol.manager_spawner;
+
+
+message StartProcess {
+  message EnvItem {
+    optional string name = 1;
+    optional string value = 2;
+  }
+
+  repeated EnvItem environment = 1;
+  optional string group_name = 2;
+  optional string user_name = 3;
+  optional string work_dir = 4;
+  repeated string command = 5;
+
+  extend Message {
+    optional StartProcess msg = 50;
+  }
+}

@@ -53,6 +53,8 @@ class ManagerFdSource : public FdSource {
     if (!this->checkFD()) {
       return EventRef();
     }
+
+    // TODO(stefano): Parse message from manager.
     return EventRef();
   }
 };

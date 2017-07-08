@@ -28,7 +28,8 @@ using sf::core::exception::ContextUninitialised;
 using sf::core::exception::SfException;
 
 using sf::core::interface::MetaDataStore;
-using sf::core::interface::NoMetadataStore;
+using sf::core::interface::MemoryMetadataStore;
+//using sf::core::interface::NoMetadataStore;
 
 using sf::core::model::EventRef;
 using sf::core::model::LogInfo;
@@ -41,8 +42,11 @@ static ProxyLogger logger("core.bin.async-process");
 
 
 void AsyncPorcess::configureInitialCluster() {
+  // TODO(stefano): This is an in-memory store for speed.
+  // TODO(stefano): After the configuration system swap with NoOp.
   Cluster cluster = std::make_shared<ClusterRaw>(
-    std::make_shared<NoMetadataStore>()
+    std::make_shared<MemoryMetadataStore>()
+    //std::make_shared<NoMetadataStore>()
   );
   Cluster::Instance(cluster);
 }

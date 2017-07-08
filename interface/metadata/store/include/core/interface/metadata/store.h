@@ -83,12 +83,33 @@ namespace interface {
   typedef std::shared_ptr<MetaDataStore> MetaDataStoreRef;
 
 
+  //! Concrete in-memory only metadata store.
+  /*!
+   * Intended for development and testing ONLY.
+   * TTL is not supported.
+   */
+  class MemoryMetadataStore : public MetaDataStore {
+   public:
+    poolqueue::Promise erase(std::string key);
+    poolqueue::Promise get(std::string key);
+    poolqueue::Promise set(std::string key, nlohmann::json value);
+    poolqueue::Promise set(
+        std::string key, nlohmann::json value,
+        std::chrono::duration<int> ttl
+    );
+
+   protected:
+    std::map<std::string, nlohmann::json> store_;
+  };
+
+
   //! Concrete metadata store that rejects all requests.
   /*!
    * Intended for the context to use when a valid store is not provided.
    * Helps catching configuration mistakes and initialisation problems.
    */
   class NoMetadataStore : public MetaDataStore {
+   public:
     poolqueue::Promise erase(std::string key);
     poolqueue::Promise get(std::string key);
     poolqueue::Promise set(std::string key, nlohmann::json value);

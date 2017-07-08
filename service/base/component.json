@@ -4,6 +4,7 @@
 
   "deps": [
     "core.exceptions",
+    "core.utility.random",
 
     "dependencies.json",
     "dependencies.poolqueue"

@@ -9,7 +9,41 @@ using nlohmann::json;
 using poolqueue::Promise;
 
 using sf::core::exception::NotImplemented;
+using sf::core::interface::MemoryMetadataStore;
 using sf::core::interface::NoMetadataStore;
+
+
+Promise MemoryMetadataStore::erase(std::string key) {
+  return Promise().settle().then([&, this]() {
+    this->store_.erase(key);
+    return nullptr;
+  });
+}
+
+Promise MemoryMetadataStore::get(std::string key) {
+  return Promise().settle().then([&, this]() {
+    // TODO(stefano): throw ItemNotFound if missing.
+    return this->store_.at(key);
+  });
+}
+
+Promise MemoryMetadataStore::set(std::string key, json value) {
+  return Promise().settle().then([&, this]() {
+    this->store_[key] = value;
+    return nullptr;
+  });
+}
+
+Promise MemoryMetadataStore::set(
+    std::string key, json value, std::chrono::duration<int> ttl
+) {
+  return Promise().settle().then([]() {
+    throw NotImplemented(
+        "MemoryMetadataStore::set with TTL is not implemented"
+    );
+    return nullptr;
+  });
+}
 
 
 Promise NoMetadataStore::erase(std::string key) {
